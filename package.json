@@ -10,7 +10,8 @@
     "typecheck": "tsc",
     "test": "vitest run",
     "record": "tsx scripts/record-payloads.ts",
-    "probe:typesafe": "tsx scripts/probe-typesafe.ts"
+    "probe:typesafe": "tsx scripts/probe-typesafe.ts",
+    "play": "tsx scripts/play.ts"
   },
   "dependencies": {
     "@typesafe-ai/sdk": "0.7.0",
