@@ -25,7 +25,7 @@ const input: FallbackInput = {
 }
 
 const signal = new AbortController().signal
-const answer = '{"choice":0,"confidence":0.9}'
+const answer = '{"choice":1,"confidence":0.9}'
 
 function claude(message: Partial<Anthropic.Beta.BetaMessage>) {
   const calls: { params: Anthropic.Beta.MessageCreateParamsNonStreaming; signal?: AbortSignal }[] =
@@ -91,7 +91,7 @@ describe("Claude fallback", () => {
   it("joins text split by citations", async () => {
     const { provider } = claude({
       content: [
-        { type: "text", text: '{"choice":1,', citations: null },
+        { type: "text", text: '{"choice":2,', citations: null },
         { type: "text", text: '"confidence":0.6}', citations: null },
       ],
     })

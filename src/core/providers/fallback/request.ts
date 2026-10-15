@@ -39,8 +39,8 @@ export function buildRequest(input: FallbackInput, webSearch: boolean): Fallback
   if (q.choices.length > 0 && q.type !== "slider" && q.type !== "open_ended") {
     lines.push("Options:")
     q.choices.forEach((c, i) => {
-      const picture = input.optionImages[i] ? `(picture ${i}, see below)` : ""
-      lines.push(`${i}: ${[c.text, picture].filter(Boolean).join(" ") || "(no text)"}`)
+      const picture = input.optionImages[i] ? `(picture ${i + 1}, see below)` : ""
+      lines.push(`${i + 1}: ${[c.text, picture].filter(Boolean).join(" ") || "(no text)"}`)
     })
   }
   if (input.jev) {
@@ -58,7 +58,7 @@ export function buildRequest(input: FallbackInput, webSearch: boolean): Fallback
     )
   }
   input.optionImages.forEach((jpeg, i) => {
-    if (jpeg) parts.push({ type: "text", text: `Picture ${i}:` }, { type: "image", jpeg })
+    if (jpeg) parts.push({ type: "text", text: `Picture ${i + 1}:` }, { type: "image", jpeg })
   })
   return { system: webSearch ? `${SYSTEM}\n${SEARCH}` : SYSTEM, parts, schema: shape.schema }
 }
@@ -66,29 +66,30 @@ export function buildRequest(input: FallbackInput, webSearch: boolean): Fallback
 export function parseAnswer(q: Question, raw: string): ParsedAnswer {
   const data = extractJson(raw)
   const n = q.choices.length
-  const isIndex = (v: unknown): v is number =>
-    typeof v === "number" && Number.isInteger(v) && v >= 0 && v < n
+  // The prompt numbers options from 1, like the questions.
+  const isOption = (v: unknown): v is number =>
+    typeof v === "number" && Number.isInteger(v) && v >= 1 && v <= n
   const c = data.confidence
   const confidence =
     typeof c === "number" && Number.isFinite(c) ? Math.min(1, Math.max(0, c)) : null
   switch (q.type) {
     case "quiz":
     case "true_false":
-      if (!isIndex(data.choice)) throw new Error("Fallback picked no valid option")
-      return { answer: { kind: "choice", index: data.choice }, confidence }
+      if (!isOption(data.choice)) throw new Error("Fallback picked no valid option")
+      return { answer: { kind: "choice", index: data.choice - 1 }, confidence }
     case "multiple_select_quiz": {
       const list: unknown[] = Array.isArray(data.choices) ? data.choices : []
-      if (list.length === 0 || !list.every(isIndex))
+      if (list.length === 0 || !list.every(isOption))
         throw new Error("Fallback picked no valid options")
-      const indices = [...new Set(list as number[])].sort((a, b) => a - b)
+      const indices = [...new Set(list as number[])].map((v) => v - 1).sort((a, b) => a - b)
       return { answer: { kind: "choices", indices }, confidence }
     }
     case "jumble": {
       const order: unknown[] = Array.isArray(data.order) ? data.order : []
-      if (order.length !== n || !order.every(isIndex) || new Set(order).size !== n) {
+      if (order.length !== n || !order.every(isOption) || new Set(order).size !== n) {
         throw new Error("Fallback order is not a full permutation")
       }
-      return { answer: { kind: "order", order: order as number[] }, confidence }
+      return { answer: { kind: "order", order: (order as number[]).map((v) => v - 1) }, confidence }
     }
     case "slider": {
       const value = data.value

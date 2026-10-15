@@ -36,10 +36,10 @@ describe("buildRequest", () => {
       [
         "Question 3: Hauptstadt der Schweiz?",
         "Options:",
-        "0: Zürich",
-        "1: Bern",
-        "2: Genf",
-        "3: Basel",
+        "1: Zürich",
+        "2: Bern",
+        "3: Genf",
+        "4: Basel",
         'Exactly one option is correct. Put its number in "choice".',
       ].join("\n"),
     )
@@ -81,12 +81,12 @@ describe("buildRequest", () => {
       false,
     )
     expect(textOf(input({ question: q, optionImages: [null, null, c] }))).toContain(
-      "0: (no text)\n1: (no text)\n2: (picture 2, see below)",
+      "1: (no text)\n2: (no text)\n3: (picture 3, see below)",
     )
     expect(r.parts.slice(1)).toEqual([
       { type: "text", text: "Question image:" },
       { type: "image", jpeg: a },
-      { type: "text", text: "Picture 2:" },
+      { type: "text", text: "Picture 3:" },
       { type: "image", jpeg: c },
     ])
   })
@@ -119,24 +119,25 @@ describe("buildRequest", () => {
 
 describe("parseAnswer", () => {
   it("reads plain JSON and JSON wrapped in text", () => {
-    expect(parseAnswer(question(), '{"choice":1,"confidence":0.8}')).toEqual({
+    expect(parseAnswer(question(), '{"choice":2,"confidence":0.8}')).toEqual({
       answer: { kind: "choice", index: 1 },
       confidence: 0.8,
     })
     expect(
-      parseAnswer(question(), 'Sure!\n```json\n{"choice": 2, "confidence": 1.4}\n```').confidence,
+      parseAnswer(question(), 'Sure!\n```json\n{"choice": 3, "confidence": 1.4}\n```').confidence,
     ).toBe(1)
   })
 
   it("rejects answers that don't fit the question", () => {
-    expect(() => parseAnswer(question(), '{"choice":4,"confidence":0.9}')).toThrow()
+    expect(() => parseAnswer(question(), '{"choice":5,"confidence":0.9}')).toThrow()
+    expect(() => parseAnswer(question(), '{"choice":0,"confidence":0.9}')).toThrow()
     expect(() => parseAnswer(question(), '{"choice":"1","confidence":0.9}')).toThrow()
     expect(() => parseAnswer(question(), "no idea")).toThrow()
     expect(() =>
-      parseAnswer(question({ type: "jumble" }), '{"order":[0,0,1,2],"confidence":1}'),
+      parseAnswer(question({ type: "jumble" }), '{"order":[1,1,2,3],"confidence":1}'),
     ).toThrow()
     expect(() =>
-      parseAnswer(question({ type: "jumble" }), '{"order":[0,1,2],"confidence":1}'),
+      parseAnswer(question({ type: "jumble" }), '{"order":[1,2,3],"confidence":1}'),
     ).toThrow()
     expect(() =>
       parseAnswer(question({ type: "multiple_select_quiz" }), '{"choices":[],"confidence":1}'),
@@ -150,14 +151,14 @@ describe("parseAnswer", () => {
     expect(
       parseAnswer(
         question({ type: "multiple_select_quiz" }),
-        '{"choices":[3,1,3],"confidence":0.5}',
+        '{"choices":[4,2,4],"confidence":0.5}',
       ).answer,
     ).toEqual({
       kind: "choices",
       indices: [1, 3],
     })
     expect(
-      parseAnswer(question({ type: "jumble" }), '{"order":[2,0,3,1],"confidence":null}'),
+      parseAnswer(question({ type: "jumble" }), '{"order":[3,1,4,2],"confidence":null}'),
     ).toEqual({
       answer: { kind: "order", order: [2, 0, 3, 1] },
       confidence: null,
