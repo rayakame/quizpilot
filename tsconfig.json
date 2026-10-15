@@ -11,5 +11,6 @@
     "types": ["node"],
     "noEmit": true
   },
-  "include": ["src", "scripts", "test", "types"]
+  "include": ["src", "scripts", "test", "types", "electron.vite.config.ts"],
+  "exclude": ["src/renderer"]
 }
