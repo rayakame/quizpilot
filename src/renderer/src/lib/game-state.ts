@@ -120,7 +120,8 @@ export function pastRounds(state: GameState): RoundView[] {
 }
 
 export function isOver(state: GameState): boolean {
-  return state.bots.length > 0 && state.bots.every((b) => DONE.includes(b.status))
+  const played = state.bots.filter((b) => b.joinError === null)
+  return played.length > 0 && played.every((b) => DONE.includes(b.status))
 }
 
 export function canPause(bot: BotView): boolean {

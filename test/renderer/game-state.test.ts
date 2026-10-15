@@ -133,6 +133,17 @@ describe("isOver", () => {
   })
 })
 
+describe("isOver after a failed join", () => {
+  it("is not over while a bot only failed to join", () => {
+    const state = play(
+      { type: "status", bot: "Anna", status: "joining" },
+      { type: "status", bot: "Anna", status: "disconnected", detail: "Name is already taken" },
+      { type: "joinFailed", bot: "Anna", code: "duplicate_name", message: "Name is already taken" },
+    )
+    expect(isOver(state)).toBe(false)
+  })
+})
+
 describe("choiceRows", () => {
   it("marks our pick, Jev's probabilities and the right answer", () => {
     const state = play(
