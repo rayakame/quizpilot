@@ -42,13 +42,15 @@ export type SessionEvent =
   | { type: "answered"; bot: string; index: number; afterMs: number }
   | { type: "result"; bot: string; result: QuestionResult }
   | { type: "ended"; bot: string; end: QuizEnd }
+  | { type: "gameReset" }
 
 interface Bot {
   name: string
   adapter: KahootAdapterLike
   status: BotStatus
   paused: boolean
-  reconnects: number
+  joined: boolean
+  reconnecting: boolean
   current: number | null
 }
 
@@ -86,6 +88,7 @@ export class GameSession {
       const bot = this.addBot(name)
       try {
         await bot.adapter.join(pin, name)
+        bot.joined = true
         if (bot.status === "joining") this.setStatus(bot, "lobby")
       } catch (err) {
         this.setStatus(bot, "disconnected", err instanceof Error ? err.message : String(err))
@@ -122,7 +125,8 @@ export class GameSession {
       adapter: this.deps.createAdapter(),
       status: "joining",
       paused: false,
-      reconnects: 0,
+      joined: false,
+      reconnecting: false,
       current: null,
     }
     this.bots.push(bot)
@@ -145,6 +149,15 @@ export class GameSession {
     a.on("quizEnded", (end) => {
       this.setStatus(bot, "finished")
       this.emit({ type: "ended", bot: bot.name, end })
+    })
+    a.on("gameReset", () => {
+      if (this.rounds.size > 0 || this.previous.length > 0) {
+        this.rounds.clear()
+        this.previous.length = 0
+        this.emit({ type: "gameReset" })
+      }
+      bot.current = null
+      if (bot.status === "finished") this.setStatus(bot, bot.paused ? "paused" : "lobby")
     })
     a.on("disconnected", (d) => void this.onDisconnect(bot, d))
     return bot
@@ -212,22 +225,27 @@ export class GameSession {
   }
 
   private async onDisconnect(bot: Bot, d: AdapterEvents["disconnected"]): Promise<void> {
-    if (GONE.includes(bot.status)) return
+    // A failed reconnect makes kahoot.js report another lost connection; the running loop owns it.
+    if (bot.reconnecting || GONE.includes(bot.status) || bot.status === "disconnected") return
     if (d.kicked) return this.setStatus(bot, "kicked")
-    const wait = RECONNECT_DELAYS_MS[bot.reconnects]
-    if (!d.retryable || !this.settings.reconnect || wait === undefined) {
+    if (!bot.joined || !d.retryable || !this.settings.reconnect) {
       return this.setStatus(bot, "disconnected", d.reason)
     }
-    bot.reconnects++
-    this.setStatus(bot, "joining", "reconnecting")
-    await sleep(wait)
-    try {
-      await bot.adapter.reconnect()
-      bot.reconnects = 0
-      this.setStatus(bot, bot.paused ? "paused" : "lobby")
-    } catch {
-      await this.onDisconnect(bot, d)
+    bot.reconnecting = true
+    for (const wait of RECONNECT_DELAYS_MS) {
+      this.setStatus(bot, "joining", "reconnecting")
+      await sleep(wait)
+      if (GONE.includes(bot.status)) break
+      try {
+        await bot.adapter.reconnect()
+        bot.reconnecting = false
+        return this.setStatus(bot, bot.paused ? "paused" : "lobby")
+      } catch {
+        continue
+      }
     }
+    bot.reconnecting = false
+    if (!GONE.includes(bot.status)) this.setStatus(bot, "disconnected", d.reason)
   }
 
   private delay(): number {

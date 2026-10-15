@@ -253,6 +253,25 @@ describe("earlier questions as context", () => {
   })
 })
 
+describe("playing again", () => {
+  it("starts fresh after the host resets the game", async () => {
+    const { session, adapters, decide, events } = setup()
+    await session.join("123456", ["Anna"])
+    const a = adapters[0]!
+    a.emit("questionReady", { question: question(0), startsInMs: 0 })
+    await vi.advanceTimersByTimeAsync(300)
+    a.emit("quizEnded", { rank: 1, totalScore: 1000, correctCount: 1, incorrectCount: 0 })
+    a.emit("gameReset", {})
+    expect(statusOf(events, "Anna")?.status).toBe("lobby")
+    a.emit("questionReady", { question: question(0, { title: "Neue Frage" }), startsInMs: 0 })
+    expect(decide).toHaveBeenCalledTimes(2)
+    expect(decide.mock.calls[1]?.[2]).toEqual({ quizContext: null, previous: [] })
+    a.emit("questionStarted", { question: question(0) })
+    await vi.advanceTimersByTimeAsync(300)
+    expect(a.answer).toHaveBeenCalledTimes(1)
+  })
+})
+
 describe("reconnecting", () => {
   it("retries a lost connection after 1, 3 and 9 seconds, then gives up", async () => {
     const { session, adapters, events } = setup()
@@ -268,6 +287,33 @@ describe("reconnecting", () => {
     await vi.advanceTimersByTimeAsync(9000)
     expect(adapters[0]!.reconnect).toHaveBeenCalledTimes(3)
     expect(statusOf(events, "Anna")?.status).toBe("disconnected")
+  })
+
+  it("ignores the disconnect kahoot.js fires when a reconnect attempt fails", async () => {
+    const { session, adapters, events } = setup()
+    await session.join("123456", ["Anna"])
+    const a = adapters[0]!
+    let connected = false
+    a.reconnect.mockImplementationOnce(async () => {
+      a.emit("disconnected", lost)
+      throw new Error("offline")
+    })
+    a.reconnect.mockImplementation(async () => {
+      if (connected) throw new Error("Already connected!")
+      connected = true
+    })
+    a.emit("disconnected", lost)
+    await vi.advanceTimersByTimeAsync(30_000)
+    expect(a.reconnect).toHaveBeenCalledTimes(2)
+    expect(statusOf(events, "Anna")?.status).toBe("lobby")
+  })
+
+  it("does not reconnect a bot whose join failed", async () => {
+    const { session, adapters } = setup()
+    await session.join("123456", ["bad"])
+    adapters[0]!.emit("disconnected", lost)
+    await vi.advanceTimersByTimeAsync(20_000)
+    expect(adapters[0]!.reconnect).not.toHaveBeenCalled()
   })
 
   it("puts the bot back after a successful reconnect", async () => {
