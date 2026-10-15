@@ -16,6 +16,7 @@
     "test": "vitest run",
     "record": "tsx scripts/record-payloads.ts",
     "probe:typesafe": "tsx scripts/probe-typesafe.ts",
+    "probe:fallback": "tsx scripts/probe-fallback.ts",
     "play": "tsx scripts/play.ts"
   },
   "dependencies": {
