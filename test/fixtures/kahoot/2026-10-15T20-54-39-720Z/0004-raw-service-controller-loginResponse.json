@@ -1,0 +1,11 @@
+{
+  "ext": {
+    "timetrack": 1792097680985
+  },
+  "data": {
+    "description": "Duplicate name",
+    "type": "loginResponse",
+    "error": "USER_INPUT"
+  },
+  "channel": "/service/controller"
+}

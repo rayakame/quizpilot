@@ -1,0 +1,22 @@
+{
+  "gameBlockIndex": 7,
+  "totalGameBlockCount": 8,
+  "layout": "TOP_IMAGE",
+  "title": "Hi was geht",
+  "video": {
+    "startTime": 0,
+    "endTime": 0,
+    "service": "youtube",
+    "fullUrl": ""
+  },
+  "media": [],
+  "extensiveMode": true,
+  "type": "content",
+  "reactions": true,
+  "description": "Fortnite undso",
+  "questionRestricted": false,
+  "getReadyTimeAvailable": 0,
+  "getReadyTimeRemaining": 0,
+  "questionIndex": 7,
+  "gameBlockType": "content"
+}

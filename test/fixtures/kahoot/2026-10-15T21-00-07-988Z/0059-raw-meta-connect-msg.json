@@ -1,0 +1,8 @@
+{
+  "ext": {
+    "ack": 24
+  },
+  "channel": "/meta/connect",
+  "id": "30",
+  "successful": true
+}

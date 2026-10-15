@@ -1,0 +1,41 @@
+{
+  "ext": {
+    "timetrack": 1792097361654
+  },
+  "data": {
+    "gameid": "916240",
+    "host": "play.kahoot.it",
+    "id": 8,
+    "type": "message",
+    "content": "{\"rank\":1,\"totalScore\":500,\"reactions\":true,\"pointsData\":{\"totalPointsWithBonuses\":500,\"questionPoints\":500,\"answerStreakPoints\":{\"streakLevel\":1,\"previousStreakLevel\":0},\"lastGameBlockIndex\":4},\"hasAnswer\":true,\"skip\":false,\"correctChoices\":[0,2],\"choice\":[0],\"points\":500,\"isCorrect\":false,\"text\":\"2\",\"type\":\"multiple_select_quiz\"}",
+    "cid": "82809432"
+  },
+  "channel": "/service/player",
+  "contentParsed": {
+    "rank": 1,
+    "totalScore": 500,
+    "reactions": true,
+    "pointsData": {
+      "totalPointsWithBonuses": 500,
+      "questionPoints": 500,
+      "answerStreakPoints": {
+        "streakLevel": 1,
+        "previousStreakLevel": 0
+      },
+      "lastGameBlockIndex": 4
+    },
+    "hasAnswer": true,
+    "skip": false,
+    "correctChoices": [
+      0,
+      2
+    ],
+    "choice": [
+      0
+    ],
+    "points": 500,
+    "isCorrect": false,
+    "text": "2",
+    "type": "multiple_select_quiz"
+  }
+}

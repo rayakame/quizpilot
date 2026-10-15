@@ -1,0 +1,39 @@
+{
+  "ext": {
+    "timetrack": 1792097354062
+  },
+  "data": {
+    "gameid": "916240",
+    "id": 1,
+    "type": "message",
+    "content": "{\"gameBlockIndex\":4,\"totalGameBlockCount\":8,\"extensiveMode\":false,\"type\":\"multiple_select_quiz\",\"timeRemaining\":3068,\"timeAvailable\":5000,\"numberOfAnswersAllowed\":1,\"currentQuestionAnswerCount\":0,\"numberOfChoices\":4,\"questionRestricted\":false,\"getReadyTimeAvailable\":7200,\"getReadyTimeRemaining\":7200,\"nextGameBlockData\":{\"type\":\"jumble\",\"media\":[],\"choices\":[{},{},{},{}],\"pointsMultiplier\":1},\"questionIndex\":4,\"gameBlockType\":\"multiple_select_quiz\"}"
+  },
+  "channel": "/service/player",
+  "contentParsed": {
+    "gameBlockIndex": 4,
+    "totalGameBlockCount": 8,
+    "extensiveMode": false,
+    "type": "multiple_select_quiz",
+    "timeRemaining": 3068,
+    "timeAvailable": 5000,
+    "numberOfAnswersAllowed": 1,
+    "currentQuestionAnswerCount": 0,
+    "numberOfChoices": 4,
+    "questionRestricted": false,
+    "getReadyTimeAvailable": 7200,
+    "getReadyTimeRemaining": 7200,
+    "nextGameBlockData": {
+      "type": "jumble",
+      "media": [],
+      "choices": [
+        {},
+        {},
+        {},
+        {}
+      ],
+      "pointsMultiplier": 1
+    },
+    "questionIndex": 4,
+    "gameBlockType": "multiple_select_quiz"
+  }
+}

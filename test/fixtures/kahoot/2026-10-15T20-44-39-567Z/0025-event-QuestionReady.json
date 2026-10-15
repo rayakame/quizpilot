@@ -1,0 +1,62 @@
+{
+  "gameBlockIndex": 0,
+  "totalGameBlockCount": 8,
+  "layout": "CLASSIC",
+  "title": "Hauptstadt der Schweiz?",
+  "video": {
+    "startTime": 0,
+    "endTime": 0,
+    "service": "youtube",
+    "fullUrl": ""
+  },
+  "media": [],
+  "extensiveMode": true,
+  "type": "quiz",
+  "timeRemaining": 0,
+  "timeAvailable": 20000,
+  "numberOfAnswersAllowed": 1,
+  "currentQuestionAnswerCount": 0,
+  "pointsMultiplier": 1,
+  "numberOfChoices": 4,
+  "choices": [
+    {
+      "answer": "Zürich"
+    },
+    {
+      "answer": "Bern"
+    },
+    {
+      "answer": "Genf"
+    },
+    {
+      "answer": "Basel"
+    }
+  ],
+  "questionRestricted": false,
+  "getReadyTimeAvailable": 5000,
+  "getReadyTimeRemaining": 5000,
+  "nextGameBlockData": {
+    "type": "quiz",
+    "media": [],
+    "imageMetadata": {
+      "width": 2120,
+      "height": 1414,
+      "id": "5acaaf64-b131-4968-a951-afde14c526bf",
+      "altText": "Paris skyline with Eiffel Tower on a sunny day, wide angle view, France",
+      "contentType": "image/jpeg",
+      "origin": "Getty Images",
+      "externalRef": "1492597085",
+      "resources": "Alexander Spatari/Moment/Getty Images"
+    },
+    "choices": [
+      {},
+      {},
+      {},
+      {}
+    ],
+    "pointsMultiplier": 1,
+    "layout": "CLASSIC"
+  },
+  "questionIndex": 0,
+  "gameBlockType": "quiz"
+}

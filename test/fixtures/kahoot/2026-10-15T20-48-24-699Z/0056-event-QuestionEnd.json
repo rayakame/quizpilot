@@ -1,0 +1,29 @@
+{
+  "rank": 2,
+  "totalScore": 0,
+  "reactions": true,
+  "pointsData": {
+    "totalPointsWithBonuses": 0,
+    "questionPoints": 0,
+    "answerStreakPoints": {
+      "streakLevel": 0,
+      "previousStreakLevel": 0
+    },
+    "lastGameBlockIndex": 2
+  },
+  "nemesis": {
+    "name": "Recorder",
+    "isGhost": false,
+    "totalScore": 0
+  },
+  "hasAnswer": true,
+  "skip": false,
+  "choice": 0,
+  "points": 0,
+  "correctChoices": [
+    2
+  ],
+  "text": "",
+  "type": "quiz",
+  "isCorrect": false
+}

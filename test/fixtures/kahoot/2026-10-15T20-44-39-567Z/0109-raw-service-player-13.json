@@ -1,0 +1,42 @@
+{
+  "ext": {
+    "timetrack": 1792097178179
+  },
+  "data": {
+    "gameid": "916240",
+    "host": "play.kahoot.it",
+    "id": 13,
+    "type": "message",
+    "content": "{\"rank\":1,\"revealDelay\":13700,\"reactionsDelay\":13700,\"startTime\":1792097028086,\"quizTitle\":\"test\",\"quizId\":\"00000000-0000-0000-0000-000000000000\",\"hostId\":\"00000000-0000-0000-0000-000000000000\",\"isIslandPodium\":false,\"isOnlyNonPointGameBlockKahoot\":false,\"organisationId\":\"00000000-0000-0000-0000-000000000000\",\"primaryUsage\":\"student\",\"coverMetadata\":{\"width\":2120,\"height\":1414,\"id\":\"5acaaf64-b131-4968-a951-afde14c526bf\",\"altText\":\"Paris skyline with Eiffel Tower on a sunny day, wide angle view, France\",\"contentType\":\"image/jpeg\",\"origin\":\"Getty Images\",\"externalRef\":\"1492597085\",\"resources\":\"Alexander Spatari/Moment/Getty Images\"},\"correctCount\":0,\"incorrectCount\":6,\"totalScore\":500,\"endOfGameCampaign\":\"\",\"reactions\":true}",
+    "cid": "1296057491"
+  },
+  "channel": "/service/player",
+  "contentParsed": {
+    "rank": 1,
+    "revealDelay": 13700,
+    "reactionsDelay": 13700,
+    "startTime": 1792097028086,
+    "quizTitle": "test",
+    "quizId": "00000000-0000-0000-0000-000000000000",
+    "hostId": "00000000-0000-0000-0000-000000000000",
+    "isIslandPodium": false,
+    "isOnlyNonPointGameBlockKahoot": false,
+    "organisationId": "00000000-0000-0000-0000-000000000000",
+    "primaryUsage": "student",
+    "coverMetadata": {
+      "width": 2120,
+      "height": 1414,
+      "id": "5acaaf64-b131-4968-a951-afde14c526bf",
+      "altText": "Paris skyline with Eiffel Tower on a sunny day, wide angle view, France",
+      "contentType": "image/jpeg",
+      "origin": "Getty Images",
+      "externalRef": "1492597085",
+      "resources": "Alexander Spatari/Moment/Getty Images"
+    },
+    "correctCount": 0,
+    "incorrectCount": 6,
+    "totalScore": 500,
+    "endOfGameCampaign": "",
+    "reactions": true
+  }
+}

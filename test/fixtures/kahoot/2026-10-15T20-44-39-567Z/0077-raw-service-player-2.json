@@ -1,0 +1,46 @@
+{
+  "ext": {
+    "timetrack": 1792097155104
+  },
+  "data": {
+    "gameid": "916240",
+    "id": 2,
+    "type": "message",
+    "content": "{\"gameBlockIndex\":4,\"totalGameBlockCount\":8,\"title\":\"Welche sind primzahlen\",\"video\":{\"startTime\":0,\"endTime\":0,\"service\":\"youtube\",\"fullUrl\":\"\"},\"media\":[],\"extensiveMode\":true,\"type\":\"multiple_select_quiz\",\"timeRemaining\":4982,\"timeAvailable\":5000,\"numberOfAnswersAllowed\":1,\"currentQuestionAnswerCount\":0,\"pointsMultiplier\":1,\"numberOfChoices\":4,\"choices\":[{\"answer\":\"2\"},{\"answer\":\"4\"},{\"answer\":\"5\"},{\"answer\":\"9\"}]}"
+  },
+  "channel": "/service/player",
+  "contentParsed": {
+    "gameBlockIndex": 4,
+    "totalGameBlockCount": 8,
+    "title": "Welche sind primzahlen",
+    "video": {
+      "startTime": 0,
+      "endTime": 0,
+      "service": "youtube",
+      "fullUrl": ""
+    },
+    "media": [],
+    "extensiveMode": true,
+    "type": "multiple_select_quiz",
+    "timeRemaining": 4982,
+    "timeAvailable": 5000,
+    "numberOfAnswersAllowed": 1,
+    "currentQuestionAnswerCount": 0,
+    "pointsMultiplier": 1,
+    "numberOfChoices": 4,
+    "choices": [
+      {
+        "answer": "2"
+      },
+      {
+        "answer": "4"
+      },
+      {
+        "answer": "5"
+      },
+      {
+        "answer": "9"
+      }
+    ]
+  }
+}

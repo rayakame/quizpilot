@@ -1,0 +1,10 @@
+{
+  "ext": {
+    "timetrack": 1792098009365
+  },
+  "data": {
+    "type": "status",
+    "status": "ACTIVE"
+  },
+  "channel": "/service/status"
+}

@@ -1,0 +1,27 @@
+{
+  "ext": {
+    "timesync": {
+      "p": 0,
+      "a": -13,
+      "tc": 1792097079795,
+      "ts": 1792097079808
+    },
+    "ack": true
+  },
+  "minimumVersion": "1.0",
+  "clientId": "8t7idawpu4897b7n1apqy28skx475",
+  "supportedConnectionTypes": [
+    "websocket",
+    "long-polling",
+    "callback-polling"
+  ],
+  "advice": {
+    "interval": 0,
+    "timeout": 30000,
+    "reconnect": "retry"
+  },
+  "channel": "/meta/handshake",
+  "id": "1",
+  "version": "1.0",
+  "successful": true
+}

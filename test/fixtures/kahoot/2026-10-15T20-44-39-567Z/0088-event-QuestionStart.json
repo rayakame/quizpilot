@@ -1,0 +1,34 @@
+{
+  "gameBlockIndex": 5,
+  "totalGameBlockCount": 8,
+  "title": "Sortiere nach größe, klein nach groß",
+  "video": {
+    "startTime": 0,
+    "endTime": 0,
+    "service": "youtube",
+    "fullUrl": ""
+  },
+  "media": [],
+  "extensiveMode": true,
+  "type": "jumble",
+  "timeRemaining": 59992,
+  "timeAvailable": 60000,
+  "numberOfAnswersAllowed": 1,
+  "currentQuestionAnswerCount": 0,
+  "pointsMultiplier": 1,
+  "numberOfChoices": 4,
+  "choices": [
+    {
+      "answer": "Elefant"
+    },
+    {
+      "answer": "Pferd"
+    },
+    {
+      "answer": "Maus"
+    },
+    {
+      "answer": "Katze"
+    }
+  ]
+}

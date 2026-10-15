@@ -1,0 +1,15 @@
+{
+  "ext": {
+    "timetrack": 1792098040130
+  },
+  "data": {
+    "gameid": "281651",
+    "host": "play.kahoot.it",
+    "id": 52,
+    "type": "message",
+    "content": "null",
+    "cid": "1851079941"
+  },
+  "channel": "/service/player",
+  "contentParsed": null
+}

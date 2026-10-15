@@ -1,0 +1,35 @@
+{
+  "gameBlockIndex": 0,
+  "totalGameBlockCount": 8,
+  "layout": "CLASSIC",
+  "title": "Hauptstadt der Schweiz?",
+  "video": {
+    "startTime": 0,
+    "endTime": 0,
+    "service": "youtube",
+    "fullUrl": ""
+  },
+  "media": [],
+  "extensiveMode": true,
+  "type": "quiz",
+  "timeRemaining": 19990,
+  "timeAvailable": 20000,
+  "numberOfAnswersAllowed": 1,
+  "currentQuestionAnswerCount": 0,
+  "pointsMultiplier": 1,
+  "numberOfChoices": 4,
+  "choices": [
+    {
+      "answer": "Zürich"
+    },
+    {
+      "answer": "Bern"
+    },
+    {
+      "answer": "Genf"
+    },
+    {
+      "answer": "Basel"
+    }
+  ]
+}

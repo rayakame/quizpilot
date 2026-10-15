@@ -1,0 +1,33 @@
+{
+  "stableIdentifier": "b020bc4d-42ba-4a0f-a634-fed6561a9fd0-9",
+  "isHighContrast": false,
+  "loginState": 0,
+  "didControllerLeave": false,
+  "avatarTimestamp": 1791388043672,
+  "wasControllerKicked": false,
+  "availableCollaborations": {
+    "isAutoAssign": true,
+    "canRename": false,
+    "data": [],
+    "collaborationNameLocale": "de",
+    "changedCollaborationIndex": -1
+  },
+  "chosenCollaborationIndex": -1,
+  "kahootLangIsRTL": false,
+  "avatar": {
+    "type": 2550,
+    "item": 3350
+  },
+  "youtubeAPIKey": "",
+  "shouldBlockYouTube": false,
+  "gameApiId": "aec956f2-bcf7-4c40-845f-bb1b3d0e80ed",
+  "islandData": null,
+  "audienceQuestionsData": null,
+  "controllerEstimateCount": 5,
+  "state": 0,
+  "data": {
+    "teamMembers": [],
+    "canChangeAvatar": true,
+    "reactions": true
+  }
+}

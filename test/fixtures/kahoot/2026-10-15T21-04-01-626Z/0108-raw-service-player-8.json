@@ -1,0 +1,46 @@
+{
+  "ext": {
+    "timetrack": 1792098319568
+  },
+  "data": {
+    "gameid": "281651",
+    "host": "play.kahoot.it",
+    "id": 8,
+    "type": "message",
+    "content": "{\"rank\":1,\"totalScore\":500,\"reactions\":true,\"pointsData\":{\"totalPointsWithBonuses\":500,\"questionPoints\":0,\"answerStreakPoints\":{\"streakLevel\":0,\"previousStreakLevel\":1},\"lastGameBlockIndex\":5},\"hasAnswer\":true,\"skip\":false,\"choice\":[0,1,2,3],\"correctChoices\":[1,3,2,0],\"points\":0,\"isCorrect\":false,\"text\":\"Elefant|Maus|Pferd|Katze\",\"type\":\"jumble\"}",
+    "cid": "1789162914"
+  },
+  "channel": "/service/player",
+  "contentParsed": {
+    "rank": 1,
+    "totalScore": 500,
+    "reactions": true,
+    "pointsData": {
+      "totalPointsWithBonuses": 500,
+      "questionPoints": 0,
+      "answerStreakPoints": {
+        "streakLevel": 0,
+        "previousStreakLevel": 1
+      },
+      "lastGameBlockIndex": 5
+    },
+    "hasAnswer": true,
+    "skip": false,
+    "choice": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "correctChoices": [
+      1,
+      3,
+      2,
+      0
+    ],
+    "points": 0,
+    "isCorrect": false,
+    "text": "Elefant|Maus|Pferd|Katze",
+    "type": "jumble"
+  }
+}

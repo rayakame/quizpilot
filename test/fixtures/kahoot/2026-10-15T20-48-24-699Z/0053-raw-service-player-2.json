@@ -1,0 +1,24 @@
+{
+  "ext": {
+    "timetrack": 1792097345287
+  },
+  "data": {
+    "gameid": "916240",
+    "id": 2,
+    "type": "message",
+    "content": "{\"gameBlockIndex\":2,\"totalGameBlockCount\":8,\"layout\":\"CLASSIC\",\"extensiveMode\":false,\"type\":\"quiz\",\"timeRemaining\":19988,\"timeAvailable\":20000,\"numberOfAnswersAllowed\":1,\"currentQuestionAnswerCount\":0,\"numberOfChoices\":4}"
+  },
+  "channel": "/service/player",
+  "contentParsed": {
+    "gameBlockIndex": 2,
+    "totalGameBlockCount": 8,
+    "layout": "CLASSIC",
+    "extensiveMode": false,
+    "type": "quiz",
+    "timeRemaining": 19988,
+    "timeAvailable": 20000,
+    "numberOfAnswersAllowed": 1,
+    "currentQuestionAnswerCount": 0,
+    "numberOfChoices": 4
+  }
+}

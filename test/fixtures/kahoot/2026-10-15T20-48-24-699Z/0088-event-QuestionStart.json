@@ -1,0 +1,11 @@
+{
+  "gameBlockIndex": 5,
+  "totalGameBlockCount": 8,
+  "extensiveMode": false,
+  "type": "jumble",
+  "timeRemaining": 59990,
+  "timeAvailable": 60000,
+  "numberOfAnswersAllowed": 1,
+  "currentQuestionAnswerCount": 0,
+  "numberOfChoices": 4
+}

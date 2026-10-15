@@ -1,0 +1,43 @@
+{
+  "ext": {
+    "timetrack": 1792097345666
+  },
+  "data": {
+    "gameid": "916240",
+    "host": "play.kahoot.it",
+    "id": 8,
+    "type": "message",
+    "content": "{\"rank\":2,\"totalScore\":0,\"reactions\":true,\"pointsData\":{\"totalPointsWithBonuses\":0,\"questionPoints\":0,\"answerStreakPoints\":{\"streakLevel\":0,\"previousStreakLevel\":0},\"lastGameBlockIndex\":2},\"nemesis\":{\"name\":\"Recorder\",\"isGhost\":false,\"totalScore\":0},\"hasAnswer\":true,\"skip\":false,\"choice\":0,\"points\":0,\"correctChoices\":[2],\"text\":\"\",\"type\":\"quiz\",\"isCorrect\":false}",
+    "cid": "82809432"
+  },
+  "channel": "/service/player",
+  "contentParsed": {
+    "rank": 2,
+    "totalScore": 0,
+    "reactions": true,
+    "pointsData": {
+      "totalPointsWithBonuses": 0,
+      "questionPoints": 0,
+      "answerStreakPoints": {
+        "streakLevel": 0,
+        "previousStreakLevel": 0
+      },
+      "lastGameBlockIndex": 2
+    },
+    "nemesis": {
+      "name": "Recorder",
+      "isGhost": false,
+      "totalScore": 0
+    },
+    "hasAnswer": true,
+    "skip": false,
+    "choice": 0,
+    "points": 0,
+    "correctChoices": [
+      2
+    ],
+    "text": "",
+    "type": "quiz",
+    "isCorrect": false
+  }
+}

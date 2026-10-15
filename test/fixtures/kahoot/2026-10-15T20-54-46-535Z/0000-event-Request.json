@@ -1,0 +1,10 @@
+{
+  "_cancelHandlers": [
+    null,
+    null
+  ],
+  "_isPending": true,
+  "_isCanceled": false,
+  "_rejectOnCancel": false,
+  "_promise": {}
+}

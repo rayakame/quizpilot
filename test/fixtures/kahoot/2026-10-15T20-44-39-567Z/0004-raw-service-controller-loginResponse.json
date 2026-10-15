@@ -1,0 +1,10 @@
+{
+  "ext": {
+    "timetrack": 1792097081000
+  },
+  "data": {
+    "type": "loginResponse",
+    "cid": "1296057491"
+  },
+  "channel": "/service/controller"
+}

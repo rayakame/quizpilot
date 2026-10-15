@@ -1,0 +1,12 @@
+{
+  "gameBlockIndex": 3,
+  "totalGameBlockCount": 8,
+  "layout": "TRUE_FALSE",
+  "extensiveMode": false,
+  "type": "quiz",
+  "timeRemaining": 19992,
+  "timeAvailable": 20000,
+  "numberOfAnswersAllowed": 1,
+  "currentQuestionAnswerCount": 0,
+  "numberOfChoices": 2
+}

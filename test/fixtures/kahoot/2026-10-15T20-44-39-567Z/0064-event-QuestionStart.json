@@ -1,0 +1,29 @@
+{
+  "gameBlockIndex": 3,
+  "totalGameBlockCount": 8,
+  "layout": "TRUE_FALSE",
+  "title": "Die erde ist flach",
+  "video": {
+    "startTime": 0,
+    "endTime": 0,
+    "service": "youtube",
+    "fullUrl": ""
+  },
+  "media": [],
+  "extensiveMode": true,
+  "type": "quiz",
+  "timeRemaining": 19989,
+  "timeAvailable": 20000,
+  "numberOfAnswersAllowed": 1,
+  "currentQuestionAnswerCount": 0,
+  "pointsMultiplier": 1,
+  "numberOfChoices": 2,
+  "choices": [
+    {
+      "answer": "True"
+    },
+    {
+      "answer": "False"
+    }
+  ]
+}

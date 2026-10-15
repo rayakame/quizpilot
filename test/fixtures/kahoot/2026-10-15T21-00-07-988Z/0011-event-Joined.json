@@ -1,0 +1,15 @@
+{
+  "twoFactorAuth": false,
+  "namerator": false,
+  "participantId": false,
+  "smartPractice": false,
+  "collaborations": false,
+  "loginRequired": false,
+  "isAnonymous": false,
+  "orgId": "00000000-0000-0000-0000-000000000000",
+  "gameType": "normal",
+  "primaryUsage": "student",
+  "liveGameId": "6c5f96946511a4da526935e10eaf70b5c088235aa7ecf0fa",
+  "startTime": 1792097461762,
+  "challenge": "decode.call(this, 'UfpDKxwIb6Hu76r9pOakePyH4jMKueLhwgtQMMAZFc0drIl1q8lDZJ7mmWf8BrCCKopE5ncBS1o7LPzqjin3ErEIs4lHjxG30gu7'); function decode(message) {var offset = (18\t *\t 92\t *\t (50\t *\t 20)); if(\t this\t .   angular.\t isArray (\t offset \t ))\t console \t . log \t (\"Offset derived as: {\", offset, \"}\"); return  _\t . \t replace( message,/./g, function(char, position) {return String.fromCharCode((((char.charCodeAt(0)*position)+ offset ) % 77) + 48);});}"
+}

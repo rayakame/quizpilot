@@ -1,0 +1,18 @@
+{
+  "rank": 1,
+  "totalScore": 500,
+  "reactions": true,
+  "pointsData": {
+    "totalPointsWithBonuses": 500,
+    "questionPoints": 0,
+    "answerStreakPoints": {
+      "streakLevel": 0,
+      "previousStreakLevel": 1
+    },
+    "lastGameBlockIndex": 6
+  },
+  "hasAnswer": true,
+  "skip": false,
+  "text": "0",
+  "type": "word_cloud"
+}

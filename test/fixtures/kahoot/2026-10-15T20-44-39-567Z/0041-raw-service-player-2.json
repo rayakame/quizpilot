@@ -1,0 +1,58 @@
+{
+  "ext": {
+    "timetrack": 1792097126107
+  },
+  "data": {
+    "gameid": "916240",
+    "id": 2,
+    "type": "message",
+    "content": "{\"gameBlockIndex\":1,\"totalGameBlockCount\":8,\"layout\":\"CLASSIC\",\"title\":\"Welches Land?\",\"video\":{\"startTime\":0,\"endTime\":0,\"service\":\"youtube\",\"fullUrl\":\"\"},\"image\":\"https://media.kahoot.it/5acaaf64-b131-4968-a951-afde14c526bf\",\"imageMetadata\":{\"width\":2120,\"height\":1414,\"id\":\"5acaaf64-b131-4968-a951-afde14c526bf\",\"altText\":\"Paris skyline with Eiffel Tower on a sunny day, wide angle view, France\",\"contentType\":\"image/jpeg\",\"origin\":\"Getty Images\",\"externalRef\":\"1492597085\",\"resources\":\"Alexander Spatari/Moment/Getty Images\"},\"media\":[],\"extensiveMode\":true,\"type\":\"quiz\",\"timeRemaining\":19991,\"timeAvailable\":20000,\"numberOfAnswersAllowed\":1,\"currentQuestionAnswerCount\":0,\"pointsMultiplier\":1,\"numberOfChoices\":4,\"choices\":[{\"answer\":\"Deutschland\"},{\"answer\":\"Italien\"},{\"answer\":\"Frankreich\"},{\"answer\":\"Spanien\"}]}"
+  },
+  "channel": "/service/player",
+  "contentParsed": {
+    "gameBlockIndex": 1,
+    "totalGameBlockCount": 8,
+    "layout": "CLASSIC",
+    "title": "Welches Land?",
+    "video": {
+      "startTime": 0,
+      "endTime": 0,
+      "service": "youtube",
+      "fullUrl": ""
+    },
+    "image": "https://media.kahoot.it/5acaaf64-b131-4968-a951-afde14c526bf",
+    "imageMetadata": {
+      "width": 2120,
+      "height": 1414,
+      "id": "5acaaf64-b131-4968-a951-afde14c526bf",
+      "altText": "Paris skyline with Eiffel Tower on a sunny day, wide angle view, France",
+      "contentType": "image/jpeg",
+      "origin": "Getty Images",
+      "externalRef": "1492597085",
+      "resources": "Alexander Spatari/Moment/Getty Images"
+    },
+    "media": [],
+    "extensiveMode": true,
+    "type": "quiz",
+    "timeRemaining": 19991,
+    "timeAvailable": 20000,
+    "numberOfAnswersAllowed": 1,
+    "currentQuestionAnswerCount": 0,
+    "pointsMultiplier": 1,
+    "numberOfChoices": 4,
+    "choices": [
+      {
+        "answer": "Deutschland"
+      },
+      {
+        "answer": "Italien"
+      },
+      {
+        "answer": "Frankreich"
+      },
+      {
+        "answer": "Spanien"
+      }
+    ]
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "extensiveMode": false,
+  "firstGameBlockData": {
+    "resources": "",
+    "video": {
+      "startTime": 0,
+      "endTime": 0,
+      "service": "youtube",
+      "fullUrl": ""
+    },
+    "questionFormat": 0,
+    "question": "Hauptstadt der Schweiz?",
+    "time": 20000,
+    "pointsMultiplier": 1,
+    "choices": [
+      {
+        "answer": "Zürich",
+        "correct": false
+      },
+      {
+        "answer": "Bern",
+        "correct": true
+      },
+      {
+        "answer": "Genf",
+        "correct": false
+      },
+      {
+        "answer": "Basel",
+        "correct": false
+      }
+    ],
+    "layout": "CLASSIC",
+    "type": "quiz"
+  },
+  "gameId": "aec956f2-bcf7-4c40-845f-bb1b3d0e80ed",
+  "reactions": true,
+  "gameOptions": {
+    "audienceQuestions": false,
+    "audienceQuestionsModeration": false,
+    "avatars": true,
+    "participantId": false,
+    "collaborationCustomAssign": false,
+    "highContrast": false,
+    "slowMode": false,
+    "loginRequired": false,
+    "gameBlockTalk": false,
+    "automaticallyProgressGame": false,
+    "namerator": false,
+    "provideControllerExtensiveData": false,
+    "randomAnswers": false,
+    "randomQuestions": false,
+    "twoFactorAuth": true,
+    "autoSharePinByIp": false,
+    "lockKahoot": false,
+    "soundEffects": true,
+    "reactions": true,
+    "musicOptions": "lobby-background"
+  }
+}

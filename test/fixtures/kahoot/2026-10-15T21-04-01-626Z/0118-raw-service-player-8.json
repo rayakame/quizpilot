@@ -1,0 +1,32 @@
+{
+  "ext": {
+    "timetrack": 1792098326474
+  },
+  "data": {
+    "gameid": "281651",
+    "host": "play.kahoot.it",
+    "id": 8,
+    "type": "message",
+    "content": "{\"rank\":1,\"totalScore\":500,\"reactions\":true,\"pointsData\":{\"totalPointsWithBonuses\":500,\"questionPoints\":0,\"answerStreakPoints\":{\"streakLevel\":0,\"previousStreakLevel\":1},\"lastGameBlockIndex\":6},\"hasAnswer\":true,\"skip\":false,\"text\":\"0\",\"type\":\"word_cloud\"}",
+    "cid": "1789162914"
+  },
+  "channel": "/service/player",
+  "contentParsed": {
+    "rank": 1,
+    "totalScore": 500,
+    "reactions": true,
+    "pointsData": {
+      "totalPointsWithBonuses": 500,
+      "questionPoints": 0,
+      "answerStreakPoints": {
+        "streakLevel": 0,
+        "previousStreakLevel": 1
+      },
+      "lastGameBlockIndex": 6
+    },
+    "hasAnswer": true,
+    "skip": false,
+    "text": "0",
+    "type": "word_cloud"
+  }
+}

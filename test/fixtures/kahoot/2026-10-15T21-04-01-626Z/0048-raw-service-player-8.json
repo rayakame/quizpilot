@@ -1,0 +1,38 @@
+{
+  "ext": {
+    "timetrack": 1792098281873
+  },
+  "data": {
+    "gameid": "281651",
+    "host": "play.kahoot.it",
+    "id": 8,
+    "type": "message",
+    "content": "{\"rank\":1,\"totalScore\":0,\"reactions\":true,\"pointsData\":{\"totalPointsWithBonuses\":0,\"questionPoints\":0,\"answerStreakPoints\":{\"streakLevel\":0,\"previousStreakLevel\":0},\"lastGameBlockIndex\":0},\"hasAnswer\":true,\"skip\":false,\"choice\":0,\"points\":0,\"correctChoices\":[1],\"text\":\"Zürich\",\"type\":\"quiz\",\"isCorrect\":false}",
+    "cid": "1789162914"
+  },
+  "channel": "/service/player",
+  "contentParsed": {
+    "rank": 1,
+    "totalScore": 0,
+    "reactions": true,
+    "pointsData": {
+      "totalPointsWithBonuses": 0,
+      "questionPoints": 0,
+      "answerStreakPoints": {
+        "streakLevel": 0,
+        "previousStreakLevel": 0
+      },
+      "lastGameBlockIndex": 0
+    },
+    "hasAnswer": true,
+    "skip": false,
+    "choice": 0,
+    "points": 0,
+    "correctChoices": [
+      1
+    ],
+    "text": "Zürich",
+    "type": "quiz",
+    "isCorrect": false
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "gameBlockIndex": 5,
+  "totalGameBlockCount": 8,
+  "extensiveMode": false,
+  "type": "jumble",
+  "timeRemaining": 57465,
+  "timeAvailable": 60000,
+  "numberOfAnswersAllowed": 1,
+  "currentQuestionAnswerCount": 0,
+  "numberOfChoices": 4,
+  "questionRestricted": false,
+  "getReadyTimeAvailable": 5500,
+  "getReadyTimeRemaining": 5500,
+  "nextGameBlockData": {
+    "type": "word_cloud",
+    "media": []
+  },
+  "questionIndex": 5,
+  "gameBlockType": "jumble"
+}

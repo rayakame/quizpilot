@@ -1,0 +1,24 @@
+{
+  "rank": 1,
+  "totalScore": 0,
+  "reactions": true,
+  "pointsData": {
+    "totalPointsWithBonuses": 0,
+    "questionPoints": 0,
+    "answerStreakPoints": {
+      "streakLevel": 0,
+      "previousStreakLevel": 0
+    },
+    "lastGameBlockIndex": 1
+  },
+  "hasAnswer": true,
+  "skip": false,
+  "choice": 0,
+  "points": 0,
+  "correctChoices": [
+    2
+  ],
+  "text": "Deutschland",
+  "type": "quiz",
+  "isCorrect": false
+}

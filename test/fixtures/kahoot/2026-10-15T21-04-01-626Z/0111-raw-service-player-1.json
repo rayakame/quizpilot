@@ -1,0 +1,32 @@
+{
+  "ext": {
+    "timetrack": 1792098320961
+  },
+  "data": {
+    "gameid": "281651",
+    "id": 1,
+    "type": "message",
+    "content": "{\"gameBlockIndex\":6,\"totalGameBlockCount\":8,\"extensiveMode\":false,\"type\":\"word_cloud\",\"timeRemaining\":28192,\"timeAvailable\":30000,\"numberOfAnswersAllowed\":1,\"currentQuestionAnswerCount\":0,\"questionRestricted\":false,\"getReadyTimeAvailable\":5000,\"getReadyTimeRemaining\":5000,\"nextGameBlockData\":{\"type\":\"content\",\"media\":[],\"layout\":\"TOP_IMAGE\"},\"questionIndex\":6,\"gameBlockType\":\"word_cloud\"}"
+  },
+  "channel": "/service/player",
+  "contentParsed": {
+    "gameBlockIndex": 6,
+    "totalGameBlockCount": 8,
+    "extensiveMode": false,
+    "type": "word_cloud",
+    "timeRemaining": 28192,
+    "timeAvailable": 30000,
+    "numberOfAnswersAllowed": 1,
+    "currentQuestionAnswerCount": 0,
+    "questionRestricted": false,
+    "getReadyTimeAvailable": 5000,
+    "getReadyTimeRemaining": 5000,
+    "nextGameBlockData": {
+      "type": "content",
+      "media": [],
+      "layout": "TOP_IMAGE"
+    },
+    "questionIndex": 6,
+    "gameBlockType": "word_cloud"
+  }
+}

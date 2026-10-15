@@ -1,0 +1,48 @@
+{
+  "ext": {
+    "timetrack": 1792097306226
+  },
+  "data": {
+    "gameid": "916240",
+    "host": "play.kahoot.it",
+    "id": 17,
+    "type": "message",
+    "content": "{\"stableIdentifier\":\"c83f8575-0cbf-4703-9e08-f3afe2fd88a3-22\",\"isHighContrast\":false,\"loginState\":3,\"controllerIndex\":1,\"didControllerLeave\":false,\"avatarTimestamp\":1791388043672,\"wasControllerKicked\":false,\"availableCollaborations\":{\"isAutoAssign\":true,\"canRename\":false,\"data\":[],\"collaborationNameLocale\":\"de\",\"changedCollaborationIndex\":-1},\"chosenCollaborationIndex\":-1,\"kahootLangIsRTL\":false,\"avatar\":{\"type\":1900,\"item\":3450},\"youtubeAPIKey\":\"\",\"shouldBlockYouTube\":false,\"gameApiId\":\"cdac7eeb-92d8-423b-ad14-e7d4826ce4c2\",\"islandData\":null,\"audienceQuestionsData\":null,\"controllerEstimateCount\":5,\"state\":0,\"data\":{\"teamMembers\":[],\"canChangeAvatar\":true,\"reactions\":true}}",
+    "cid": "82809432"
+  },
+  "channel": "/service/player",
+  "contentParsed": {
+    "stableIdentifier": "c83f8575-0cbf-4703-9e08-f3afe2fd88a3-22",
+    "isHighContrast": false,
+    "loginState": 3,
+    "controllerIndex": 1,
+    "didControllerLeave": false,
+    "avatarTimestamp": 1791388043672,
+    "wasControllerKicked": false,
+    "availableCollaborations": {
+      "isAutoAssign": true,
+      "canRename": false,
+      "data": [],
+      "collaborationNameLocale": "de",
+      "changedCollaborationIndex": -1
+    },
+    "chosenCollaborationIndex": -1,
+    "kahootLangIsRTL": false,
+    "avatar": {
+      "type": 1900,
+      "item": 3450
+    },
+    "youtubeAPIKey": "",
+    "shouldBlockYouTube": false,
+    "gameApiId": "cdac7eeb-92d8-423b-ad14-e7d4826ce4c2",
+    "islandData": null,
+    "audienceQuestionsData": null,
+    "controllerEstimateCount": 5,
+    "state": 0,
+    "data": {
+      "teamMembers": [],
+      "canChangeAvatar": true,
+      "reactions": true
+    }
+  }
+}

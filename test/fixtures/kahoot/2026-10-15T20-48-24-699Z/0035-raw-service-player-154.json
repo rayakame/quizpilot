@@ -1,0 +1,15 @@
+{
+  "ext": {
+    "timetrack": 1792097333254
+  },
+  "data": {
+    "gameid": "916240",
+    "id": 154,
+    "type": "message",
+    "content": "{\"reactions\":true}"
+  },
+  "channel": "/service/player",
+  "contentParsed": {
+    "reactions": true
+  }
+}

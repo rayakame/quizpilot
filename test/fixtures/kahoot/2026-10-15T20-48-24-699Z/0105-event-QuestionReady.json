@@ -1,0 +1,13 @@
+{
+  "gameBlockIndex": 7,
+  "totalGameBlockCount": 8,
+  "layout": "TOP_IMAGE",
+  "extensiveMode": false,
+  "type": "content",
+  "reactions": true,
+  "questionRestricted": false,
+  "getReadyTimeAvailable": 0,
+  "getReadyTimeRemaining": 0,
+  "questionIndex": 7,
+  "gameBlockType": "content"
+}

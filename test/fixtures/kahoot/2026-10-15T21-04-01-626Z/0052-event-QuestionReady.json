@@ -1,0 +1,57 @@
+{
+  "gameBlockIndex": 1,
+  "totalGameBlockCount": 8,
+  "layout": "CLASSIC",
+  "extensiveMode": false,
+  "type": "quiz",
+  "timeRemaining": 17869,
+  "timeAvailable": 20000,
+  "numberOfAnswersAllowed": 1,
+  "currentQuestionAnswerCount": 0,
+  "numberOfChoices": 4,
+  "questionRestricted": false,
+  "getReadyTimeAvailable": 5000,
+  "getReadyTimeRemaining": 5000,
+  "nextGameBlockData": {
+    "type": "quiz",
+    "media": [],
+    "choices": [
+      {
+        "image": {
+          "width": 1440,
+          "height": 959,
+          "id": "c3db673e-7756-4dff-a821-b0eefd57b2d2",
+          "contentType": "image/jpeg"
+        }
+      },
+      {
+        "image": {
+          "width": 1920,
+          "height": 1328,
+          "id": "190414ce-7925-4152-9f32-e5eebcf53322",
+          "contentType": "image/jpeg"
+        }
+      },
+      {
+        "image": {
+          "width": 256,
+          "height": 341,
+          "id": "893357b3-5903-4543-b4e2-6c7e12c2a4bc",
+          "contentType": "image/png"
+        }
+      },
+      {
+        "image": {
+          "width": 436,
+          "height": 458,
+          "id": "98780cb4-36d0-4cab-88ef-db10ac11d116",
+          "contentType": "image/jpeg"
+        }
+      }
+    ],
+    "pointsMultiplier": 1,
+    "layout": "CLASSIC"
+  },
+  "questionIndex": 1,
+  "gameBlockType": "quiz"
+}

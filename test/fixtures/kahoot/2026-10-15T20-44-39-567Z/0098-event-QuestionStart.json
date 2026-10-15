@@ -1,0 +1,18 @@
+{
+  "gameBlockIndex": 6,
+  "totalGameBlockCount": 8,
+  "title": "Ein Wort für Montag",
+  "video": {
+    "startTime": 0,
+    "endTime": 0,
+    "service": "youtube",
+    "fullUrl": ""
+  },
+  "media": [],
+  "extensiveMode": true,
+  "type": "word_cloud",
+  "timeRemaining": 29990,
+  "timeAvailable": 30000,
+  "numberOfAnswersAllowed": 1,
+  "currentQuestionAnswerCount": 0
+}

@@ -1,0 +1,28 @@
+{
+  "gameBlockIndex": 3,
+  "totalGameBlockCount": 8,
+  "layout": "TRUE_FALSE",
+  "extensiveMode": false,
+  "type": "quiz",
+  "timeRemaining": 16770,
+  "timeAvailable": 20000,
+  "numberOfAnswersAllowed": 1,
+  "currentQuestionAnswerCount": 0,
+  "numberOfChoices": 2,
+  "questionRestricted": false,
+  "getReadyTimeAvailable": 5000,
+  "getReadyTimeRemaining": 5000,
+  "nextGameBlockData": {
+    "type": "multiple_select_quiz",
+    "media": [],
+    "choices": [
+      {},
+      {},
+      {},
+      {}
+    ],
+    "pointsMultiplier": 1
+  },
+  "questionIndex": 3,
+  "gameBlockType": "quiz"
+}
