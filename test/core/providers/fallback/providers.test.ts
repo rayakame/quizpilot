@@ -6,6 +6,7 @@ import { NO_CONTEXT } from "../../../../src/core/answer/context.js"
 import type { FallbackInput } from "../../../../src/core/answer/engine.js"
 import { createClaudeFallback } from "../../../../src/core/providers/fallback/anthropic.js"
 import { createGeminiFallback } from "../../../../src/core/providers/fallback/gemini.js"
+import type { ModelChoice } from "../../../../src/core/providers/fallback/models.js"
 import { createOpenAIFallback } from "../../../../src/core/providers/fallback/openai.js"
 
 const input: FallbackInput = {
@@ -27,25 +28,28 @@ const input: FallbackInput = {
 const signal = new AbortController().signal
 const answer = '{"choice":1,"confidence":0.9}'
 
-function claude(message: Partial<Anthropic.Beta.BetaMessage>) {
+function claude(message: Partial<Anthropic.Beta.BetaMessage>, choice?: ModelChoice) {
   const calls: { params: Anthropic.Beta.MessageCreateParamsNonStreaming; signal?: AbortSignal }[] =
     []
-  const provider = createClaudeFallback({
-    beta: {
-      messages: {
-        create: async (params, options) => {
-          calls.push({ params, signal: options?.signal })
-          return {
-            model: "claude-opus-5-5",
-            stop_reason: "end_turn",
-            content: [{ type: "text", text: answer, citations: null }],
-            usage: { input_tokens: 900, output_tokens: 40 },
-            ...message,
-          } as Anthropic.Beta.BetaMessage
+  const provider = createClaudeFallback(
+    {
+      beta: {
+        messages: {
+          create: async (params, options) => {
+            calls.push({ params, signal: options?.signal })
+            return {
+              model: "claude-opus-5-5",
+              stop_reason: "end_turn",
+              content: [{ type: "text", text: answer, citations: null }],
+              usage: { input_tokens: 900, output_tokens: 40 },
+              ...message,
+            } as Anthropic.Beta.BetaMessage
+          },
         },
       },
     },
-  })
+    choice,
+  )
   return { provider, calls }
 }
 
@@ -101,6 +105,29 @@ describe("Claude fallback", () => {
     })
   })
 
+  it("uses the chosen model and effort", async () => {
+    const { provider, calls } = claude({}, { model: "claude-sonnet-5-5", effort: "medium" })
+    await provider.decide(input, { signal, webSearch: false })
+    expect(calls[0]!.params).toMatchObject({
+      model: "claude-sonnet-5-5",
+      fallbacks: "default",
+      output_config: { effort: "medium" },
+    })
+  })
+
+  it("leaves out what Haiku doesn't support", async () => {
+    const { provider, calls } = claude({}, { model: "claude-haiku-4-5", effort: null })
+    await provider.decide(input, { signal, webSearch: true })
+    const { params } = calls[0]!
+    expect(params.model).toBe("claude-haiku-4-5")
+    expect(params.betas).toBeUndefined()
+    expect(params.fallbacks).toBeUndefined()
+    expect(params.output_config).toEqual({
+      format: expect.objectContaining({ type: "json_schema" }),
+    })
+    expect(params.tools).toEqual([{ type: "web_search_20250305", name: "web_search", max_uses: 2 }])
+  })
+
   it("gives up when Claude declines", async () => {
     const { provider } = claude({ stop_reason: "refusal", content: [] })
     await expect(provider.decide(input, { signal, webSearch: false })).rejects.toThrow("declined")
@@ -108,23 +135,26 @@ describe("Claude fallback", () => {
 })
 
 describe("OpenAI fallback", () => {
-  function openai(output_text = answer) {
+  function openai(output_text = answer, choice?: ModelChoice) {
     const calls: {
       params: OpenAI.Responses.ResponseCreateParamsNonStreaming
       signal?: AbortSignal
     }[] = []
-    const provider = createOpenAIFallback({
-      responses: {
-        create: async (params, options) => {
-          calls.push({ params, signal: options?.signal })
-          return {
-            model: "gpt-6.1-sol",
-            output_text,
-            usage: { input_tokens: 700, output_tokens: 30 },
-          } as OpenAI.Responses.Response
+    const provider = createOpenAIFallback(
+      {
+        responses: {
+          create: async (params, options) => {
+            calls.push({ params, signal: options?.signal })
+            return {
+              model: "gpt-6.1-sol",
+              output_text,
+              usage: { input_tokens: 700, output_tokens: 30 },
+            } as OpenAI.Responses.Response
+          },
         },
       },
-    })
+      choice,
+    )
     return { provider, calls }
   }
 
@@ -162,6 +192,12 @@ describe("OpenAI fallback", () => {
     expect(calls[0]!.params.tools).toEqual([{ type: "web_search", search_context_size: "low" }])
   })
 
+  it("uses the chosen model and effort", async () => {
+    const { provider, calls } = openai(answer, { model: "gpt-6-luna", effort: "high" })
+    await provider.decide(input, { signal, webSearch: false })
+    expect(calls[0]!.params).toMatchObject({ model: "gpt-6-luna", reasoning: { effort: "high" } })
+  })
+
   it("fails on an empty answer, for example a refusal", async () => {
     const { provider } = openai("")
     await expect(provider.decide(input, { signal, webSearch: false })).rejects.toThrow()
@@ -169,25 +205,28 @@ describe("OpenAI fallback", () => {
 })
 
 describe("Gemini fallback", () => {
-  function gemini(response: Partial<GenerateContentResponse> = {}) {
+  function gemini(response: Partial<GenerateContentResponse> = {}, choice?: ModelChoice) {
     const calls: GenerateContentParameters[] = []
-    const provider = createGeminiFallback({
-      models: {
-        generateContent: async (params) => {
-          calls.push(params)
-          return {
-            text: answer,
-            modelVersion: "gemini-3.8-flash",
-            usageMetadata: {
-              promptTokenCount: 600,
-              candidatesTokenCount: 20,
-              thoughtsTokenCount: 50,
-            },
-            ...response,
-          } as GenerateContentResponse
+    const provider = createGeminiFallback(
+      {
+        models: {
+          generateContent: async (params) => {
+            calls.push(params)
+            return {
+              text: answer,
+              modelVersion: "gemini-3.8-flash",
+              usageMetadata: {
+                promptTokenCount: 600,
+                candidatesTokenCount: 20,
+                thoughtsTokenCount: 50,
+              },
+              ...response,
+            } as GenerateContentResponse
+          },
         },
       },
-    })
+      choice,
+    )
     return { provider, calls }
   }
 
@@ -213,6 +252,13 @@ describe("Gemini fallback", () => {
     const { provider, calls } = gemini()
     await provider.decide(input, { signal, webSearch: true })
     expect(calls[0]!.config!.tools).toEqual([{ googleSearch: {} }])
+  })
+
+  it("uses the chosen model and thinking level", async () => {
+    const { provider, calls } = gemini({}, { model: "gemini-3.5-flash-lite", effort: "minimal" })
+    await provider.decide(input, { signal, webSearch: false })
+    expect(calls[0]!.model).toBe("gemini-3.5-flash-lite")
+    expect(calls[0]!.config!.thinkingConfig).toEqual({ thinkingLevel: "MINIMAL" })
   })
 
   it("fails when Gemini sends no text", async () => {

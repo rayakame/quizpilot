@@ -1,6 +1,6 @@
 import type Anthropic from "@anthropic-ai/sdk"
 import type { FallbackProvider } from "../../answer/engine.js"
-import { DEFAULT_MODELS } from "./ids.js"
+import { resolveChoice, type ModelChoice } from "./models.js"
 import { base64, buildRequest, parseAnswer, type FallbackPart } from "./request.js"
 
 type CreateParams = Anthropic.Beta.MessageCreateParamsNonStreaming
@@ -19,24 +19,31 @@ export interface AnthropicLike {
 
 export function createClaudeFallback(
   client: AnthropicLike,
-  model = DEFAULT_MODELS.anthropic,
+  choice: ModelChoice = resolveChoice("anthropic"),
 ): FallbackProvider {
+  // Haiku 4.5 predates server-side refusal fallback and the current web search tool.
+  const current = choice.model !== "claude-haiku-4-5"
+  const effort = choice.effort === "minimal" ? null : choice.effort
+  const search = current
+    ? ({ type: "web_search_20260209", name: "web_search", max_uses: 2 } as const)
+    : ({ type: "web_search_20250305", name: "web_search", max_uses: 2 } as const)
   return {
     async decide(input, { signal, webSearch }) {
       const request = buildRequest(input, webSearch)
       const message = await client.beta.messages.create(
         {
-          model,
+          model: choice.model,
           max_tokens: 8000,
-          betas: ["server-side-fallback-2026-07-01"],
-          fallbacks: "default",
-          // Opus 5.5 always thinks; low effort keeps that short.
-          output_config: { effort: "low", format: { type: "json_schema", schema: request.schema } },
+          ...(current
+            ? { betas: ["server-side-fallback-2026-07-01"], fallbacks: "default" as const }
+            : {}),
+          output_config: {
+            ...(effort ? { effort } : {}),
+            format: { type: "json_schema", schema: request.schema },
+          },
           system: request.system,
           messages: [{ role: "user", content: request.parts.map(toBlock) }],
-          ...(webSearch
-            ? { tools: [{ type: "web_search_20260209", name: "web_search", max_uses: 2 }] }
-            : {}),
+          ...(webSearch ? { tools: [search] } : {}),
         },
         { signal },
       )

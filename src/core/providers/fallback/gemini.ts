@@ -5,7 +5,7 @@ import {
   type Part,
 } from "@google/genai"
 import type { FallbackProvider } from "../../answer/engine.js"
-import { DEFAULT_MODELS } from "./ids.js"
+import { resolveChoice, type Effort, type ModelChoice } from "./models.js"
 import { base64, buildRequest, parseAnswer, type FallbackPart } from "./request.js"
 
 export interface GeminiLike {
@@ -14,25 +14,25 @@ export interface GeminiLike {
 
 export function createGeminiFallback(
   client: GeminiLike,
-  model = DEFAULT_MODELS.gemini,
+  choice: ModelChoice = resolveChoice("gemini"),
 ): FallbackProvider {
   return {
     async decide(input, { signal, webSearch }) {
       const request = buildRequest(input, webSearch)
       const response = await client.models.generateContent({
-        model,
+        model: choice.model,
         contents: [{ role: "user", parts: request.parts.map(toPart) }],
         config: {
           systemInstruction: request.system,
           responseMimeType: "application/json",
           responseJsonSchema: request.schema,
-          thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
+          ...(choice.effort ? { thinkingConfig: { thinkingLevel: LEVELS[choice.effort] } } : {}),
           abortSignal: signal,
           ...(webSearch ? { tools: [{ googleSearch: {} }] } : {}),
         },
       })
       const parsed = parseAnswer(input.question, response.text ?? "")
-      const used = response.modelVersion ?? model
+      const used = response.modelVersion ?? choice.model
       const meta = response.usageMetadata
       return {
         ...parsed,
@@ -49,6 +49,13 @@ export function createGeminiFallback(
       }
     },
   }
+}
+
+const LEVELS: Record<Effort, ThinkingLevel> = {
+  minimal: ThinkingLevel.MINIMAL,
+  low: ThinkingLevel.LOW,
+  medium: ThinkingLevel.MEDIUM,
+  high: ThinkingLevel.HIGH,
 }
 
 function toPart(part: FallbackPart): Part {

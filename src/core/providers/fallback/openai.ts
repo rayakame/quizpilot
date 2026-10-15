@@ -1,6 +1,6 @@
 import type OpenAI from "openai"
 import type { FallbackProvider } from "../../answer/engine.js"
-import { DEFAULT_MODELS } from "./ids.js"
+import { resolveChoice, type ModelChoice } from "./models.js"
 import { base64, buildRequest, parseAnswer, type FallbackPart } from "./request.js"
 
 type CreateParams = OpenAI.Responses.ResponseCreateParamsNonStreaming
@@ -17,16 +17,16 @@ export interface OpenAILike {
 
 export function createOpenAIFallback(
   client: OpenAILike,
-  model = DEFAULT_MODELS.openai,
+  choice: ModelChoice = resolveChoice("openai"),
 ): FallbackProvider {
   return {
     async decide(input, { signal, webSearch }) {
       const request = buildRequest(input, webSearch)
       const response = await client.responses.create(
         {
-          model,
+          model: choice.model,
           store: false,
-          reasoning: { effort: "low" },
+          ...(choice.effort ? { reasoning: { effort: choice.effort } } : {}),
           instructions: request.system,
           input: [{ role: "user", content: request.parts.map(toContent) }],
           text: {

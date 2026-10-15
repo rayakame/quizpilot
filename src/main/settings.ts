@@ -1,6 +1,7 @@
 import { chmod, mkdir, readFile, rename, writeFile } from "node:fs/promises"
 import { dirname } from "node:path"
 import { FALLBACK_PROVIDERS, type FallbackProviderId } from "../core/providers/fallback/ids.js"
+import { resolveChoice, type ModelChoice } from "../core/providers/fallback/models.js"
 import type { PublicSettings, Timing } from "../shared/api.js"
 import { MAX_DELAY_MS } from "../shared/start.js"
 
@@ -10,6 +11,7 @@ export interface Config {
   fallback: {
     provider: FallbackProviderId
     models: Record<string, string>
+    efforts: Record<string, string>
     below: number
     imageInstantAt: number
     webSearch: boolean
@@ -22,7 +24,14 @@ export interface Config {
 export const DEFAULT_CONFIG: Config = {
   version: 1,
   keys: { typesafe: "", anthropic: "", openai: "", gemini: "" },
-  fallback: { provider: "anthropic", models: {}, below: 0.6, imageInstantAt: 0.9, webSearch: true },
+  fallback: {
+    provider: "anthropic",
+    models: {},
+    efforts: {},
+    below: 0.6,
+    imageInstantAt: 0.9,
+    webSearch: true,
+  },
   context: { includePrevious: true },
   behavior: { timing: { mode: "instant", minMs: 1000, maxMs: 5000 }, reconnect: true },
   ui: { language: "en", theme: "system" },
@@ -74,11 +83,8 @@ export function parseConfig(raw: unknown): Config {
     },
     fallback: {
       provider: oneOf(fallback.provider, FALLBACK_PROVIDERS, d.fallback.provider),
-      models: Object.fromEntries(
-        Object.entries(obj(fallback.models)).filter(
-          (e): e is [string, string] => typeof e[1] === "string",
-        ),
-      ),
+      models: strings(fallback.models),
+      efforts: strings(fallback.efforts),
       below: num(fallback.below, d.fallback.below, 0, 1),
       imageInstantAt: num(fallback.imageInstantAt, d.fallback.imageInstantAt, 0, 1),
       webSearch: bool(fallback.webSearch, d.fallback.webSearch),
@@ -104,8 +110,19 @@ export function toPublic(config: Config): PublicSettings {
       provider: config.fallback.provider,
       webSearch: config.fallback.webSearch,
       savedKeys: FALLBACK_PROVIDERS.filter((p) => config.keys[p] !== ""),
+      choices: Object.fromEntries(
+        FALLBACK_PROVIDERS.map((p) => [p, choiceFor(config, p)]),
+      ) as Record<FallbackProviderId, ModelChoice>,
     },
   }
+}
+
+export function choiceFor(config: Config, provider: FallbackProviderId): ModelChoice {
+  return resolveChoice(
+    provider,
+    config.fallback.models[provider],
+    config.fallback.efforts[provider],
+  )
 }
 
 export class SettingsStore {
@@ -145,6 +162,12 @@ function isObject(value: unknown): value is Obj {
 
 function obj(value: unknown): Obj {
   return isObject(value) ? value : {}
+}
+
+function strings(value: unknown): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(obj(value)).filter((e): e is [string, string] => typeof e[1] === "string"),
+  )
 }
 
 function str(value: unknown, fallback: string): string {

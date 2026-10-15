@@ -11,6 +11,7 @@
     PROVIDER_NAMES,
     type FallbackProviderId,
   } from "../../../core/providers/fallback/ids.js"
+  import { MODELS, resolveChoice, type Effort } from "../../../core/providers/fallback/models.js"
   import type { KeyCheck, PublicSettings } from "../../../shared/api.js"
 
   let {
@@ -34,18 +35,35 @@
   let provider = $state<FallbackProviderId>(settings.fallback.provider)
   // svelte-ignore state_referenced_locally
   let webSearch = $state(settings.fallback.webSearch)
+  // svelte-ignore state_referenced_locally
+  let choices = $state($state.snapshot(settings.fallback.choices))
   let key = $state("")
   let checking = $state(false)
   let problem = $state<Exclude<KeyCheck, "ok"> | null>(null)
 
+  const EFFORT_TEXT: Record<Effort, string> = {
+    minimal: "Minimal",
+    low: "Low",
+    medium: "Medium",
+    high: "High",
+  }
+
   const saved = $derived(settings.fallback.savedKeys.includes(provider))
+  const choice = $derived(choices[provider])
+  const option = $derived(MODELS[provider].find((o) => o.id === choice.model)!)
   const active = $derived(settings.fallback.savedKeys.includes(settings.fallback.provider))
 
   async function save(event: SubmitEvent) {
     event.preventDefault()
     checking = true
     problem = null
-    const result = await window.quizpilot.saveFallback({ provider, key, webSearch })
+    const result = await window.quizpilot.saveFallback({
+      provider,
+      key,
+      webSearch,
+      model: choice.model,
+      effort: choice.effort,
+    })
     checking = false
     if (result === "ok") onDone()
     else problem = result
@@ -57,75 +75,116 @@
   }
 </script>
 
-<div class="flex h-full items-center justify-center p-6">
-  <Card.Root class="w-full max-w-md">
-    <Card.Header>
-      <Card.Title>{firstRun ? "Backup AI (optional)" : "Backup AI"}</Card.Title>
-      <Card.Description>
-        When Jev is unsure, QuizPilot can ask a second AI. It needs its own API key and costs a
-        little per question.
-      </Card.Description>
-    </Card.Header>
-    <form class="contents" onsubmit={save}>
-      <Card.Content class="grid gap-4">
-        <RadioGroup.Root
-          value={provider}
-          onValueChange={(v) => {
-            provider = v as FallbackProviderId
-            key = ""
-            problem = null
-          }}
-        >
-          {#each FALLBACK_PROVIDERS as id (id)}
-            <div class="flex items-center gap-2">
-              <RadioGroup.Item value={id} id="provider-{id}" />
-              <Label for="provider-{id}" class="font-normal">
-                {PROVIDER_NAMES[id]}
-                {#if COMPANY[id] !== PROVIDER_NAMES[id]}
-                  <span class="text-muted-foreground">({COMPANY[id]})</span>
-                {/if}
-              </Label>
-            </div>
-          {/each}
-        </RadioGroup.Root>
-        <div class="grid gap-2">
-          <Label for="fallback-key">API key</Label>
-          <Input
-            id="fallback-key"
-            type="password"
-            autocomplete="off"
-            placeholder={saved ? "Saved, leave empty to keep it" : ""}
-            bind:value={key}
-          />
-          {#if problem}
-            <p class="text-destructive text-sm">{keyText(problem, PROVIDER_NAMES[provider])}</p>
-          {/if}
-          <Button
-            variant="link"
-            class="h-auto w-fit p-0"
-            onclick={() => window.quizpilot.openExternal(KEY_PAGES[provider])}
+<div class="h-full overflow-y-auto">
+  <div class="flex min-h-full items-center justify-center p-6">
+    <Card.Root class="w-full max-w-md">
+      <Card.Header>
+        <Card.Title>{firstRun ? "Backup AI (optional)" : "Backup AI"}</Card.Title>
+        <Card.Description>
+          When Jev is unsure, QuizPilot can ask a second AI. It needs its own API key and costs a
+          little per question.
+        </Card.Description>
+      </Card.Header>
+      <form class="contents" onsubmit={save}>
+        <Card.Content class="grid gap-4">
+          <RadioGroup.Root
+            value={provider}
+            onValueChange={(v) => {
+              provider = v as FallbackProviderId
+              key = ""
+              problem = null
+            }}
           >
-            Get a key from {COMPANY[provider]}
-          </Button>
-        </div>
-        <div class="flex items-center gap-2">
-          <Switch id="web-search" bind:checked={webSearch} />
-          <Label for="web-search" class="font-normal">Search the web when there's time</Label>
-        </div>
-      </Card.Content>
-      <Card.Footer class="justify-end gap-2">
-        {#if firstRun}
-          <Button variant="ghost" onclick={onDone}>Skip</Button>
-        {:else}
-          <Button variant="ghost" onclick={onDone}>Cancel</Button>
-          {#if active}
-            <Button variant="outline" onclick={turnOff}>Turn off</Button>
+            {#each FALLBACK_PROVIDERS as id (id)}
+              <div class="flex items-center gap-2">
+                <RadioGroup.Item value={id} id="provider-{id}" />
+                <Label for="provider-{id}" class="font-normal">
+                  {PROVIDER_NAMES[id]}
+                  {#if COMPANY[id] !== PROVIDER_NAMES[id]}
+                    <span class="text-muted-foreground">({COMPANY[id]})</span>
+                  {/if}
+                </Label>
+              </div>
+            {/each}
+          </RadioGroup.Root>
+          <div class="grid gap-2">
+            <Label for="fallback-key">API key</Label>
+            <Input
+              id="fallback-key"
+              type="password"
+              autocomplete="off"
+              placeholder={saved ? "Saved, leave empty to keep it" : ""}
+              bind:value={key}
+            />
+            {#if problem}
+              <p class="text-destructive text-sm">{keyText(problem, PROVIDER_NAMES[provider])}</p>
+            {/if}
+            <Button
+              variant="link"
+              class="h-auto w-fit p-0"
+              onclick={() => window.quizpilot.openExternal(KEY_PAGES[provider])}
+            >
+              Get a key from {COMPANY[provider]}
+            </Button>
+          </div>
+          <div class="grid gap-2">
+            <Label>Model</Label>
+            <RadioGroup.Root
+              value={choice.model}
+              onValueChange={(m) => (choices[provider] = resolveChoice(provider, m, choice.effort))}
+            >
+              {#each MODELS[provider] as model (model.id)}
+                <div class="flex items-center gap-2">
+                  <RadioGroup.Item value={model.id} id="model-{model.id}" />
+                  <Label for="model-{model.id}" class="font-normal">
+                    {model.name} <span class="text-muted-foreground">· {model.note}</span>
+                  </Label>
+                </div>
+              {/each}
+            </RadioGroup.Root>
+          </div>
+          <div class="grid gap-2">
+            <Label>Effort</Label>
+            {#if option.efforts.length === 0}
+              <p class="text-muted-foreground text-sm">{option.name} has no effort setting.</p>
+            {:else}
+              <RadioGroup.Root
+                class="flex flex-wrap gap-4"
+                value={choice.effort ?? ""}
+                onValueChange={(e) =>
+                  (choices[provider] = resolveChoice(provider, choice.model, e))}
+              >
+                {#each option.efforts as effort (effort)}
+                  <div class="flex items-center gap-2">
+                    <RadioGroup.Item value={effort} id="effort-{effort}" />
+                    <Label for="effort-{effort}" class="font-normal">{EFFORT_TEXT[effort]}</Label>
+                  </div>
+                {/each}
+              </RadioGroup.Root>
+              <p class="text-muted-foreground text-sm">
+                More effort can be more accurate but answers later.
+              </p>
+            {/if}
+          </div>
+          <div class="flex items-center gap-2">
+            <Switch id="web-search" bind:checked={webSearch} />
+            <Label for="web-search" class="font-normal">Search the web when there's time</Label>
+          </div>
+        </Card.Content>
+        <Card.Footer class="justify-end gap-2">
+          {#if firstRun}
+            <Button variant="ghost" onclick={onDone}>Skip</Button>
+          {:else}
+            <Button variant="ghost" onclick={onDone}>Cancel</Button>
+            {#if active}
+              <Button variant="outline" onclick={turnOff}>Turn off</Button>
+            {/if}
           {/if}
-        {/if}
-        <Button type="submit" disabled={checking || (!key.trim() && !saved)}>
-          {checking ? "Checking…" : "Save"}
-        </Button>
-      </Card.Footer>
-    </form>
-  </Card.Root>
+          <Button type="submit" disabled={checking || (!key.trim() && !saved)}>
+            {checking ? "Checking…" : "Save"}
+          </Button>
+        </Card.Footer>
+      </form>
+    </Card.Root>
+  </div>
 </div>

@@ -6,7 +6,16 @@ const settings: PublicSettings = {
   hasTypesafeKey: true,
   timing: { mode: "human", minMs: 1000, maxMs: 5000 },
   includePrevious: false,
-  fallback: { provider: "anthropic", webSearch: true, savedKeys: [] },
+  fallback: {
+    provider: "anthropic",
+    webSearch: true,
+    savedKeys: [],
+    choices: {
+      anthropic: { model: "claude-opus-5-5", effort: "low" },
+      openai: { model: "gpt-6.1-sol", effort: "low" },
+      gemini: { model: "gemini-3.8-flash", effort: "low" },
+    },
+  },
 }
 
 const counter = () => {

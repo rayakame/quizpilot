@@ -56,23 +56,41 @@ describe("saveFallback", () => {
     const s = await store()
     const check = vi.fn(async () => "ok" as const)
     expect(
-      await saveFallback(s, { provider: "gemini", key: " AIza ", webSearch: false }, check),
+      await saveFallback(
+        s,
+        {
+          provider: "gemini",
+          key: " AIza ",
+          webSearch: false,
+          model: "gemini-4-argon",
+          effort: "high",
+        },
+        check,
+      ),
     ).toBe("ok")
     expect(check).toHaveBeenCalledWith("gemini", "AIza")
     expect(s.get().keys.gemini).toBe("AIza")
-    expect(toPublic(s.get()).fallback).toEqual({
+    expect(toPublic(s.get()).fallback).toMatchObject({
       provider: "gemini",
       webSearch: false,
       savedKeys: ["gemini"],
+    })
+    expect(toPublic(s.get()).fallback.choices.gemini).toEqual({
+      model: "gemini-4-argon",
+      effort: "high",
     })
   })
 
   it("keeps everything when the key doesn't work", async () => {
     const s = await store()
     const check = vi.fn(async () => "invalid" as const)
-    expect(await saveFallback(s, { provider: "openai", key: "sk-x", webSearch: true }, check)).toBe(
-      "invalid",
-    )
+    expect(
+      await saveFallback(
+        s,
+        { provider: "openai", key: "sk-x", webSearch: true, model: "gpt-6.1-sol", effort: "low" },
+        check,
+      ),
+    ).toBe("invalid")
     expect(s.get()).toEqual(DEFAULT_CONFIG)
   })
 
@@ -80,15 +98,43 @@ describe("saveFallback", () => {
     const s = await store()
     await s.update((c) => ({ ...c, keys: { ...c.keys, openai: "sk-1" } }))
     const check = vi.fn(async () => "ok" as const)
-    expect(await saveFallback(s, { provider: "openai", key: "", webSearch: true }, check)).toBe(
-      "ok",
-    )
+    expect(
+      await saveFallback(
+        s,
+        { provider: "openai", key: "", webSearch: true, model: "gpt-6-luna", effort: "medium" },
+        check,
+      ),
+    ).toBe("ok")
     expect(check).not.toHaveBeenCalled()
     expect(s.get().fallback.provider).toBe("openai")
-    expect(await saveFallback(s, { provider: "gemini", key: "", webSearch: true }, check)).toBe(
-      "invalid",
-    )
+    expect(toPublic(s.get()).fallback.choices.openai).toEqual({
+      model: "gpt-6-luna",
+      effort: "medium",
+    })
+    expect(
+      await saveFallback(
+        s,
+        { provider: "gemini", key: "", webSearch: true, model: "gemini-3.8-flash", effort: "low" },
+        check,
+      ),
+    ).toBe("invalid")
     expect(s.get().fallback.provider).toBe("openai")
+  })
+
+  it("stores no effort for models without one and repairs unknown models", async () => {
+    const s = await store()
+    const check = vi.fn(async () => "ok" as const)
+    const setup = { provider: "anthropic" as const, webSearch: true, effort: "high" as const }
+    await saveFallback(s, { ...setup, key: "sk-ant", model: "claude-haiku-4-5" }, check)
+    expect(toPublic(s.get()).fallback.choices.anthropic).toEqual({
+      model: "claude-haiku-4-5",
+      effort: null,
+    })
+    await saveFallback(s, { ...setup, key: "", model: "claude-3" }, check)
+    expect(toPublic(s.get()).fallback.choices.anthropic).toEqual({
+      model: "claude-opus-5-5",
+      effort: "high",
+    })
   })
 
   it("forgets the key of the active provider on removal", async () => {

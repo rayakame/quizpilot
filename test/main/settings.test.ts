@@ -23,6 +23,7 @@ describe("parseConfig", () => {
       fallback: {
         provider: "openai",
         models: { openai: "gpt-x" },
+        efforts: { openai: "high" },
         below: 0.5,
         imageInstantAt: 0.8,
         webSearch: false,
@@ -38,13 +39,14 @@ describe("parseConfig", () => {
     const config = parseConfig({
       version: 1,
       keys: { typesafe: 42 },
-      fallback: { below: 7, models: { openai: 3, gemini: "g" } },
+      fallback: { below: 7, models: { openai: 3, gemini: "g" }, efforts: { gemini: 5 } },
       behavior: { timing: { mode: "human", minMs: 4000, maxMs: 1000 } },
       ui: { theme: "pink" },
     })
     expect(config.keys.typesafe).toBe("")
     expect(config.fallback.below).toBe(0.6)
     expect(config.fallback.models).toEqual({ gemini: "g" })
+    expect(config.fallback.efforts).toEqual({})
     expect(config.behavior.timing).toEqual(DEFAULT_CONFIG.behavior.timing)
     expect(config.ui.theme).toBe("system")
   })
@@ -98,7 +100,16 @@ describe("toPublic", () => {
       hasTypesafeKey: true,
       timing: DEFAULT_CONFIG.behavior.timing,
       includePrevious: true,
-      fallback: { provider: "anthropic", webSearch: true, savedKeys: ["openai"] },
+      fallback: {
+        provider: "anthropic",
+        webSearch: true,
+        savedKeys: ["openai"],
+        choices: {
+          anthropic: { model: "claude-opus-5-5", effort: "low" },
+          openai: { model: "gpt-6.1-sol", effort: "low" },
+          gemini: { model: "gemini-3.8-flash", effort: "low" },
+        },
+      },
     })
     expect(JSON.stringify(view)).not.toContain("secret")
   })

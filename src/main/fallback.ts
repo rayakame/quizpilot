@@ -5,7 +5,8 @@ import type { FallbackProvider } from "../core/answer/engine.js"
 import { createFallback } from "../core/providers/fallback/create.js"
 import type { FallbackProviderId } from "../core/providers/fallback/ids.js"
 import type { FallbackSetup, KeyCheck } from "../shared/api.js"
-import type { Config, SettingsStore } from "./settings.js"
+import { resolveChoice } from "../core/providers/fallback/models.js"
+import { choiceFor, type Config, type SettingsStore } from "./settings.js"
 
 export type KeyProbe = (apiKey: string) => Promise<unknown>
 
@@ -41,11 +42,22 @@ export async function saveFallback(
     const result = await check(setup.provider, key)
     if (result !== "ok") return result
   }
-  await store.update((c) => ({
-    ...c,
-    keys: key ? { ...c.keys, [setup.provider]: key } : c.keys,
-    fallback: { ...c.fallback, provider: setup.provider, webSearch: setup.webSearch },
-  }))
+  const { model, effort } = resolveChoice(setup.provider, setup.model, setup.effort)
+  await store.update((c) => {
+    const efforts = { ...c.fallback.efforts, [setup.provider]: effort ?? "" }
+    if (!effort) delete efforts[setup.provider]
+    return {
+      ...c,
+      keys: key ? { ...c.keys, [setup.provider]: key } : c.keys,
+      fallback: {
+        ...c.fallback,
+        provider: setup.provider,
+        webSearch: setup.webSearch,
+        models: { ...c.fallback.models, [setup.provider]: model },
+        efforts,
+      },
+    }
+  })
   return "ok"
 }
 
@@ -57,9 +69,7 @@ export function fallbackFor(config: Config): FallbackProvider | null {
   const provider = config.fallback.provider
   const key = config.keys[provider]
   if (!key) return null
-  return retryWithoutSearch(
-    logFailures(createFallback(provider, key, config.fallback.models[provider])),
-  )
+  return retryWithoutSearch(logFailures(createFallback(provider, key, choiceFor(config, provider))))
 }
 
 // Not every provider is confirmed to take web search and a JSON schema together.
