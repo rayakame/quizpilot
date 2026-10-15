@@ -1,0 +1,184 @@
+<script lang="ts">
+  import Dices from "@lucide/svelte/icons/dices"
+  import Plus from "@lucide/svelte/icons/plus"
+  import X from "@lucide/svelte/icons/x"
+  import * as Alert from "$lib/components/ui/alert/index.js"
+  import { Button } from "$lib/components/ui/button/index.js"
+  import * as Card from "$lib/components/ui/card/index.js"
+  import { Input } from "$lib/components/ui/input/index.js"
+  import { Label } from "$lib/components/ui/label/index.js"
+  import * as RadioGroup from "$lib/components/ui/radio-group/index.js"
+  import { Switch } from "$lib/components/ui/switch/index.js"
+  import { Textarea } from "$lib/components/ui/textarea/index.js"
+  import { game } from "$lib/game.svelte.js"
+  import { ERROR_TEXT } from "$lib/messages.js"
+  import { addField, botName, newForm, stepProblem, toRequest } from "$lib/start-form.js"
+  import { generateName } from "../../../core/names/names.js"
+  import { MAX_BOTS } from "../../../core/session/game-session.js"
+  import type { PublicSettings } from "../../../shared/api.js"
+
+  let { settings }: { settings: PublicSettings } = $props()
+
+  const STEPS = ["Game", "Bots", "Options"]
+  const BACK_TO_PIN = ["pin", "not_found", "locked", "unknown"]
+
+  // svelte-ignore state_referenced_locally
+  let form = $state(newForm(settings))
+  let step = $state(0)
+  let error = $state<string | null>(null)
+  let starting = $state(false)
+
+  function next(event: SubmitEvent) {
+    event.preventDefault()
+    const problem = stepProblem(form, step)
+    error = problem ? ERROR_TEXT[problem] : null
+    if (problem) return
+    if (step < STEPS.length - 1) step += 1
+    else void start()
+  }
+
+  async function start() {
+    starting = true
+    game.reset()
+    const result = await window.quizpilot.startGame(toRequest($state.snapshot(form)))
+    starting = false
+    if (result.ok) return game.begin()
+    game.reset()
+    error = ERROR_TEXT[result.error]
+    if (result.error === "unknown") error += ` (${result.message})`
+    if (BACK_TO_PIN.includes(result.error)) step = 0
+  }
+
+  function randomName(i: number) {
+    const others = form.bots.filter((_, j) => j !== i).map(botName)
+    form.bots[i]!.value = generateName(others)
+  }
+</script>
+
+<div class="flex h-full items-center justify-center p-6">
+  <Card.Root class="w-full max-w-lg">
+    <Card.Header>
+      <Card.Title>New game</Card.Title>
+      <Card.Description>
+        {#each STEPS as label, i (label)}
+          <span class={i === step ? "text-foreground font-medium" : ""}>{i + 1}. {label}</span>
+          {#if i < STEPS.length - 1}<span class="px-1">›</span>{/if}
+        {/each}
+      </Card.Description>
+    </Card.Header>
+    <form class="contents" onsubmit={next}>
+      <Card.Content class="grid gap-4">
+        {#if step === 0}
+          <div class="grid gap-2">
+            <Label for="pin">Game PIN</Label>
+            <Input
+              id="pin"
+              bind:value={form.pin}
+              placeholder="123456 or kahoot.it link"
+              autofocus
+            />
+          </div>
+        {:else if step === 1}
+          <div class="grid gap-2">
+            <Label>Bots</Label>
+            {#each form.bots as bot, i (i)}
+              <div class="flex gap-2">
+                <Input bind:value={bot.value} placeholder={bot.placeholder} maxlength={15} />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Random name"
+                  onclick={() => randomName(i)}
+                >
+                  <Dices />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Remove bot"
+                  disabled={form.bots.length === 1}
+                  onclick={() => form.bots.splice(i, 1)}
+                >
+                  <X />
+                </Button>
+              </div>
+            {/each}
+            {#if form.bots.length < MAX_BOTS}
+              <Button
+                variant="outline"
+                class="w-fit"
+                onclick={() => (form.bots = addField(form.bots))}
+              >
+                <Plus /> Add bot
+              </Button>
+            {/if}
+          </div>
+        {:else}
+          <div class="grid gap-2">
+            <Label>When to answer</Label>
+            <RadioGroup.Root
+              value={form.human ? "human" : "instant"}
+              onValueChange={(v) => (form.human = v === "human")}
+            >
+              <div class="flex items-center gap-2">
+                <RadioGroup.Item value="instant" id="instant" />
+                <Label for="instant" class="font-normal">As soon as the answer is ready</Label>
+              </div>
+              <div class="flex items-center gap-2">
+                <RadioGroup.Item value="human" id="human" />
+                <Label for="human" class="font-normal">Like a human, after a random delay</Label>
+              </div>
+            </RadioGroup.Root>
+            {#if form.human}
+              <div class="flex items-center gap-2 pl-6 text-sm">
+                <Input
+                  type="number"
+                  min="0"
+                  max="30"
+                  step="0.5"
+                  class="w-20"
+                  bind:value={form.minSeconds}
+                />
+                to
+                <Input
+                  type="number"
+                  min="0"
+                  max="30"
+                  step="0.5"
+                  class="w-20"
+                  bind:value={form.maxSeconds}
+                />
+                seconds
+              </div>
+            {/if}
+          </div>
+          <div class="grid gap-2">
+            <Label for="context">What is the quiz about? (optional)</Label>
+            <Textarea
+              id="context"
+              bind:value={form.context}
+              placeholder="e.g. TUM first-semester quiz about campus life in Munich"
+            />
+          </div>
+          <div class="flex items-center gap-2">
+            <Switch id="previous" bind:checked={form.includePrevious} />
+            <Label for="previous" class="font-normal">Tell the AI about earlier questions</Label>
+          </div>
+        {/if}
+        {#if error}
+          <Alert.Root variant="destructive">
+            <Alert.Description>{error}</Alert.Description>
+          </Alert.Root>
+        {/if}
+      </Card.Content>
+      <Card.Footer class="justify-between">
+        <Button variant="ghost" disabled={step === 0 || starting} onclick={() => (step -= 1)}>
+          Back
+        </Button>
+        <Button type="submit" disabled={starting}>
+          {step < STEPS.length - 1 ? "Next" : starting ? "Joining…" : "Join game"}
+        </Button>
+      </Card.Footer>
+    </form>
+  </Card.Root>
+</div>

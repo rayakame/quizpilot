@@ -2,8 +2,10 @@
   import { ModeWatcher } from "mode-watcher"
   import { Button } from "$lib/components/ui/button/index.js"
   import { Toaster } from "$lib/components/ui/sonner/index.js"
+  import { game } from "$lib/game.svelte.js"
   import type { PublicSettings } from "../../shared/api.js"
   import KeySetup from "./views/KeySetup.svelte"
+  import StartWizard from "./views/StartWizard.svelte"
 
   let settings = $state<PublicSettings | null>(null)
   let changingKey = $state(false)
@@ -20,7 +22,7 @@
 <div class="flex h-screen flex-col">
   <header class="flex h-12 shrink-0 items-center justify-between border-b px-4">
     <span class="font-semibold">QuizPilot</span>
-    {#if settings?.hasTypesafeKey && !changingKey}
+    {#if settings?.hasTypesafeKey && !game.started && !changingKey}
       <Button variant="ghost" size="sm" onclick={() => (changingKey = true)}>TypeSafe key</Button>
     {/if}
   </header>
@@ -35,8 +37,14 @@
           await refresh()
         }}
       />
+    {:else if game.started}
+      <ul class="p-6">
+        {#each game.state.bots as bot (bot.name)}
+          <li>{bot.name}: {bot.status}</li>
+        {/each}
+      </ul>
     {:else}
-      <p class="text-muted-foreground p-6">Ready to play.</p>
+      <StartWizard {settings} />
     {/if}
   </main>
 </div>
