@@ -19,8 +19,11 @@
     "play": "tsx scripts/play.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "0.134.0",
+    "@google/genai": "2.29.1",
     "@typesafe-ai/sdk": "0.7.0",
     "kahoot.js-latest": "^1.0.9",
+    "openai": "7.34.0",
     "sharp": "^0.35.5"
   },
   "devDependencies": {
