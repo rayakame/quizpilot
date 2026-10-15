@@ -64,7 +64,10 @@ export function sourceText(decision: Decision): string {
     case "fallback": {
       const id = decision.fallback?.provider as FallbackProviderId | undefined
       const name = (id && PROVIDER_NAMES[id]) ?? "Backup AI"
-      return decision.confidence === null ? name : `${name} · ${percent(decision.confidence)}`
+      const sure = decision.confidence === null ? [] : [percent(decision.confidence)]
+      const ms = decision.fallback?.latencyMs
+      const time = ms === undefined ? [] : [`${(ms / 1000).toFixed(1)} s`]
+      return [name, ...sure, ...time].join(" · ")
     }
     case "quiz-link":
       return "Quiz link"

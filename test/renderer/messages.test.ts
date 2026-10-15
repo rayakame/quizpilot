@@ -14,9 +14,11 @@ describe("sourceText", () => {
   it("names the backup AI and how sure it was", () => {
     const fallback = { provider: "anthropic", model: "claude-opus-5-5", latencyMs: 2100 }
     expect(sourceText(decision({ source: "fallback", confidence: 0.72, fallback }))).toBe(
-      "Claude · 72%",
+      "Claude · 72% · 2.1 s",
     )
-    expect(sourceText(decision({ source: "fallback", confidence: null, fallback }))).toBe("Claude")
+    expect(sourceText(decision({ source: "fallback", confidence: null, fallback }))).toBe(
+      "Claude · 2.1 s",
+    )
     expect(sourceText(decision({ source: "jev", confidence: 0.9 }))).toBe("Jev · 90%")
   })
 })
