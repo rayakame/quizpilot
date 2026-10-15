@@ -1,3 +1,21 @@
-import { contextBridge } from "electron"
+import { contextBridge, ipcRenderer } from "electron"
+import { CHANNELS, GAME_EVENT_CHANNEL, type GameEvent, type QuizPilotApi } from "../shared/api.js"
 
-contextBridge.exposeInMainWorld("quizpilot", {})
+const api: QuizPilotApi = {
+  getSettings: () => ipcRenderer.invoke(CHANNELS.getSettings),
+  saveTypesafeKey: (key) => ipcRenderer.invoke(CHANNELS.saveTypesafeKey, key),
+  startGame: (request) => ipcRenderer.invoke(CHANNELS.startGame, request),
+  addBot: (name) => ipcRenderer.invoke(CHANNELS.addBot, name),
+  submitTwoStep: (sequence) => ipcRenderer.invoke(CHANNELS.submitTwoStep, sequence),
+  pause: (bot, paused) => ipcRenderer.invoke(CHANNELS.pause, bot, paused),
+  leave: (bot) => ipcRenderer.invoke(CHANNELS.leave, bot),
+  endGame: () => ipcRenderer.invoke(CHANNELS.endGame),
+  openExternal: (url) => ipcRenderer.invoke(CHANNELS.openExternal, url),
+  onGameEvent: (listener) => {
+    const handler = (_event: unknown, payload: GameEvent) => listener(payload)
+    ipcRenderer.on(GAME_EVENT_CHANNEL, handler)
+    return () => ipcRenderer.off(GAME_EVENT_CHANNEL, handler)
+  },
+}
+
+contextBridge.exposeInMainWorld("quizpilot", api)
