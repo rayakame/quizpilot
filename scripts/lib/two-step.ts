@@ -9,6 +9,23 @@ export function twoStepEvent(msg: RawMessage): TwoStepEvent | null {
   return IDS[msg.data.id] ?? null
 }
 
+// Kahoot keeps broadcasting resets every 10 s, even to players who already got in.
+export class TwoStepGate {
+  done = false
+  private asking = false
+
+  shouldAsk(event: TwoStepEvent | null): boolean {
+    if (event === "correct") this.done = true
+    if (event !== "reset" || this.done || this.asking) return false
+    this.asking = true
+    return true
+  }
+
+  answered() {
+    this.asking = false
+  }
+}
+
 export function parseSequence(input: string): number[] | null {
   const digits = input.replace(/\s+/g, "")
   if (!/^[0-3]{4}$/.test(digits)) return null

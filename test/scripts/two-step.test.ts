@@ -1,5 +1,20 @@
 import { describe, expect, it } from "vitest"
-import { parseSequence, twoStepAnswer, twoStepEvent } from "../../scripts/lib/two-step.js"
+import { parseSequence, TwoStepGate, twoStepAnswer, twoStepEvent } from "../../scripts/lib/two-step.js"
+
+describe("TwoStepGate", () => {
+  it("asks once per reset until the code is accepted", () => {
+    const gate = new TwoStepGate()
+    expect(gate.shouldAsk("reset")).toBe(true)
+    expect(gate.shouldAsk("reset")).toBe(false)
+    gate.answered()
+    expect(gate.shouldAsk("wrong")).toBe(false)
+    expect(gate.shouldAsk("reset")).toBe(true)
+    gate.answered()
+    expect(gate.shouldAsk("correct")).toBe(false)
+    expect(gate.shouldAsk("reset")).toBe(false)
+    expect(gate.done).toBe(true)
+  })
+})
 
 describe("parseSequence", () => {
   it("reads four distinct shapes 0-3", () => {

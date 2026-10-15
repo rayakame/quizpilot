@@ -3,7 +3,13 @@ import { join } from "node:path"
 import { createInterface } from "node:readline/promises"
 import Kahoot from "kahoot.js-latest"
 import { fixtureName, rawLabel, toFixture, type RawMessage } from "./lib/fixtures.js"
-import { parseSequence, twoStepAnswer, twoStepEvent, type TwoStepEvent } from "./lib/two-step.js"
+import {
+  parseSequence,
+  TwoStepGate,
+  twoStepAnswer,
+  twoStepEvent,
+  type TwoStepEvent,
+} from "./lib/two-step.js"
 
 const [pinArg, name = "Recorder"] = process.argv.slice(2)
 if (!pinArg) {
@@ -39,12 +45,11 @@ client.on("QuestionStart", (question: { answer(choice: number): Promise<unknown>
 })
 
 // kahoot.js drops these because Kahoot's session info reports twoFactorAuth: false even when it's on.
-let asking = false
+const gate = new TwoStepGate()
 async function onTwoStep(event: TwoStepEvent | null) {
   if (event === "wrong") console.log("two-step code was wrong")
   if (event === "correct") console.log("two-step code accepted")
-  if (event !== "reset" || asking) return
-  asking = true
+  if (!gate.shouldAsk(event)) return
   const rl = createInterface({ input: process.stdin, output: process.stdout })
   let sequence: number[] | null = null
   while (!sequence) {
@@ -53,7 +58,7 @@ async function onTwoStep(event: TwoStepEvent | null) {
     if (!sequence) console.log("need four different digits 0-3")
   }
   rl.close()
-  asking = false
+  gate.answered()
   await client._send(twoStepAnswer(pin, sequence, client.clientId)).catch((err: unknown) => {
     console.error("sending the code failed:", err)
   })
