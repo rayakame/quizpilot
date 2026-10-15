@@ -22,6 +22,8 @@ export interface KahootClientLike {
   leave(): Promise<unknown>
   reconnect(): Promise<unknown>
   _send(message: unknown): Promise<unknown>
+  _message?(frame: string): void
+  quiz?: { currentQuestion?: Record<string, unknown> }
 }
 
 export interface AdapterEvents {
@@ -32,6 +34,7 @@ export interface AdapterEvents {
   questionStarted: { question: Question }
   questionEnded: QuestionResult
   quizEnded: QuizEnd
+  gameReset: Record<string, never>
   disconnected: { reason: string; kicked: boolean; retryable: boolean }
 }
 
@@ -63,17 +66,39 @@ export class KahootAdapter extends Emitter<AdapterEvents> implements KahootAdapt
 
   constructor(private readonly client: KahootClientLike) {
     super()
+    const handle = client._message?.bind(client)
+    if (handle) {
+      // kahoot.js only reads the first message of a frame, but CometD may batch several.
+      client._message = (frame: string) => {
+        const messages: unknown = JSON.parse(frame)
+        if (!Array.isArray(messages)) return handle(frame)
+        for (const message of messages) handle(JSON.stringify([message]))
+      }
+    }
     client.handlers.quizpilot = (message) => void this.onRaw(message as RawMessage)
     client.on("QuestionReady", (p: KahootPayload) => this.emit("questionReady", toUpcoming(p)))
-    client.on("QuestionStart", (p: KahootPayload) =>
-      this.emit("questionStarted", { question: toQuestion(p) }),
-    )
+    client.on("QuestionStart", (p: KahootPayload) => {
+      const question = toQuestion(p)
+      // kahoot.js takes the answer's question index from QuestionReady, which late joiners miss.
+      const quiz = (client.quiz ??= {})
+      quiz.currentQuestion = {
+        ...quiz.currentQuestion,
+        ...p,
+        questionIndex: question.index,
+        gameBlockType: p.gameBlockType ?? p.type,
+      }
+      this.emit("questionStarted", { question })
+    })
     client.on("QuestionEnd", (p: KahootPayload) => this.emit("questionEnded", toResult(p)))
     client.on("Podium", (p: KahootPayload) => {
       // Kahoot sends the podium twice.
       if (this.ended) return
       this.ended = true
       this.emit("quizEnded", toQuizEnd(p))
+    })
+    client.on("GameReset", () => {
+      this.ended = false
+      this.emit("gameReset", {})
     })
     client.on("Disconnect", (reason: string) =>
       this.emit("disconnected", {

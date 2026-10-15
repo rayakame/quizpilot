@@ -19,6 +19,7 @@ const EVENTS = [
   "questionStarted",
   "questionEnded",
   "quizEnded",
+  "gameReset",
   "disconnected",
 ] as const
 
@@ -98,6 +99,35 @@ describe("two-step join", () => {
     expect(sentIds(client)).toEqual([50, 50, 16])
     const first = client._send.mock.calls[0]?.[0] as { data: { content: string } }
     expect(JSON.parse(first.data.content)).toEqual({ gameId: "281651", sequence: [1, 0, 3, 2] })
+  })
+})
+
+describe("kahoot.js quirks", () => {
+  it("tells kahoot.js which question is running when Ready was missed", () => {
+    const { client } = setup()
+    client.fire("QuestionStart", { gameBlockIndex: 4, type: "multiple_select_quiz", timeAvailable: 5000 })
+    expect(client.quiz?.currentQuestion).toMatchObject({
+      questionIndex: 4,
+      gameBlockType: "multiple_select_quiz",
+    })
+  })
+
+  it("handles every message of a batched frame", () => {
+    const { client, of } = setup()
+    client._message(
+      JSON.stringify([{ channel: "/meta/connect" }, { channel: "/service/player", data: { id: 53 } }]),
+    )
+    expect(of("twoStepRequired")).toHaveLength(1)
+  })
+
+  it("reports a game reset and the next podium again", () => {
+    const { client, of } = setup()
+    const podium = { rank: 1, totalScore: 100 }
+    client.fire("Podium", podium)
+    client.fire("GameReset", undefined)
+    client.fire("Podium", podium)
+    expect(of("gameReset")).toHaveLength(1)
+    expect(of("quizEnded")).toHaveLength(2)
   })
 })
 

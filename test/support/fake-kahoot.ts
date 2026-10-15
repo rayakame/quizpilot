@@ -11,7 +11,14 @@ export class FakeKahootClient implements KahootClientLike {
   leave = vi.fn<KahootClientLike["leave"]>(async () => ({}))
   reconnect = vi.fn<KahootClientLike["reconnect"]>(async () => ({}))
   _send = vi.fn<KahootClientLike["_send"]>(async () => ({}))
+  quiz?: { currentQuestion?: Record<string, unknown> }
   private listeners = new Map<string, ((...args: never[]) => void)[]>()
+
+  // Like kahoot.js: only the first message of a frame reaches the handlers.
+  _message(frame: string) {
+    const [first] = JSON.parse(frame) as unknown[]
+    this.raw(first)
+  }
 
   on(event: string, listener: (...args: never[]) => void) {
     this.listeners.set(event, [...(this.listeners.get(event) ?? []), listener])
