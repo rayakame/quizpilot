@@ -17,6 +17,7 @@ export const TIMING = {
   imageTimeoutMs: 3000,
   jevReserveMs: 1000,
   jevTimeoutMs: 4000,
+  imageFallbackWaitMs: 5000,
   fallbackMinRemainingMs: 3000,
   webSearchMinRemainingMs: 8000,
 } as const
@@ -136,8 +137,11 @@ export async function decide(
       parallel.abort()
       return fromJev(jev, usage)
     }
-    const r = await parallel.result
+    const fairlySure = jev !== null && sure >= settings.fallbackBelow
+    const waitMs = TIMING.imageFallbackWaitMs - (deps.now() - parallel.startedAt)
+    const r = fairlySure ? await withTimeout(parallel.result, waitMs, null) : await parallel.result
     if (r) return fromFallback(r, jev, usage)
+    parallel.abort()
   } else if (fallback && (jev === null || jev.proposal.wantsFallback) && enoughForFallback()) {
     const r = await startFallback(
       fallback,
@@ -206,7 +210,7 @@ function startFallback(
   settings: EngineSettings,
   remaining: () => number,
   deps: EngineDeps,
-): { result: Promise<TimedFallback | null>; abort(): void } {
+): { result: Promise<TimedFallback | null>; startedAt: number; abort(): void } {
   const t = timeoutSignal(remaining())
   const webSearch = settings.webSearch && remaining() >= TIMING.webSearchMinRemainingMs
   const started = deps.now()
@@ -216,7 +220,7 @@ function startFallback(
       () => null,
     )
     .finally(t.cancel)
-  return { result, abort: t.abort }
+  return { result, startedAt: started, abort: t.abort }
 }
 
 function fromJev(jev: JevOutcome, usage: Usage[]): Decision {

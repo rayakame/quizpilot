@@ -219,6 +219,31 @@ describe("decide: image questions", () => {
     expect(fb.provider.decide).toHaveBeenCalledTimes(1)
   })
 
+  it("waits at most 5 s for the fallback when Jev is fairly sure", async () => {
+    const fb = fallbackAnswering({}, 8000)
+    let done = false
+    const p = decide(
+      withImage(),
+      Date.now(),
+      NO_CONTEXT,
+      settings,
+      deps({ jev: jevChoosing(1, 0.7, 500), fallback: fb.provider }),
+    ).then((r) => {
+      done = true
+      return r
+    })
+    await vi.advanceTimersByTimeAsync(5000)
+    expect(done).toBe(true)
+    await expect(p).resolves.toMatchObject({ source: "jev", answer: { kind: "choice", index: 1 } })
+    expect(fb.seen[0]?.signal.aborted).toBe(true)
+  })
+
+  it("still takes a fallback that arrives within 5 s when Jev is fairly sure", async () => {
+    const fb = fallbackAnswering({}, 3000)
+    const r = await run(withImage(), deps({ jev: jevChoosing(1, 0.7, 500), fallback: fb.provider }))
+    expect(r).toMatchObject({ source: "fallback", fallback: { latencyMs: 3000 } })
+  })
+
   it("takes Jev's answer when the fallback misses the deadline", async () => {
     const fb = fallbackAnswering({}, 60_000)
     const start = Date.now()
