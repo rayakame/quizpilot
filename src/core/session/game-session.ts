@@ -1,6 +1,11 @@
 import type { AskContext, PreviousQuestion } from "../answer/context.js"
 import { answerText, correctAnswer } from "../answer/describe.js"
-import type { AdapterEvents, KahootAdapterLike } from "../kahoot/adapter.js"
+import {
+  JoinError,
+  type AdapterEvents,
+  type JoinErrorCode,
+  type KahootAdapterLike,
+} from "../kahoot/adapter.js"
 import type { QuestionResult, QuizEnd } from "../kahoot/normalize.js"
 import type { Decision, Question } from "../types.js"
 import { sleep } from "../util/async.js"
@@ -33,8 +38,13 @@ export interface SessionDeps {
   random(): number
 }
 
+export type JoinOutcome =
+  | { name: string; ok: true }
+  | { name: string; ok: false; code: JoinErrorCode; message: string }
+
 export type SessionEvent =
   | { type: "status"; bot: string; status: BotStatus; detail?: string }
+  | { type: "joinFailed"; bot: string; code: JoinErrorCode; message: string }
   | { type: "twoStepRequired" }
   | { type: "twoStepResult"; ok: boolean }
   | { type: "question"; question: Question }
@@ -80,20 +90,34 @@ export class GameSession {
     return () => this.listeners.delete(fn)
   }
 
-  async join(pin: string, names: string[]): Promise<void> {
-    if (names.length === 0 || names.length > MAX_BOTS) {
+  async join(pin: string, names: string[]): Promise<JoinOutcome[]> {
+    const active = this.bots.filter((b) => !GONE.includes(b.status) && b.status !== "disconnected")
+    if (names.length === 0 || active.length + names.length > MAX_BOTS) {
       throw new Error(`Use between 1 and ${MAX_BOTS} bots`)
     }
+    const used = this.bots.map((b) => b.name.toLowerCase())
+    for (const name of names) {
+      if (used.includes(name.toLowerCase())) throw new Error(`${name} is already in the game`)
+      used.push(name.toLowerCase())
+    }
+    const outcomes: JoinOutcome[] = []
     for (const name of names) {
       const bot = this.addBot(name)
       try {
         await bot.adapter.join(pin, name)
         bot.joined = true
         if (bot.status === "joining") this.setStatus(bot, "lobby")
+        outcomes.push({ name, ok: true })
       } catch (err) {
-        this.setStatus(bot, "disconnected", err instanceof Error ? err.message : String(err))
+        const code = err instanceof JoinError ? err.code : "unknown"
+        const message = err instanceof Error ? err.message : String(err)
+        this.bots.splice(this.bots.indexOf(bot), 1)
+        this.setStatus(bot, "disconnected", message)
+        this.emit({ type: "joinFailed", bot: name, code, message })
+        outcomes.push({ name, ok: false, code, message })
       }
     }
+    return outcomes
   }
 
   async submitTwoStep(sequence: number[]): Promise<void> {
@@ -102,11 +126,13 @@ export class GameSession {
     await Promise.all(waiting.map((b) => b.adapter.submitTwoStep(sequence)))
   }
 
-  pause(name: string, paused: boolean): void {
-    const bot = this.bots.find((b) => b.name === name)
-    if (!bot || GONE.includes(bot.status) || bot.status === "disconnected") return
-    bot.paused = paused
-    this.setStatus(bot, paused ? "paused" : bot.current === null ? "lobby" : "playing")
+  pause(name: string | null, paused: boolean): void {
+    for (const bot of this.bots) {
+      if (name !== null && bot.name !== name) continue
+      if (GONE.includes(bot.status) || bot.status === "disconnected") continue
+      bot.paused = paused
+      this.setStatus(bot, paused ? "paused" : bot.current === null ? "lobby" : "playing")
+    }
   }
 
   async leave(name?: string): Promise<void> {
@@ -130,6 +156,7 @@ export class GameSession {
       current: null,
     }
     this.bots.push(bot)
+    this.setStatus(bot, "joining")
     const a = bot.adapter
     a.on("twoStepRequired", () => {
       this.setStatus(bot, "twoStep")

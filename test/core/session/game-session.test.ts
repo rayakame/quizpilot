@@ -80,12 +80,52 @@ describe("joining", () => {
   it("joins every bot and puts it in the lobby", async () => {
     const { session, adapters, events } = setup()
     await session.join("123456", ["Anna", "Ben"])
+    expect(events[0]).toEqual({ type: "status", bot: "Anna", status: "joining" })
     expect(adapters.map((a) => a.join.mock.calls[0])).toEqual([
       ["123456", "Anna"],
       ["123456", "Ben"],
     ])
     expect(statusOf(events, "Anna")?.status).toBe("lobby")
     expect(statusOf(events, "Ben")?.status).toBe("lobby")
+  })
+
+  it("reports how each join went", async () => {
+    const { session, events } = setup()
+    const outcomes = await session.join("123456", ["Anna", "bad"])
+    expect(outcomes).toEqual([
+      { name: "Anna", ok: true },
+      { name: "bad", ok: false, code: "duplicate_name", message: "Name is already taken" },
+    ])
+    expect(events).toContainEqual({
+      type: "joinFailed",
+      bot: "bad",
+      code: "duplicate_name",
+      message: "Name is already taken",
+    })
+  })
+
+  it("counts bots across joins, but not the ones that failed", async () => {
+    const { session } = setup()
+    await session.join("123456", ["a", "b", "c", "bad"])
+    await expect(session.join("123456", ["d", "e"])).resolves.toHaveLength(2)
+    await expect(session.join("123456", ["f"])).rejects.toThrow("between 1 and 5")
+  })
+
+  it("rejects names that are already in the game", async () => {
+    const { session, adapters } = setup()
+    await session.join("123456", ["Anna"])
+    await expect(session.join("123456", ["anna"])).rejects.toThrow("already in the game")
+    await expect(session.join("123456", ["Ben", "ben"])).rejects.toThrow("already in the game")
+    expect(adapters).toHaveLength(1)
+  })
+
+  it("lets a failed name be used again", async () => {
+    const { session } = setup()
+    await session.join("123456", ["bad"])
+    const retry = session.join("123456", ["bad"])
+    await expect(retry).resolves.toEqual([
+      { name: "bad", ok: false, code: "duplicate_name", message: "Name is already taken" },
+    ])
   })
 
   it("marks only the bot whose join failed", async () => {
@@ -182,6 +222,19 @@ describe("answering", () => {
     adapters[0]!.emit("questionStarted", { question: question(1) })
     await vi.advanceTimersByTimeAsync(1000)
     expect(adapters[0]!.answer).toHaveBeenCalledTimes(1)
+  })
+
+  it("pauses and resumes every bot at once", async () => {
+    const { session, adapters, events } = setup()
+    await session.join("123456", ["Anna", "Ben"])
+    session.pause(null, true)
+    expect(statusOf(events, "Anna")?.status).toBe("paused")
+    expect(statusOf(events, "Ben")?.status).toBe("paused")
+    for (const a of adapters) a.emit("questionStarted", { question: question(0) })
+    await vi.advanceTimersByTimeAsync(1000)
+    expect(adapters.every((a) => a.answer.mock.calls.length === 0)).toBe(true)
+    session.pause(null, false)
+    expect(statusOf(events, "Anna")?.status).toBe("playing")
   })
 
   it("leaves on request and ignores the disconnect that follows", async () => {

@@ -143,6 +143,13 @@ describe("join, answer and disconnect", () => {
     const cases: [unknown, string][] = [
       [{ description: "Duplicate name", type: "loginResponse", error: "USER_INPUT" }, "duplicate_name"],
       [{ status: "LOCKED", description: "Locked" }, "locked"],
+      [
+        { description: "Request failed or timed out.", error: { response: { statusCode: 404 } } },
+        "not_found",
+      ],
+      [{ description: "Missing header token (pin doesn't exist)" }, "not_found"],
+      [{ description: "Request failed or timed out.", error: {} }, "unknown"],
+      [{ description: "Invalid/Missing PIN" }, "not_found"],
       ["Failed to get challenge data", "unknown"],
     ]
     for (const [reason, code] of cases) {

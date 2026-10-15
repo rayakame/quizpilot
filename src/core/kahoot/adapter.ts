@@ -47,7 +47,7 @@ export interface KahootAdapterLike {
   reconnect(): Promise<void>
 }
 
-export type JoinErrorCode = "duplicate_name" | "locked" | "unknown"
+export type JoinErrorCode = "not_found" | "duplicate_name" | "locked" | "unknown"
 
 export class JoinError extends Error {
   constructor(
@@ -150,13 +150,21 @@ export class KahootAdapter extends Emitter<AdapterEvents> implements KahootAdapt
   }
 }
 
+const UNKNOWN_PIN = ["Invalid/Missing PIN", "Missing header token (pin doesn't exist)"]
+
 function toJoinError(err: unknown): JoinError {
   const e = (err !== null && typeof err === "object" ? err : {}) as {
     description?: unknown
     status?: unknown
+    error?: { response?: { statusCode?: unknown } }
   }
   if (e.description === "Duplicate name") return new JoinError("duplicate_name", "Name is already taken")
   if (e.status === "LOCKED") return new JoinError("locked", "Game is locked")
+  // kahoot.js reports an unknown PIN as a failed request; only the HTTP status tells.
+  const notFound = e.error?.response?.statusCode === 404
+  if (notFound || (typeof e.description === "string" && UNKNOWN_PIN.includes(e.description))) {
+    return new JoinError("not_found", "No game with this PIN")
+  }
   const message =
     typeof err === "string" ? err : typeof e.description === "string" ? e.description : "Join failed"
   return new JoinError("unknown", message)
