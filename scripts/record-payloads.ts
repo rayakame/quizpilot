@@ -3,6 +3,7 @@ import { join } from "node:path"
 import { createInterface } from "node:readline/promises"
 import Kahoot from "kahoot.js-latest"
 import { fixtureName, rawLabel, toFixture, type RawMessage } from "./lib/fixtures.js"
+import { twoStepEvent, type TwoStepEvent } from "./lib/two-step.js"
 
 const [pin, name = "Recorder"] = process.argv.slice(2)
 if (!pin) {
@@ -19,8 +20,10 @@ function save(label: string, data: unknown) {
 }
 
 const client = new Kahoot()
-client.handlers.recorder = (msg) =>
+client.handlers.recorder = (msg) => {
   save(`raw ${rawLabel(msg as RawMessage)}`, toFixture(msg as RawMessage))
+  onTwoStep(twoStepEvent(msg as RawMessage))
+}
 
 const emit = client.emit.bind(client)
 client.emit = (event: string, ...args: unknown[]) => {
@@ -34,12 +37,19 @@ client.on("QuestionStart", (question: { answer(choice: number): Promise<unknown>
   question.answer(0).catch(() => {})
 })
 
-client.on("TwoFactorReset", async () => {
+// kahoot.js drops these because Kahoot's session info reports twoFactorAuth: false even when it's on.
+let asking = false
+async function onTwoStep(event: TwoStepEvent | null) {
+  if (event === "wrong") console.log("two-step code was wrong")
+  if (event === "correct") console.log("two-step code accepted")
+  if (event !== "reset" || asking) return
+  asking = true
   const rl = createInterface({ input: process.stdin, output: process.stdout })
   const code = await rl.question("two-step code, 0=red 1=blue 2=yellow 3=green (e.g. 0213): ")
   rl.close()
-  await client.answerTwoFactorAuth(code.trim().split("").map(Number))
-})
+  asking = false
+  await client.answerTwoFactorAuth(code.trim().split("").map(Number)).catch(() => {})
+}
 
 client.on("Disconnect", (reason: string) => {
   console.log(`disconnected (${reason}), saved to ${dir}`)
