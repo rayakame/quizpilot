@@ -233,6 +233,21 @@ describe("decide: image questions", () => {
     await expect(p).resolves.toMatchObject({ source: "jev" })
   })
 
+  it("answers before the deadline when a late join meets a hanging image", async () => {
+    const d = deps({ loadImage: vi.fn(() => new Promise<Uint8Array | null>(() => {})) })
+    let done = false
+    const p = decide(
+      quiz({ image: { url: "https://images-cdn.kahoot.it/x" }, timeLimitMs: 5000 }),
+      Date.now() - 2000,
+      NO_CONTEXT,
+      settings,
+      d,
+    ).then(() => (done = true))
+    await vi.advanceTimersByTimeAsync(1499)
+    expect(done).toBe(true)
+    await p
+  })
+
   it("goes on with text only when the image download hangs", async () => {
     const d = deps({ loadImage: vi.fn(() => new Promise<Uint8Array | null>(() => {})) })
     const r = await run(withImage(), d)

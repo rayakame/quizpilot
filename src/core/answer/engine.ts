@@ -15,6 +15,7 @@ import {
 export const TIMING = {
   answerMarginMs: 1500,
   imageTimeoutMs: 3000,
+  jevReserveMs: 1000,
   jevTimeoutMs: 4000,
   fallbackMinRemainingMs: 3000,
   webSearchMinRemainingMs: 8000,
@@ -89,7 +90,8 @@ export async function decide(
   if (q.type === "survey" || q.type === "unknown" || q.title === null) return guess(q, deps)
   if (CHOICE_TYPES.has(q.type) && q.choices.length === 0) return guess(q, deps)
 
-  const images = await loadImages(q, deps)
+  const imageBudget = Math.min(TIMING.imageTimeoutMs, remaining() - TIMING.jevReserveMs)
+  const images = await loadImages(q, deps, imageBudget)
   const input: JevInput = {
     question: q.title,
     options: q.choices.map((c) => c.text),
@@ -150,9 +152,9 @@ export async function decide(
   return jev ? fromJev(jev, usage) : guess(q, deps, usage)
 }
 
-async function loadImages(q: Question, deps: EngineDeps) {
+async function loadImages(q: Question, deps: EngineDeps, budgetMs: number) {
   const load = (ref: ImageRef | null) =>
-    ref ? withTimeout(deps.loadImage(ref), TIMING.imageTimeoutMs, null) : Promise.resolve(null)
+    ref ? withTimeout(deps.loadImage(ref), budgetMs, null) : Promise.resolve(null)
   const [question, ...options] = await Promise.all([
     load(q.image),
     ...q.choices.map((c) => load(c.image)),
