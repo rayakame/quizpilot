@@ -97,6 +97,7 @@ export async function decide(
     question: q.title,
     options: q.choices.map((c) => c.text),
     questionImage: images.question,
+    questionImageAlt: q.imageAlt ?? null,
     optionImages: images.options,
     context,
   }

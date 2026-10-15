@@ -28,6 +28,7 @@ const input = (over: Partial<JevInput> = {}): JevInput => ({
   question: "Hauptstadt der Schweiz",
   options: ["Zürich", "Bern", "Genf", "Basel"],
   questionImage: null,
+  questionImageAlt: null,
   optionImages: [null, null, null, null],
   context: NO_CONTEXT,
   ...over,
@@ -122,6 +123,16 @@ describe("chooseOne", () => {
     expect(state(s).previous_questions).toEqual(["Q1: Fluss durch München? → Isar ✓"])
     expect(String(question(s, "answer").instructions)).toContain("`quiz_context`")
     expect(String(question(s, "answer").instructions)).toContain("`previous_questions`")
+  })
+
+  it("describes the question image when Kahoot provides alt text", async () => {
+    const { jev, sent } = fake({
+      answer: { type: "choice", choice: "2", confidence: 0.9, probabilities: { "2": 0.9 } },
+    })
+    await jev.chooseOne(input({ questionImageAlt: "Paris skyline with Eiffel Tower" }), { signal })
+    const s = sent[0]!
+    expect(state(s).image_description).toBe("Paris skyline with Eiffel Tower")
+    expect(String(question(s, "answer").instructions)).toContain("`image_description`")
   })
 
   it("rejects labels outside the options", async () => {

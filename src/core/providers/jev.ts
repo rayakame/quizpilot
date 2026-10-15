@@ -24,6 +24,7 @@ export interface JevInput {
   question: string
   options: (string | null)[]
   questionImage: Uint8Array | null
+  questionImageAlt: string | null
   optionImages: (Uint8Array | null)[]
   context: AskContext
 }
@@ -158,6 +159,7 @@ function buildState(input: JevInput): { [key: string]: ContentValue } {
     options: input.options.map((o) => o ?? "(image)"),
   }
   if (input.questionImage) state.image = image(input.questionImage)
+  if (input.questionImageAlt) state.image_description = input.questionImageAlt
   if (input.context.quizContext) state.quiz_context = input.context.quizContext
   if (input.context.previous.length > 0) {
     state.previous_questions = formatPrevious(input.context.previous)
@@ -167,6 +169,9 @@ function buildState(input: JevInput): { [key: string]: ContentValue } {
 
 function instructions(base: string, input: JevInput): string {
   const hints = [base]
+  if (input.questionImageAlt) {
+    hints.push("`image_description` describes the image shown with the question.")
+  }
   if (input.context.quizContext) hints.push("`quiz_context` describes the quiz.")
   if (input.context.previous.length > 0) {
     hints.push("`previous_questions` lists earlier questions from the same quiz.")

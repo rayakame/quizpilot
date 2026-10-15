@@ -273,6 +273,12 @@ describe("decide: image questions", () => {
     await p
   })
 
+  it("hands Kahoot's image description to Jev", async () => {
+    const d = deps()
+    await run(quiz({ image: { url: "https://media.kahoot.it/x" }, imageAlt: "Paris skyline" }), d)
+    expect(vi.mocked(d.jev.chooseOne).mock.calls[0]?.[0].questionImageAlt).toBe("Paris skyline")
+  })
+
   it("goes on with text only when the image download hangs", async () => {
     const d = deps({ loadImage: vi.fn(() => new Promise<Uint8Array | null>(() => {})) })
     const r = await run(withImage(), d)
