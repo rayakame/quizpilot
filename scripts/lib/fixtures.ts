@@ -1,8 +1,4 @@
-export interface RawMessage {
-  channel?: string
-  data?: { id?: number; type?: string; content?: unknown; [key: string]: unknown }
-  [key: string]: unknown
-}
+import type { RawMessage } from "../../src/core/kahoot/raw.js"
 
 export function fixtureName(seq: number, label: string): string {
   const slug = label.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "")

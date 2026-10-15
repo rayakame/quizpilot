@@ -2,7 +2,7 @@ import { mkdirSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
 import { createInterface } from "node:readline/promises"
 import Kahoot from "kahoot.js-latest"
-import { fixtureName, rawLabel, toFixture, type RawMessage } from "./lib/fixtures.js"
+import type { RawMessage } from "../src/core/kahoot/raw.js"
 import {
   parseSequence,
   recoveryRequest,
@@ -10,7 +10,8 @@ import {
   twoStepAnswer,
   twoStepEvent,
   type TwoStepEvent,
-} from "./lib/two-step.js"
+} from "../src/core/kahoot/two-step.js"
+import { fixtureName, rawLabel, toFixture } from "./lib/fixtures.js"
 
 const [pinArg, name = "Recorder"] = process.argv.slice(2)
 if (!pinArg) {

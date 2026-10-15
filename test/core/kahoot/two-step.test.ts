@@ -5,7 +5,7 @@ import {
   TwoStepGate,
   twoStepAnswer,
   twoStepEvent,
-} from "../../scripts/lib/two-step.js"
+} from "../../../src/core/kahoot/two-step.js"
 
 describe("recoveryRequest", () => {
   it("asks the host for recovery data like the official client does after two-step", () => {

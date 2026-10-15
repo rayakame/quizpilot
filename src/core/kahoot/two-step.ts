@@ -1,4 +1,4 @@
-import type { RawMessage } from "./fixtures.js"
+import type { RawMessage } from "./raw.js"
 
 export type TwoStepEvent = "reset" | "wrong" | "correct"
 
