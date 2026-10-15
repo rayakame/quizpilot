@@ -79,6 +79,7 @@ export class GameSession {
   private readonly previous: PreviousQuestion[] = []
   private readonly listeners = new Set<(event: SessionEvent) => void>()
   private twoStepPending = false
+  private closed = false
 
   constructor(
     private readonly settings: SessionSettings,
@@ -102,6 +103,7 @@ export class GameSession {
     }
     const outcomes: JoinOutcome[] = []
     for (const name of names) {
+      if (this.closed) break
       const bot = this.addBot(name)
       try {
         await bot.adapter.join(pin, name)
@@ -114,6 +116,8 @@ export class GameSession {
         this.bots.splice(this.bots.indexOf(bot), 1)
         this.setStatus(bot, "disconnected", message)
         this.emit({ type: "joinFailed", bot: name, code, message })
+        // kahoot.js keeps the socket open after a taken name so the player can retry.
+        void bot.adapter.leave().catch(() => {})
         outcomes.push({ name, ok: false, code, message })
       }
     }
@@ -136,6 +140,7 @@ export class GameSession {
   }
 
   async leave(name?: string): Promise<void> {
+    if (name === undefined) this.closed = true
     const leaving = this.bots.filter((b) => name === undefined || b.name === name)
     await Promise.all(
       leaving.map(async (bot) => {

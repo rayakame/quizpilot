@@ -119,6 +119,17 @@ describe("joining", () => {
     expect(adapters).toHaveLength(1)
   })
 
+  it("stops joining once everyone was told to leave", async () => {
+    const { session, adapters } = setup()
+    const joining = session.join("123456", ["Anna", "slowBen", "Cem"])
+    await vi.advanceTimersByTimeAsync(10)
+    await session.leave()
+    await vi.advanceTimersByTimeAsync(1000)
+    await joining
+    expect(adapters).toHaveLength(2)
+    expect(adapters.every((a) => a.leave.mock.calls.length === 1)).toBe(true)
+  })
+
   it("lets a failed name be used again", async () => {
     const { session } = setup()
     await session.join("123456", ["bad"])
@@ -129,8 +140,10 @@ describe("joining", () => {
   })
 
   it("marks only the bot whose join failed", async () => {
-    const { session, events } = setup()
+    const { session, adapters, events } = setup()
     await session.join("123456", ["Anna", "bad"])
+    expect(adapters[1]!.leave).toHaveBeenCalledTimes(1)
+    expect(adapters[0]!.leave).not.toHaveBeenCalled()
     expect(statusOf(events, "Anna")?.status).toBe("lobby")
     expect(statusOf(events, "bad")).toMatchObject({
       status: "disconnected",

@@ -8,6 +8,7 @@ import { Emitter } from "../../src/core/util/emitter.js"
 
 export class FakeAdapter extends Emitter<AdapterEvents> implements KahootAdapterLike {
   join = vi.fn<KahootAdapterLike["join"]>(async (_pin, name) => {
+    if (name.startsWith("slow")) await new Promise((resolve) => setTimeout(resolve, 1000))
     if (name.startsWith("bad")) throw new JoinError("duplicate_name", "Name is already taken")
   })
   answer = vi.fn<KahootAdapterLike["answer"]>(async () => {})
