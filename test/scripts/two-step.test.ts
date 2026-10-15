@@ -1,5 +1,24 @@
 import { describe, expect, it } from "vitest"
-import { parseSequence, TwoStepGate, twoStepAnswer, twoStepEvent } from "../../scripts/lib/two-step.js"
+import {
+  parseSequence,
+  recoveryRequest,
+  TwoStepGate,
+  twoStepAnswer,
+  twoStepEvent,
+} from "../../scripts/lib/two-step.js"
+
+describe("recoveryRequest", () => {
+  it("asks the host for recovery data like the official client does after two-step", () => {
+    const msg = recoveryRequest("281651", "client-1")
+    expect(msg).toEqual({
+      channel: "/service/controller",
+      clientId: "client-1",
+      ext: {},
+      data: { id: 16, type: "message", gameid: "281651", host: "kahoot.it", content: expect.any(String) },
+    })
+    expect(JSON.parse(msg.data.content)).toEqual({ usingNamerator: false })
+  })
+})
 
 describe("TwoStepGate", () => {
   it("asks once per reset until the code is accepted", () => {

@@ -5,6 +5,7 @@ import Kahoot from "kahoot.js-latest"
 import { fixtureName, rawLabel, toFixture, type RawMessage } from "./lib/fixtures.js"
 import {
   parseSequence,
+  recoveryRequest,
   TwoStepGate,
   twoStepAnswer,
   twoStepEvent,
@@ -47,9 +48,16 @@ client.on("QuestionStart", (question: { answer(choice: number): Promise<unknown>
 // kahoot.js drops these because Kahoot's session info reports twoFactorAuth: false even when it's on.
 const gate = new TwoStepGate()
 async function onTwoStep(event: TwoStepEvent | null) {
+  const ask = gate.shouldAsk(event)
   if (event === "wrong") console.log("two-step code was wrong")
-  if (event === "correct") console.log("two-step code accepted")
-  if (!gate.shouldAsk(event)) return
+  if (event === "correct") {
+    console.log("two-step code accepted")
+    // The official client re-requests recovery data here; kahoot.js only did it before the code.
+    await client._send(recoveryRequest(pin, client.clientId)).catch((err: unknown) => {
+      console.error("recovery request failed:", err)
+    })
+  }
+  if (!ask) return
   const rl = createInterface({ input: process.stdin, output: process.stdout })
   let sequence: number[] | null = null
   while (!sequence) {

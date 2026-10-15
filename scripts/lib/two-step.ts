@@ -35,16 +35,18 @@ export function parseSequence(input: string): number[] | null {
 
 // kahoot.js still sends {"sequence":"0123"}; the current client sends a list plus the game id.
 export function twoStepAnswer(pin: string, sequence: number[], clientId: string) {
+  return controllerMessage(pin, clientId, 50, { gameId: pin, sequence })
+}
+
+export function recoveryRequest(pin: string, clientId: string) {
+  return controllerMessage(pin, clientId, 16, { usingNamerator: false })
+}
+
+function controllerMessage(pin: string, clientId: string, id: number, content: unknown) {
   return {
     channel: "/service/controller",
     clientId,
     ext: {},
-    data: {
-      id: 50,
-      type: "message",
-      gameid: pin,
-      host: "kahoot.it",
-      content: JSON.stringify({ gameId: pin, sequence }),
-    },
+    data: { id, type: "message", gameid: pin, host: "kahoot.it", content: JSON.stringify(content) },
   }
 }
