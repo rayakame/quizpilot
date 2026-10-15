@@ -48,7 +48,8 @@ export function fromEstimate(r: { value: number; confidence: number }, range: Sl
   }
 }
 
-export function snap(value: number, { min, max, step }: SliderRange): number {
+export function snap(value: number, { min, max, step: rawStep }: SliderRange): number {
+  const step = rawStep > 0 ? rawStep : 1
   const snapped = Number((min + Math.round((value - min) / step) * step).toFixed(10))
   if (snapped > max) return Number((min + Math.floor((max - min) / step) * step).toFixed(10))
   return Math.max(min, snapped)

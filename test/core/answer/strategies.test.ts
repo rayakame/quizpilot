@@ -69,6 +69,11 @@ describe("snap", () => {
     expect(snap(-7.4, { min: -10, max: 10, step: 2 })).toBe(-8)
     expect(snap(10, { min: 0, max: 10, step: 3 })).toBe(9)
   })
+
+  it("never returns NaN for a missing or zero step", () => {
+    expect(snap(5.4, { min: 0, max: 10, step: 0 })).toBe(5)
+    expect(snap(5.4, { min: 0, max: 10, step: Number.NaN })).toBe(5)
+  })
 })
 
 describe("fromEstimate", () => {
