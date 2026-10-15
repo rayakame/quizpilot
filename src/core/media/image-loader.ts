@@ -2,7 +2,8 @@ import sharp from "sharp"
 import type { ImageRef } from "../types.js"
 
 const MAX_SIDE = 1568
-const MIN_SIDE = 256
+// TypeSafe's docs allow 256 px per side, but the API rejects anything below 280.
+const MIN_SIDE = 280
 
 export async function normalizeImage(bytes: Uint8Array): Promise<Uint8Array> {
   const input = Buffer.from(bytes)
@@ -12,8 +13,19 @@ export async function normalizeImage(bytes: Uint8Array): Promise<Uint8Array> {
   const shortest = Math.min(width, height)
   let scale = Math.min(1, MAX_SIDE / longest)
   if (shortest * scale < MIN_SIDE) scale = Math.min(MIN_SIDE / shortest, MAX_SIDE / longest)
+  const w = Math.round(width * scale)
+  const h = Math.round(height * scale)
+  const padX = Math.max(0, MIN_SIDE - w)
+  const padY = Math.max(0, MIN_SIDE - h)
   const out = await sharp(input)
-    .resize(Math.round(width * scale), Math.round(height * scale))
+    .resize(w, h)
+    .extend({
+      left: Math.floor(padX / 2),
+      right: Math.ceil(padX / 2),
+      top: Math.floor(padY / 2),
+      bottom: Math.ceil(padY / 2),
+      background: "#ffffff",
+    })
     .flatten({ background: "#ffffff" })
     .jpeg({ quality: 85 })
     .toBuffer()

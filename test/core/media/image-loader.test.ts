@@ -31,18 +31,34 @@ describe("normalizeImage", () => {
     })
   })
 
-  it("turns transparent PNGs into JPEGs and keeps fitting sizes", async () => {
-    expect(await info(await normalizeImage(await picture(256, 341, true)))).toEqual({
-      width: 256,
-      height: 341,
+  it("keeps fitting sizes", async () => {
+    expect(await info(await normalizeImage(await picture(436, 458)))).toEqual({
+      width: 436,
+      height: 458,
       format: "jpeg",
     })
   })
 
-  it("enlarges tiny images to 256 px on the short side", async () => {
+  it("turns transparent PNGs into JPEGs at least 280 px wide, as TypeSafe requires", async () => {
+    expect(await info(await normalizeImage(await picture(256, 341, true)))).toEqual({
+      width: 280,
+      height: 373,
+      format: "jpeg",
+    })
+  })
+
+  it("enlarges tiny images to 280 px on the short side", async () => {
     expect(await info(await normalizeImage(await picture(100, 80)))).toEqual({
-      width: 320,
-      height: 256,
+      width: 350,
+      height: 280,
+      format: "jpeg",
+    })
+  })
+
+  it("pads very wide images instead of breaking a limit", async () => {
+    expect(await info(await normalizeImage(await picture(3000, 400)))).toEqual({
+      width: 1568,
+      height: 280,
       format: "jpeg",
     })
   })
