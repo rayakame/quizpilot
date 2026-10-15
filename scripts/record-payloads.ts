@@ -3,13 +3,14 @@ import { join } from "node:path"
 import { createInterface } from "node:readline/promises"
 import Kahoot from "kahoot.js-latest"
 import { fixtureName, rawLabel, toFixture, type RawMessage } from "./lib/fixtures.js"
-import { twoStepEvent, type TwoStepEvent } from "./lib/two-step.js"
+import { parseSequence, twoStepAnswer, twoStepEvent, type TwoStepEvent } from "./lib/two-step.js"
 
-const [pin, name = "Recorder"] = process.argv.slice(2)
-if (!pin) {
+const [pinArg, name = "Recorder"] = process.argv.slice(2)
+if (!pinArg) {
   console.error("usage: pnpm record <pin> [name]")
   process.exit(1)
 }
+const pin: string = pinArg
 
 const dir = join("test", "fixtures", "kahoot", new Date().toISOString().replace(/[:.]/g, "-"))
 mkdirSync(dir, { recursive: true })
@@ -45,10 +46,17 @@ async function onTwoStep(event: TwoStepEvent | null) {
   if (event !== "reset" || asking) return
   asking = true
   const rl = createInterface({ input: process.stdin, output: process.stdout })
-  const code = await rl.question("two-step code, 0=red 1=blue 2=yellow 3=green (e.g. 0213): ")
+  let sequence: number[] | null = null
+  while (!sequence) {
+    const code = await rl.question("two-step code, 0=red 1=blue 2=yellow 3=green (e.g. 0213): ")
+    sequence = parseSequence(code)
+    if (!sequence) console.log("need four different digits 0-3")
+  }
   rl.close()
   asking = false
-  await client.answerTwoFactorAuth(code.trim().split("").map(Number)).catch(() => {})
+  await client._send(twoStepAnswer(pin, sequence, client.clientId)).catch((err: unknown) => {
+    console.error("sending the code failed:", err)
+  })
 }
 
 client.on("Disconnect", (reason: string) => {
