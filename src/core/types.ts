@@ -31,6 +31,7 @@ export interface Question {
   title: string | null
   choices: Choice[]
   image: ImageRef | null
+  imageAlt?: string | null
   timeLimitMs: number
   slider?: SliderRange
   raw: unknown
