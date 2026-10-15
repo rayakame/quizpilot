@@ -56,7 +56,21 @@ export async function removeFallback(store: SettingsStore): Promise<void> {
 export function fallbackFor(config: Config): FallbackProvider | null {
   const provider = config.fallback.provider
   const key = config.keys[provider]
-  return key ? logFailures(createFallback(provider, key, config.fallback.models[provider])) : null
+  if (!key) return null
+  return retryWithoutSearch(
+    logFailures(createFallback(provider, key, config.fallback.models[provider])),
+  )
+}
+
+// Not every provider is confirmed to take web search and a JSON schema together.
+export function retryWithoutSearch(provider: FallbackProvider): FallbackProvider {
+  return {
+    decide: (input, opts) =>
+      provider.decide(input, opts).catch((err: unknown) => {
+        if (!opts.webSearch || opts.signal.aborted) throw err
+        return provider.decide(input, { ...opts, webSearch: false })
+      }),
+  }
 }
 
 // The engine treats a failed backup answer like a missing one; keep the reason visible.

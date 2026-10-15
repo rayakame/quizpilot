@@ -5,12 +5,13 @@ import { mkdtemp } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { describe, expect, it, vi } from "vitest"
-import type { FallbackInput } from "../../src/core/answer/engine.js"
+import type { FallbackInput, FallbackProvider } from "../../src/core/answer/engine.js"
 import {
   checkFallbackKey,
   fallbackFor,
   logFailures,
   removeFallback,
+  retryWithoutSearch,
   saveFallback,
   type KeyProbe,
 } from "../../src/main/fallback.js"
@@ -122,5 +123,42 @@ describe("logFailures", () => {
       provider.decide(input, { signal: cancelled.signal, webSearch: true }),
     ).rejects.toThrow()
     expect(log).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe("retryWithoutSearch", () => {
+  const input = {} as FallbackInput
+  const answer = {
+    answer: { kind: "choice" as const, index: 1 },
+    confidence: 0.8,
+    provider: "openai",
+    model: "gpt-6.1-sol",
+    usage: { provider: "openai", model: "gpt-6.1-sol", inputTokens: 1, outputTokens: 1 },
+  }
+
+  it("asks again without web search when the search request fails", async () => {
+    const decide = vi.fn<FallbackProvider["decide"]>(async (_input, opts) => {
+      if (opts.webSearch) throw new Error("400 tools not supported with json_schema")
+      return answer
+    })
+    const signal = new AbortController().signal
+    await expect(
+      retryWithoutSearch({ decide }).decide(input, { signal, webSearch: true }),
+    ).resolves.toBe(answer)
+    expect(decide.mock.calls.map((c) => c[1].webSearch)).toEqual([true, false])
+  })
+
+  it("doesn't retry without search, or after the engine gave up", async () => {
+    const decide = vi.fn<FallbackProvider["decide"]>(() => Promise.reject(new Error("nope")))
+    const live = new AbortController().signal
+    await expect(
+      retryWithoutSearch({ decide }).decide(input, { signal: live, webSearch: false }),
+    ).rejects.toThrow()
+    const cancelled = new AbortController()
+    cancelled.abort()
+    await expect(
+      retryWithoutSearch({ decide }).decide(input, { signal: cancelled.signal, webSearch: true }),
+    ).rejects.toThrow()
+    expect(decide).toHaveBeenCalledTimes(2)
   })
 })
