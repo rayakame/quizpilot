@@ -1,5 +1,6 @@
 import { chmod, mkdir, readFile, rename, writeFile } from "node:fs/promises"
 import { dirname } from "node:path"
+import { FALLBACK_PROVIDERS, type FallbackProviderId } from "../core/providers/fallback/ids.js"
 import type { PublicSettings, Timing } from "../shared/api.js"
 import { MAX_DELAY_MS } from "../shared/start.js"
 
@@ -7,7 +8,7 @@ export interface Config {
   version: 1
   keys: { typesafe: string; anthropic: string; openai: string; gemini: string }
   fallback: {
-    provider: "anthropic" | "openai" | "gemini"
+    provider: FallbackProviderId
     models: Record<string, string>
     below: number
     imageInstantAt: number
@@ -72,7 +73,7 @@ export function parseConfig(raw: unknown): Config {
       gemini: str(keys.gemini, d.keys.gemini),
     },
     fallback: {
-      provider: oneOf(fallback.provider, ["anthropic", "openai", "gemini"], d.fallback.provider),
+      provider: oneOf(fallback.provider, FALLBACK_PROVIDERS, d.fallback.provider),
       models: Object.fromEntries(
         Object.entries(obj(fallback.models)).filter(
           (e): e is [string, string] => typeof e[1] === "string",
@@ -99,6 +100,11 @@ export function toPublic(config: Config): PublicSettings {
     hasTypesafeKey: config.keys.typesafe !== "",
     timing: config.behavior.timing,
     includePrevious: config.context.includePrevious,
+    fallback: {
+      provider: config.fallback.provider,
+      webSearch: config.fallback.webSearch,
+      savedKeys: FALLBACK_PROVIDERS.filter((p) => config.keys[p] !== ""),
+    },
   }
 }
 

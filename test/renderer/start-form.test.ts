@@ -6,6 +6,7 @@ const settings: PublicSettings = {
   hasTypesafeKey: true,
   timing: { mode: "human", minMs: 1000, maxMs: 5000 },
   includePrevious: false,
+  fallback: { provider: "anthropic", webSearch: true, savedKeys: [] },
 }
 
 const counter = () => {

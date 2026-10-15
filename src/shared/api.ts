@@ -1,4 +1,5 @@
 import type { JoinErrorCode } from "../core/kahoot/adapter.js"
+import type { FallbackProviderId } from "../core/providers/fallback/ids.js"
 import type { JoinOutcome, SessionEvent, SessionSettings } from "../core/session/game-session.js"
 import type { Question } from "../core/types.js"
 
@@ -12,6 +13,13 @@ export interface PublicSettings {
   hasTypesafeKey: boolean
   timing: Timing
   includePrevious: boolean
+  fallback: { provider: FallbackProviderId; webSearch: boolean; savedKeys: FallbackProviderId[] }
+}
+
+export interface FallbackSetup {
+  provider: FallbackProviderId
+  key: string
+  webSearch: boolean
 }
 
 export interface StartRequest {

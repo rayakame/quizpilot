@@ -92,13 +92,14 @@ describe("SettingsStore", () => {
 
 describe("toPublic", () => {
   it("tells the window whether a key exists, never the key itself", () => {
-    const config = { ...DEFAULT_CONFIG, keys: { ...DEFAULT_CONFIG.keys, typesafe: "ts-secret" } }
-    const view = toPublic(config)
+    const keys = { ...DEFAULT_CONFIG.keys, typesafe: "ts-secret", openai: "sk-secret" }
+    const view = toPublic({ ...DEFAULT_CONFIG, keys })
     expect(view).toEqual({
       hasTypesafeKey: true,
       timing: DEFAULT_CONFIG.behavior.timing,
       includePrevious: true,
+      fallback: { provider: "anthropic", webSearch: true, savedKeys: ["openai"] },
     })
-    expect(JSON.stringify(view)).not.toContain("ts-secret")
+    expect(JSON.stringify(view)).not.toContain("secret")
   })
 })
