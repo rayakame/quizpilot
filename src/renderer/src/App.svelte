@@ -4,14 +4,22 @@
   import { Toaster } from "$lib/components/ui/sonner/index.js"
   import { game } from "$lib/game.svelte.js"
   import type { PublicSettings } from "../../shared/api.js"
+  import Dashboard from "./views/Dashboard.svelte"
   import KeySetup from "./views/KeySetup.svelte"
   import StartWizard from "./views/StartWizard.svelte"
+  import TwoStepDialog from "./views/TwoStepDialog.svelte"
 
   let settings = $state<PublicSettings | null>(null)
   let changingKey = $state(false)
 
   async function refresh() {
     settings = await window.quizpilot.getSettings()
+  }
+
+  async function newGame() {
+    await window.quizpilot.endGame()
+    game.reset()
+    await refresh()
   }
 
   void refresh()
@@ -38,13 +46,10 @@
         }}
       />
     {:else if game.started}
-      <ul class="p-6">
-        {#each game.state.bots as bot (bot.name)}
-          <li>{bot.name}: {bot.status}</li>
-        {/each}
-      </ul>
+      <Dashboard onNewGame={newGame} />
     {:else}
       <StartWizard {settings} />
     {/if}
   </main>
 </div>
+<TwoStepDialog />
