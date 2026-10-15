@@ -30,7 +30,22 @@ const session = new GameSession(
     reconnect: true,
   },
   {
-    createAdapter: () => new KahootAdapter(new Kahoot()),
+    createAdapter: () => {
+      const client = new Kahoot()
+      if (process.env.QUIZPILOT_DEBUG) {
+        const id = Math.random().toString(36).slice(2, 6)
+        client.handlers.debug = (m) => {
+          const r = m as { channel?: string; data?: { id?: number; type?: string } }
+          console.log(`[${id} raw] ${r.channel} ${r.data?.id ?? r.data?.type ?? ""}`)
+        }
+        const emit = client.emit.bind(client)
+        client.emit = (event: string, ...rest: unknown[]) => {
+          console.log(`[${id} event] ${event}`)
+          return emit(event, ...rest)
+        }
+      }
+      return new KahootAdapter(client)
+    },
     decide: (q, startedAt, context) =>
       decide(q, startedAt, context, engine, {
         jev,
