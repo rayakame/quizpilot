@@ -1,4 +1,5 @@
 import type { JoinErrorCode } from "../../../core/kahoot/adapter.js"
+import { PROVIDER_NAMES, type FallbackProviderId } from "../../../core/providers/fallback/ids.js"
 import type { BotStatus } from "../../../core/session/game-session.js"
 import type { Decision, QuestionType } from "../../../core/types.js"
 import type { KeyCheck, StartProblem } from "../../../shared/api.js"
@@ -28,10 +29,15 @@ export const ERROR_TEXT: Record<StartProblem | JoinErrorCode, string> = {
   unknown: "Couldn't join the game.",
 }
 
-export const KEY_TEXT: Record<Exclude<KeyCheck, "ok">, string> = {
-  invalid: "TypeSafe doesn't accept this key.",
-  offline: "Couldn't reach TypeSafe. Check your connection.",
-  error: "TypeSafe had a problem. Try again in a moment.",
+export function keyText(problem: Exclude<KeyCheck, "ok">, service: string): string {
+  switch (problem) {
+    case "invalid":
+      return `${service} doesn't accept this key.`
+    case "offline":
+      return `Couldn't reach ${service}. Check your connection.`
+    case "error":
+      return `${service} had a problem. Try again in a moment.`
+  }
 }
 
 export const TYPE_TEXT: Record<QuestionType, string> = {
@@ -55,8 +61,11 @@ export function sourceText(decision: Decision): string {
   switch (decision.source) {
     case "jev":
       return decision.confidence === null ? "Jev" : `Jev · ${percent(decision.confidence)}`
-    case "fallback":
-      return decision.fallback?.model ?? "Fallback"
+    case "fallback": {
+      const id = decision.fallback?.provider as FallbackProviderId | undefined
+      const name = (id && PROVIDER_NAMES[id]) ?? "Backup AI"
+      return decision.confidence === null ? name : `${name} · ${percent(decision.confidence)}`
+    }
     case "quiz-link":
       return "Quiz link"
     case "random":

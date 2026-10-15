@@ -3,7 +3,7 @@
   import * as Card from "$lib/components/ui/card/index.js"
   import { Input } from "$lib/components/ui/input/index.js"
   import { Label } from "$lib/components/ui/label/index.js"
-  import { KEY_TEXT } from "$lib/messages.js"
+  import { keyText } from "$lib/messages.js"
   import type { KeyCheck } from "../../../shared/api.js"
 
   let { firstRun, onDone }: { firstRun: boolean; onDone: () => void } = $props()
@@ -36,7 +36,7 @@
         <Label for="typesafe-key">API key</Label>
         <Input id="typesafe-key" type="password" autocomplete="off" bind:value={key} />
         {#if problem}
-          <p class="text-destructive text-sm">{KEY_TEXT[problem]}</p>
+          <p class="text-destructive text-sm">{keyText(problem, "TypeSafe")}</p>
         {/if}
         <Button
           variant="link"
