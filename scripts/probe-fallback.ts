@@ -4,6 +4,7 @@ import type { FallbackInput } from "../src/core/answer/engine.js"
 import { normalizeImage } from "../src/core/media/image-loader.js"
 import { createFallback } from "../src/core/providers/fallback/create.js"
 import { FALLBACK_PROVIDERS, type FallbackProviderId } from "../src/core/providers/fallback/ids.js"
+import { resolveChoice } from "../src/core/providers/fallback/models.js"
 import type { Question } from "../src/core/types.js"
 
 const ENV: Record<FallbackProviderId, string> = {
@@ -12,13 +13,20 @@ const ENV: Record<FallbackProviderId, string> = {
   gemini: "GEMINI_API_KEY",
 }
 
-const provider = process.argv[2] as FallbackProviderId
-const imagePath = process.argv[3]
+const [provider, ...rest] = process.argv.slice(2) as [FallbackProviderId, ...string[]]
+const flag = (name: string) => {
+  const i = rest.indexOf(name)
+  return i < 0 ? undefined : rest.splice(i, 2)[1]
+}
+const choice = resolveChoice(provider, flag("--model"), flag("--effort"))
+const imagePath = rest[0]
 if (!FALLBACK_PROVIDERS.includes(provider) || !process.env[ENV[provider]]) {
-  console.error(`usage: ${ENV.anthropic}=… pnpm probe:fallback anthropic|openai|gemini [image.jpg]`)
+  console.error(
+    `usage: ${ENV.anthropic}=… pnpm probe:fallback anthropic|openai|gemini [--model id] [--effort level] [image.jpg]`,
+  )
   process.exit(1)
 }
-const fallback = createFallback(provider, process.env[ENV[provider]]!)
+const fallback = createFallback(provider, process.env[ENV[provider]]!, choice)
 
 const choices = (...texts: string[]) => texts.map((text) => ({ text, image: null }))
 const question = (over: Partial<Question>): Question => ({
@@ -93,7 +101,9 @@ async function ask(label: string, input: FallbackInput, webSearch: boolean) {
 }
 
 for (const webSearch of [false, true]) {
-  console.log(`\n${provider}, web search ${webSearch ? "on" : "off"}`)
+  console.log(
+    `\n${choice.model}, effort ${choice.effort ?? "–"}, web search ${webSearch ? "on" : "off"}`,
+  )
   for (const [label, q] of cases) {
     await ask(
       label,
