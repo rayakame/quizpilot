@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { abortable, timeoutSignal, withTimeout } from "../../../src/core/util/async.js"
+import { abortable, sleep, timeoutSignal, withTimeout } from "../../../src/core/util/async.js"
 
 beforeEach(() => vi.useFakeTimers())
 afterEach(() => vi.useRealTimers())
@@ -43,5 +43,16 @@ describe("withTimeout", () => {
     await vi.advanceTimersByTimeAsync(3000)
     await expect(slow).resolves.toBeNull()
     await expect(withTimeout(Promise.reject(new Error("x")), 3000, "f")).resolves.toBe("f")
+  })
+})
+
+describe("sleep", () => {
+  it("resolves after the given time", async () => {
+    let done = false
+    void sleep(1000).then(() => (done = true))
+    await vi.advanceTimersByTimeAsync(999)
+    expect(done).toBe(false)
+    await vi.advanceTimersByTimeAsync(1)
+    expect(done).toBe(true)
   })
 })
