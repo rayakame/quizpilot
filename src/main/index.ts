@@ -3,6 +3,7 @@ import { join } from "node:path"
 import { app, BrowserWindow, dialog, ipcMain, shell } from "electron"
 import { withTimeout } from "../core/util/async.js"
 import { GAME_EVENT_CHANNEL } from "../shared/api.js"
+import { removeFallback, saveFallback } from "./fallback.js"
 import { GameController } from "./game-controller.js"
 import { registerIpc } from "./ipc.js"
 import { createSession } from "./session-factory.js"
@@ -66,6 +67,8 @@ async function start(): Promise<void> {
       }
       return check
     },
+    saveFallback: (setup) => saveFallback(settings, setup),
+    removeFallback: () => removeFallback(settings),
     startGame: async (request) => {
       const result = await controller.start(request)
       if (result.ok) {

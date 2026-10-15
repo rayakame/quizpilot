@@ -6,10 +6,12 @@ import { createImageLoader } from "../core/media/image-loader.js"
 import { createJev } from "../core/providers/jev.js"
 import { GameSession } from "../core/session/game-session.js"
 import type { StartRequest } from "../shared/api.js"
+import { fallbackFor } from "./fallback.js"
 import type { Config } from "./settings.js"
 
 export function createSession(request: StartRequest, config: Config): GameSession {
   const jev = createJev(new TypeSafeClient({ apiKey: config.keys.typesafe }))
+  const fallback = fallbackFor(config)
   const loadImage = createImageLoader()
   const engine: EngineSettings = {
     fallbackBelow: config.fallback.below,
@@ -28,7 +30,7 @@ export function createSession(request: StartRequest, config: Config): GameSessio
       decide: (q, startedAt, context) =>
         decide(q, startedAt, context, engine, {
           jev,
-          fallback: null,
+          fallback,
           loadImage,
           solutions: null,
           now: Date.now,

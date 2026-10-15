@@ -38,6 +38,8 @@ export type StartResult =
 export interface QuizPilotApi {
   getSettings(): Promise<PublicSettings>
   saveTypesafeKey(key: string): Promise<KeyCheck>
+  saveFallback(setup: FallbackSetup): Promise<KeyCheck>
+  removeFallback(): Promise<void>
   startGame(request: StartRequest): Promise<StartResult>
   addBot(name: string): Promise<JoinOutcome>
   submitTwoStep(sequence: number[]): Promise<void>
@@ -53,6 +55,8 @@ export type Invokable = Exclude<keyof QuizPilotApi, "onGameEvent">
 export const CHANNELS = {
   getSettings: "settings:get",
   saveTypesafeKey: "settings:typesafe-key",
+  saveFallback: "settings:fallback",
+  removeFallback: "settings:fallback-remove",
   startGame: "game:start",
   addBot: "game:add-bot",
   submitTwoStep: "game:two-step",

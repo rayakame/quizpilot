@@ -6,6 +6,8 @@ function handlers(): Handlers {
   return {
     getSettings: vi.fn(),
     saveTypesafeKey: vi.fn(),
+    saveFallback: vi.fn(),
+    removeFallback: vi.fn(),
     startGame: vi.fn(),
     addBot: vi.fn(),
     submitTwoStep: vi.fn(),

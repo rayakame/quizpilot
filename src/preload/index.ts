@@ -4,6 +4,8 @@ import { CHANNELS, GAME_EVENT_CHANNEL, type GameEvent, type QuizPilotApi } from 
 const api: QuizPilotApi = {
   getSettings: () => ipcRenderer.invoke(CHANNELS.getSettings),
   saveTypesafeKey: (key) => ipcRenderer.invoke(CHANNELS.saveTypesafeKey, key),
+  saveFallback: (setup) => ipcRenderer.invoke(CHANNELS.saveFallback, setup),
+  removeFallback: () => ipcRenderer.invoke(CHANNELS.removeFallback),
   startGame: (request) => ipcRenderer.invoke(CHANNELS.startGame, request),
   addBot: (name) => ipcRenderer.invoke(CHANNELS.addBot, name),
   submitTwoStep: (sequence) => ipcRenderer.invoke(CHANNELS.submitTwoStep, sequence),
