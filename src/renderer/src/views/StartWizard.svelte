@@ -10,6 +10,7 @@
   import * as RadioGroup from "$lib/components/ui/radio-group/index.js"
   import { Switch } from "$lib/components/ui/switch/index.js"
   import { Textarea } from "$lib/components/ui/textarea/index.js"
+  import MistakesPicker from "./forms/MistakesPicker.svelte"
   import { saveDiagnostics } from "$lib/diagnostics.js"
   import { game } from "$lib/game.svelte.js"
   import { t } from "$lib/i18n.js"
@@ -200,6 +201,7 @@
               </div>
             {/if}
           </div>
+          <MistakesPicker value={form.mistakes} onChange={(rate) => (form.mistakes = rate)} />
           <div class="grid gap-2">
             <Label for="quiz-link">{t.start.quizLink}</Label>
             <Input

@@ -3,6 +3,7 @@ import type { Decision } from "../../src/core/types.js"
 import {
   costText,
   keyText,
+  mistakesText,
   percent,
   quizLinkText,
   secondsText,
@@ -115,5 +116,17 @@ describe("German", () => {
   it("counts questions", () => {
     const result = { ok: true as const, title: "Campus", questions: 1 }
     expect(quizLinkText({ link: "x", result })).toBe("Campus · 1 Frage")
+  })
+})
+
+describe("mistakesText", () => {
+  afterEach(() => setLanguage("en"))
+
+  it("says off or roughly how often", () => {
+    expect(mistakesText(0)).toBe("Off")
+    expect(mistakesText(0.2)).toBe("About 20%")
+    setLanguage("de")
+    expect(mistakesText(0)).toBe("Aus")
+    expect(mistakesText(0.2)).toBe("Etwa 20\u00a0%")
   })
 })

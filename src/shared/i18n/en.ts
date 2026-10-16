@@ -291,6 +291,12 @@ export const en = {
     jevKeyTitle: "TypeSafe key rejected",
     jevKeyBody: "The bots are guessing. Change the key in the settings.",
   },
+  mistakes: {
+    title: "Wrong on purpose",
+    hint: "Bots pick a wrong answer now and then, so they look human. Each bot decides on its own.",
+    off: "Off",
+    about: (share: string) => `About ${share}`,
+  },
   updates: {
     available: (version: string) => `QuizPilot ${version} is out.`,
     ready: (version: string) => `QuizPilot ${version} is ready to install.`,

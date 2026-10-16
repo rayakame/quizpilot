@@ -288,6 +288,12 @@ export const de: Messages = {
     jevKeyTitle: "TypeSafe-Key abgelehnt",
     jevKeyBody: "Die Bots raten. Ändere den Key in den Einstellungen.",
   },
+  mistakes: {
+    title: "Absichtlich falsch antworten",
+    hint: "Die Bots wählen ab und zu eine falsche Antwort, damit sie menschlich wirken. Jeder Bot entscheidet für sich.",
+    off: "Aus",
+    about: (share) => `Etwa ${share}`,
+  },
   updates: {
     available: (version) => `QuizPilot ${version} ist da.`,
     ready: (version) => `QuizPilot ${version} ist bereit zur Installation.`,

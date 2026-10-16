@@ -104,3 +104,7 @@ export function costText({ usd, complete }: Cost): string {
   if (usd < 0.001) return `<\u00a0${money(0.001, 1)}${more}`
   return `≈\u00a0${money(usd)}${more}`
 }
+
+export function mistakesText(rate: number): string {
+  return rate === 0 ? t.mistakes.off : t.mistakes.about(percent(rate))
+}

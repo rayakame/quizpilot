@@ -5,6 +5,7 @@
   import { Switch } from "$lib/components/ui/switch/index.js"
   import { t } from "$lib/i18n.js"
   import { toTiming } from "$lib/start-form.js"
+  import MistakesPicker from "../forms/MistakesPicker.svelte"
   import type { PublicSettings, SettingsPatch } from "../../../../shared/api.js"
   import { timingProblem } from "../../../../shared/start.js"
 
@@ -75,6 +76,7 @@
       <p class="text-destructive text-sm">{t.errors.timing}</p>
     {/if}
   </div>
+  <MistakesPicker value={settings.mistakes} onChange={(rate) => patch({ mistakes: rate })} />
   <div class="flex items-center gap-2">
     <Switch
       id="default-previous"
