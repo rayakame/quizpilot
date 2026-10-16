@@ -1,4 +1,5 @@
 <script lang="ts">
+  import History from "@lucide/svelte/icons/history"
   import Settings from "@lucide/svelte/icons/settings"
   import { ModeWatcher, setMode } from "mode-watcher"
   import { Button } from "$lib/components/ui/button/index.js"
@@ -8,6 +9,7 @@
   import type { PublicSettings } from "../../shared/api.js"
   import Dashboard from "./views/Dashboard.svelte"
   import FallbackSetup from "./views/FallbackSetup.svelte"
+  import HistoryPage from "./views/history/HistoryPage.svelte"
   import KeySetup from "./views/KeySetup.svelte"
   import SettingsPage from "./views/settings/Settings.svelte"
   import StartWizard from "./views/StartWizard.svelte"
@@ -55,15 +57,24 @@
       <span class="font-semibold">QuizPilot</span>
     </div>
     {#if canOpenSettings && view === null}
-      <Button
-        variant="ghost"
-        size="icon-sm"
-        aria-label="Settings"
-        class="[-webkit-app-region:no-drag]"
-        onclick={() => (view = "settings")}
-      >
-        <Settings />
-      </Button>
+      <div class="flex items-center gap-1 [-webkit-app-region:no-drag]">
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          aria-label="History"
+          onclick={() => (view = "history")}
+        >
+          <History />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          aria-label="Settings"
+          onclick={() => (view = "settings")}
+        >
+          <Settings />
+        </Button>
+      </div>
     {/if}
   </header>
   <main class="min-h-0 flex-1">
@@ -87,6 +98,8 @@
         onChange={(next) => (settings = next)}
         onClose={() => (view = null)}
       />
+    {:else if view === "history"}
+      <HistoryPage {settings} onClose={() => (view = null)} />
     {:else if game.started}
       <Dashboard
         onNewGame={newGame}
