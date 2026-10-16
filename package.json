@@ -3,7 +3,7 @@
   "productName": "QuizPilot",
   "version": "1.0.0",
   "description": "Joins Kahoot games with a few bots that answer with AI",
-  "author": "Christopher",
+  "author": "rayakame",
   "homepage": "https://github.com/rayakame/quizpilot",
   "repository": "github:rayakame/quizpilot",
   "private": true,
