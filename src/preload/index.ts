@@ -8,6 +8,7 @@ import {
 } from "../shared/api.js"
 
 const api: QuizPilotApi = {
+  platform: process.platform,
   getSettings: () => ipcRenderer.invoke(CHANNELS.getSettings),
   saveSettings: (patch) => ipcRenderer.invoke(CHANNELS.saveSettings, patch),
   getAppInfo: () => ipcRenderer.invoke(CHANNELS.getAppInfo),

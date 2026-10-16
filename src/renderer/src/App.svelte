@@ -44,7 +44,12 @@
 <ModeWatcher />
 <Toaster position="bottom-center" />
 <div class="flex h-screen flex-col">
-  <header class="flex h-12 shrink-0 items-center justify-between border-b px-4">
+  <header
+    class={[
+      "flex h-12 shrink-0 items-center justify-between border-b pr-4 select-none [-webkit-app-region:drag]",
+      window.quizpilot.platform === "darwin" ? "pl-22" : "pl-4",
+    ]}
+  >
     <div class="flex items-center gap-2">
       <Logo class="size-6" />
       <span class="font-semibold">QuizPilot</span>
@@ -54,6 +59,7 @@
         variant="ghost"
         size="icon-sm"
         aria-label="Settings"
+        class="[-webkit-app-region:no-drag]"
         onclick={() => (view = "settings")}
       >
         <Settings />

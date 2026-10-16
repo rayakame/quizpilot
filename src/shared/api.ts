@@ -64,6 +64,7 @@ export type StartResult =
   { ok: true } | { ok: false; error: StartProblem | JoinErrorCode; message: string }
 
 export interface QuizPilotApi {
+  readonly platform: string
   getSettings(): Promise<PublicSettings>
   saveSettings(patch: SettingsPatch): Promise<PublicSettings>
   getAppInfo(): Promise<AppInfo>
@@ -81,7 +82,7 @@ export interface QuizPilotApi {
   onOpenSettings(listener: () => void): () => void
 }
 
-export type Invokable = Exclude<keyof QuizPilotApi, "onGameEvent" | "onOpenSettings">
+export type Invokable = Exclude<keyof QuizPilotApi, "platform" | "onGameEvent" | "onOpenSettings">
 
 export const CHANNELS = {
   getSettings: "settings:get",

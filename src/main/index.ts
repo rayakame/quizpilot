@@ -1,6 +1,15 @@
 import { rename } from "node:fs/promises"
 import { join } from "node:path"
-import { app, BrowserWindow, dialog, ipcMain, Menu, nativeImage, shell } from "electron"
+import {
+  app,
+  BrowserWindow,
+  dialog,
+  ipcMain,
+  Menu,
+  nativeImage,
+  nativeTheme,
+  shell,
+} from "electron"
 import { withTimeout } from "../core/util/async.js"
 import { GAME_EVENT_CHANNEL, OPEN_SETTINGS_CHANNEL } from "../shared/api.js"
 import { removeFallback, saveFallback } from "./fallback.js"
@@ -10,6 +19,7 @@ import { menuTemplate } from "./menu.js"
 import { createSession } from "./session-factory.js"
 import { applyPatch, DEFAULT_CONFIG, loadConfig, SettingsStore, toPublic } from "./settings.js"
 import { checkTypesafeKey } from "./typesafe.js"
+import { frameOptions } from "./window.js"
 
 let win: BrowserWindow | null = null
 const icon = () => join(app.getAppPath(), "resources/icon.png")
@@ -23,6 +33,7 @@ function createWindow(): BrowserWindow {
     title: "QuizPilot",
     icon: icon(),
     show: false,
+    ...frameOptions(process.platform),
     webPreferences: { preload: join(import.meta.dirname, "../preload/index.cjs") },
   })
   w.once("ready-to-show", () => w.show())
@@ -53,6 +64,7 @@ async function openSettings(file: string): Promise<SettingsStore | null> {
 async function start(): Promise<void> {
   const settings = await openSettings(join(app.getPath("userData"), "config.json"))
   if (!settings) return app.quit()
+  nativeTheme.themeSource = settings.get().ui.theme
 
   const controller = new GameController({
     createSession: (request) => createSession(request, settings.get()),
@@ -65,6 +77,7 @@ async function start(): Promise<void> {
     getSettings: async () => toPublic(settings.get()),
     saveSettings: async (patch) => {
       await settings.update((c) => applyPatch(c, patch))
+      nativeTheme.themeSource = settings.get().ui.theme
       return toPublic(settings.get())
     },
     getAppInfo: async () => ({ version: app.getVersion() }),
