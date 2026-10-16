@@ -1,7 +1,7 @@
 {
   "name": "quizpilot",
   "productName": "QuizPilot",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
   "main": "./out/main/index.js",
@@ -17,7 +17,8 @@
     "record": "tsx scripts/record-payloads.ts",
     "probe:typesafe": "tsx scripts/probe-typesafe.ts",
     "probe:fallback": "tsx scripts/probe-fallback.ts",
-    "play": "tsx scripts/play.ts"
+    "play": "tsx scripts/play.ts",
+    "icons": "tsx scripts/make-icons.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.134.0",
