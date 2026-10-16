@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest"
-import { addField, newForm, stepProblem, toRequest } from "../../src/renderer/src/lib/start-form.js"
+import {
+  addField,
+  newForm,
+  stepProblem,
+  toRequest,
+  toTiming,
+} from "../../src/renderer/src/lib/start-form.js"
 import type { PublicSettings } from "../../src/shared/api.js"
 
 const settings: PublicSettings = {
@@ -77,5 +83,12 @@ describe("start form", () => {
     expect(stepProblem(form, 1)).toBe("name_taken")
     form.minSeconds = 9
     expect(stepProblem(form, 2)).toBe("timing")
+  })
+})
+
+describe("toTiming", () => {
+  it("turns seconds from the form into milliseconds", () => {
+    expect(toTiming(true, 1.5, 4)).toEqual({ mode: "human", minMs: 1500, maxMs: 4000 })
+    expect(toTiming(false, 1, 5)).toEqual({ mode: "instant", minMs: 1000, maxMs: 5000 })
   })
 })

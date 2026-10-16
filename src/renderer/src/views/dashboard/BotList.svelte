@@ -7,7 +7,7 @@
   import { Button } from "$lib/components/ui/button/index.js"
   import { game } from "$lib/game.svelte.js"
   import { canLeave, canPause, type BotView } from "$lib/game-state.js"
-  import { ERROR_TEXT, STATUS_TEXT } from "$lib/messages.js"
+  import { ERROR_TEXT, statusText } from "$lib/messages.js"
   import { suggestName } from "../../../../core/names/names.js"
 
   let { onNewGame }: { onNewGame: () => void } = $props()
@@ -40,7 +40,7 @@
         <div class="flex items-center justify-between gap-2">
           <span class="truncate font-medium">{bot.name}</span>
           <Badge variant={bot.joinError || bot.status === "kicked" ? "destructive" : "secondary"}>
-            {STATUS_TEXT[bot.status]}
+            {statusText(bot.status, bot.detail)}
           </Badge>
         </div>
         <div class="text-muted-foreground text-sm">

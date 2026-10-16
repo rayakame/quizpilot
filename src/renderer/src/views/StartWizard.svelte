@@ -15,7 +15,7 @@
   import { addField, botName, newForm, stepProblem, toRequest } from "$lib/start-form.js"
   import { generateName } from "../../../core/names/names.js"
   import { MAX_BOTS } from "../../../core/session/game-session.js"
-  import type { PublicSettings } from "../../../shared/api.js"
+  import type { PublicSettings, StartResult } from "../../../shared/api.js"
 
   let { settings }: { settings: PublicSettings } = $props()
 
@@ -40,8 +40,18 @@
   async function start() {
     starting = true
     game.reset()
-    const result = await window.quizpilot.startGame(toRequest($state.snapshot(form)))
-    starting = false
+    let result: StartResult
+    try {
+      result = await window.quizpilot.startGame(toRequest($state.snapshot(form)))
+    } catch (err) {
+      result = {
+        ok: false,
+        error: "unknown",
+        message: err instanceof Error ? err.message : String(err),
+      }
+    } finally {
+      starting = false
+    }
     if (result.ok) return game.begin()
     game.reset()
     error = ERROR_TEXT[result.error]

@@ -1,6 +1,6 @@
 import { generateName } from "../../../core/names/names.js"
 import { MAX_BOTS } from "../../../core/session/game-session.js"
-import type { PublicSettings, StartProblem, StartRequest } from "../../../shared/api.js"
+import type { PublicSettings, StartProblem, StartRequest, Timing } from "../../../shared/api.js"
 import { nameProblem, parsePin, timingProblem } from "../../../shared/start.js"
 
 export interface BotField {
@@ -44,13 +44,17 @@ export function toRequest(form: StartForm): StartRequest {
   return {
     pin: parsePin(form.pin) ?? form.pin.trim(),
     names: form.bots.map(botName),
-    timing: {
-      mode: form.human ? "human" : "instant",
-      minMs: Math.round(Number(form.minSeconds) * 1000),
-      maxMs: Math.round(Number(form.maxSeconds) * 1000),
-    },
+    timing: toTiming(form.human, form.minSeconds, form.maxSeconds),
     quizContext: form.context.trim() || null,
     includePrevious: form.includePrevious,
+  }
+}
+
+export function toTiming(human: boolean, minSeconds: number, maxSeconds: number): Timing {
+  return {
+    mode: human ? "human" : "instant",
+    minMs: Math.round(Number(minSeconds) * 1000),
+    maxMs: Math.round(Number(maxSeconds) * 1000),
   }
 }
 

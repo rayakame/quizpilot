@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 import type { Decision } from "../../src/core/types.js"
-import { keyText, sourceText } from "../../src/renderer/src/lib/messages.js"
+import { keyText, sourceText, statusText } from "../../src/renderer/src/lib/messages.js"
 
 const decision = (over: Partial<Decision>): Decision => ({
   answer: { kind: "choice", index: 0 },
@@ -27,5 +27,13 @@ describe("keyText", () => {
   it("names the service whose key failed", () => {
     expect(keyText("invalid", "Gemini")).toBe("Gemini doesn't accept this key.")
     expect(keyText("offline", "TypeSafe")).toBe("Couldn't reach TypeSafe. Check your connection.")
+  })
+})
+
+describe("statusText", () => {
+  it("tells reconnecting bots from joining ones", () => {
+    expect(statusText("joining", null)).toBe("Joining")
+    expect(statusText("joining", "reconnecting")).toBe("Reconnecting")
+    expect(statusText("lobby", "reconnecting")).toBe("In lobby")
   })
 })

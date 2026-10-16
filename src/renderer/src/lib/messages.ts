@@ -2,7 +2,7 @@ import type { JoinErrorCode } from "../../../core/kahoot/adapter.js"
 import { PROVIDER_NAMES, type FallbackProviderId } from "../../../core/providers/fallback/ids.js"
 import type { BotStatus } from "../../../core/session/game-session.js"
 import type { Decision, QuestionType } from "../../../core/types.js"
-import type { KeyCheck, StartProblem } from "../../../shared/api.js"
+import type { KeyCheck, StartProblem, Theme } from "../../../shared/api.js"
 
 export const STATUS_TEXT: Record<BotStatus, string> = {
   joining: "Joining",
@@ -14,6 +14,16 @@ export const STATUS_TEXT: Record<BotStatus, string> = {
   kicked: "Removed by host",
   disconnected: "Disconnected",
   finished: "Finished",
+}
+
+export function statusText(status: BotStatus, detail: string | null): string {
+  return status === "joining" && detail === "reconnecting" ? "Reconnecting" : STATUS_TEXT[status]
+}
+
+export const THEME_TEXT: Record<Theme, string> = {
+  system: "Like the system",
+  light: "Light",
+  dark: "Dark",
 }
 
 export const ERROR_TEXT: Record<StartProblem | JoinErrorCode, string> = {
