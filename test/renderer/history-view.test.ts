@@ -22,7 +22,7 @@ const q = (over: Partial<HistoryQuestion> = {}): HistoryQuestion => ({
   correctChoices: [0],
   decision: { answer: { kind: "choice", index: 0 }, source: "jev", confidence: 0.95, usage: [] },
   costUsd: 0,
-  results: [{ bot: "Anna", answeredMs: 500, correct: true, points: 900 }],
+  results: [{ bot: "Anna", answeredMs: 500, correct: true, points: 900, onPurpose: false }],
   ...over,
 })
 
@@ -41,11 +41,13 @@ const game: HistoryGame = {
 
 describe("matches", () => {
   it("finds wrong and mixed questions", () => {
-    const wrong = q({ results: [{ bot: "Anna", answeredMs: 1, correct: false, points: 0 }] })
+    const wrong = q({
+      results: [{ bot: "Anna", answeredMs: 1, correct: false, points: 0, onPurpose: false }],
+    })
     const mixed = q({
       results: [
-        { bot: "Anna", answeredMs: 1, correct: false, points: 0 },
-        { bot: "Ben", answeredMs: 1, correct: true, points: 900 },
+        { bot: "Anna", answeredMs: 1, correct: false, points: 0, onPurpose: false },
+        { bot: "Ben", answeredMs: 1, correct: true, points: 900, onPurpose: false },
       ],
     })
     expect(matches(wrong, "wrong", 0.6)).toBe(true)

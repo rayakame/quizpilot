@@ -87,7 +87,7 @@ export class HistoryRecorder implements GameRecorder {
       case "decision":
         return store.saveDecision(id, e.index, e.decision, costOf(e.decision.usage))
       case "answered":
-        return store.saveAnswered(id, e.index, e.bot, e.afterMs)
+        return store.saveAnswered(id, e.index, e.bot, e.afterMs, e.onPurpose === true)
       case "result": {
         const index = e.result.index ?? current.last
         if (index !== null) store.saveResult(id, index, e.bot, e.result)

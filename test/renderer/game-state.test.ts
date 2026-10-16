@@ -227,3 +227,26 @@ describe("disconnects", () => {
     expect(back.bots[0]?.cause).toBeNull()
   })
 })
+
+describe("mistakes on purpose", () => {
+  const missed = (...more: GameEvent[]) =>
+    play(
+      { type: "question", question: question(0) },
+      { type: "answered", bot: "Ben", index: 0, afterMs: 900, onPurpose: true },
+      ...more,
+    )
+
+  it("remembers which bots missed on purpose", () => {
+    expect(missed().rounds[0]?.onPurpose).toEqual(["Ben"])
+  })
+
+  it("doesn't count a miss on purpose against the answer", () => {
+    const both = missed(
+      { type: "result", bot: "Anna", result: result() },
+      { type: "result", bot: "Ben", result: result({ correct: false, points: 0 }) },
+    )
+    expect(outcome(both.rounds[0]!)).toBe("right")
+    const onlyBen = missed({ type: "result", bot: "Ben", result: result({ correct: false }) })
+    expect(outcome(onlyBen.rounds[0]!)).toBe("open")
+  })
+})

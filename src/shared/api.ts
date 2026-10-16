@@ -38,6 +38,7 @@ export interface HistoryResult {
   answeredMs: number | null
   correct: boolean | null
   points: number | null
+  onPurpose: boolean
 }
 
 export interface HistoryQuestion {

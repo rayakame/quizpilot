@@ -16,7 +16,14 @@ const q = (results: Partial<HistoryResult>[]): HistoryQuestion => ({
   correctChoices: null,
   decision: null,
   costUsd: null,
-  results: results.map((r) => ({ bot: "a", answeredMs: null, correct: null, points: null, ...r })),
+  results: results.map((r) => ({
+    bot: "a",
+    answeredMs: null,
+    correct: null,
+    points: null,
+    onPurpose: false,
+    ...r,
+  })),
 })
 
 describe("questionOutcome", () => {
@@ -26,5 +33,18 @@ describe("questionOutcome", () => {
     expect(questionOutcome(q([{ correct: true }, { correct: false }]))).toBe("mixed")
     expect(questionOutcome(q([{ correct: null }]))).toBe("open")
     expect(questionOutcome(q([]))).toBe("open")
+  })
+})
+
+describe("misses on purpose", () => {
+  it("are left out of the grade", () => {
+    expect(
+      questionOutcome(
+        q([
+          { bot: "Anna", correct: true },
+          { bot: "Ben", correct: false, onPurpose: true },
+        ]),
+      ),
+    ).toBe("right")
   })
 })

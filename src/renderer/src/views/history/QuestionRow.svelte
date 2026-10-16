@@ -78,6 +78,7 @@
                   : t.history.result.wrong}
               {#if r.points !== null}· {t.common.points(r.points)}{/if}
               {#if r.answeredMs !== null}· {secondsText(r.answeredMs)}{/if}
+              {#if r.onPurpose}· {t.game.onPurpose}{/if}
             </li>
           {/each}
         </ul>

@@ -143,3 +143,48 @@ describe("HistoryStore", () => {
     expect(store.latestGameId()).toBeNull()
   })
 })
+
+describe("misses on purpose", () => {
+  it("are saved and left out of the game's score", () => {
+    const store = HistoryStore.open(":memory:")
+    const id = store.startGame(game)
+    store.saveQuestion(id, question(0))
+    store.saveAnswered(id, 0, "Anna", 800, false)
+    store.saveAnswered(id, 0, "Ben", 900, true)
+    store.saveResult(id, 0, "Anna", result())
+    store.saveResult(id, 0, "Ben", result({ correct: false, points: 0 }))
+    const results = store.getGame(id)!.questions[0]!.results
+    expect(results.map((r) => [r.bot, r.onPurpose])).toEqual([
+      ["Anna", false],
+      ["Ben", true],
+    ])
+    expect(store.listGames()[0]).toMatchObject({ graded: 1, correct: 1 })
+  })
+
+  it("adds the new column to a history from before", async () => {
+    const { mkdtemp } = await import("node:fs/promises")
+    const { tmpdir } = await import("node:os")
+    const { join } = await import("node:path")
+    const { DatabaseSync } = await import("node:sqlite")
+    const file = join(await mkdtemp(join(tmpdir(), "qp-history-")), "history.db")
+    const first = HistoryStore.open(file)
+    const id = first.startGame(game)
+    first.saveQuestion(id, question(0))
+    first.saveResult(id, 0, "Anna", result())
+    first.close()
+    // Turn it back into a version 1 database, as older QuizPilot versions left it.
+    const raw = new DatabaseSync(file)
+    raw.exec("alter table results drop column on_purpose; pragma user_version = 1")
+    raw.close()
+    const store = HistoryStore.open(file)
+    expect(store.getGame(id)!.questions[0]!.results[0]).toMatchObject({
+      bot: "Anna",
+      correct: true,
+      onPurpose: false,
+    })
+    store.close()
+    const check = new DatabaseSync(file)
+    expect(check.prepare("pragma user_version").get()).toEqual({ user_version: 2 })
+    check.close()
+  })
+})

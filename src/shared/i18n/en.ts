@@ -208,6 +208,7 @@ export const en = {
     answer: "Answer:",
     thinking: "Thinking…",
     answeredAfter: (time: string) => `answered after ${time}`,
+    onPurpose: "wrong on purpose",
     over: "Game over",
     right: "Right",
     answers: "Answers",

@@ -93,6 +93,9 @@
                 · {t.game.answeredAfter(secondsText(round.answeredMs[bot]))}
               {/if}
             </span>
+            {#if round.onPurpose.includes(bot)}
+              <Badge variant="outline">{t.game.onPurpose}</Badge>
+            {/if}
           </li>
         {/each}
       </ul>

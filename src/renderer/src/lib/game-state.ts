@@ -20,6 +20,7 @@ export interface RoundView {
   decision: Decision | null
   results: Record<string, QuestionResult>
   answeredMs: Record<string, number>
+  onPurpose: string[]
 }
 
 export interface GameState {
@@ -71,6 +72,7 @@ export function reduce(state: GameState, event: GameEvent): GameState {
         decision: null,
         results: {},
         answeredMs: {},
+        onPurpose: [],
       }
       return { ...state, rounds: [...others, round] }
     }
@@ -80,6 +82,7 @@ export function reduce(state: GameState, event: GameEvent): GameState {
       return withRound(state, event.index, (r) => ({
         ...r,
         answeredMs: { ...r.answeredMs, [event.bot]: event.afterMs },
+        onPurpose: event.onPurpose ? [...r.onPurpose, event.bot] : r.onPurpose,
       }))
     case "result": {
       const { result } = event
@@ -163,8 +166,10 @@ export function answerSummary(round: RoundView): string | null {
 }
 
 export function outcome(round: RoundView): "right" | "wrong" | "mixed" | "open" {
-  const marks = Object.values(round.results)
-    .map((r) => r.correct)
+  // A bot that missed on purpose says nothing about whether the answer was right.
+  const marks = Object.entries(round.results)
+    .filter(([bot]) => !round.onPurpose.includes(bot))
+    .map(([, r]) => r.correct)
     .filter((c) => c !== null)
   if (marks.length === 0) return "open"
   if (marks.every((c) => c)) return "right"

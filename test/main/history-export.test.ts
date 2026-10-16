@@ -17,8 +17,8 @@ const q = (over: Partial<HistoryQuestion> = {}): HistoryQuestion => ({
   decision: { answer: { kind: "choice", index: 1 }, source: "jev", confidence: 0.62, usage: [] },
   costUsd: 0.0000126,
   results: [
-    { bot: "Anna", answeredMs: 800, correct: false, points: 0 },
-    { bot: "Ben", answeredMs: 1200, correct: false, points: 0 },
+    { bot: "Anna", answeredMs: 800, correct: false, points: 0, onPurpose: false },
+    { bot: "Ben", answeredMs: 1200, correct: false, points: 0, onPurpose: false },
   ],
   ...over,
 })

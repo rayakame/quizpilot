@@ -205,6 +205,7 @@ export const de: Messages = {
     answer: "Antwort:",
     thinking: "Denkt nach…",
     answeredAfter: (time) => `nach ${time} geantwortet`,
+    onPurpose: "absichtlich falsch",
     over: "Spiel vorbei",
     right: "Richtig",
     answers: "Antworten",

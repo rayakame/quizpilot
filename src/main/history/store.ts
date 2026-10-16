@@ -75,17 +75,20 @@ create table results (
 );
 `
 
+// Each step brings a database from the version before it up to date.
+const MIGRATIONS = [SCHEMA, "alter table results add column on_purpose integer not null default 0"]
+
 const GAMES = `
 select g.id, g.pin, g.quiz_title, g.quiz_link, g.context, g.timing, g.include_previous,
   g.started_at, g.ended_at,
   (select count(*) from questions q where q.game_id = g.id and q.type <> 'content') as questions,
   (select count(*) from questions q where q.game_id = g.id and exists (
-    select 1 from results r where r.game_id = q.game_id and r.idx = q.idx and r.correct is not null
+    select 1 from results r where r.game_id = q.game_id and r.idx = q.idx and r.correct is not null and r.on_purpose = 0
   )) as graded,
   (select count(*) from questions q where q.game_id = g.id and exists (
-    select 1 from results r where r.game_id = q.game_id and r.idx = q.idx and r.correct is not null
+    select 1 from results r where r.game_id = q.game_id and r.idx = q.idx and r.correct is not null and r.on_purpose = 0
   ) and not exists (
-    select 1 from results r where r.game_id = q.game_id and r.idx = q.idx and r.correct = 0
+    select 1 from results r where r.game_id = q.game_id and r.idx = q.idx and r.correct = 0 and r.on_purpose = 0
   )) as correct,
   (select coalesce(sum(d.cost_usd), 0) from decisions d where d.game_id = g.id) as cost_usd,
   (select coalesce(min(d.cost_complete), 1) from decisions d where d.game_id = g.id) as cost_complete
@@ -100,8 +103,8 @@ export class HistoryStore {
     const db = new DatabaseSync(file)
     db.exec("pragma foreign_keys = on")
     const { user_version } = db.prepare("pragma user_version").get() as { user_version: number }
-    if (user_version === 0) {
-      db.exec(`begin; ${SCHEMA}; pragma user_version = 1; commit;`)
+    for (let v = user_version; v < MIGRATIONS.length; v++) {
+      db.exec(`begin; ${MIGRATIONS[v]}; pragma user_version = ${v + 1}; commit;`)
     }
     return new HistoryStore(db)
   }
@@ -198,12 +201,14 @@ export class HistoryStore {
       )
   }
 
-  saveAnswered(id: number, idx: number, bot: string, ms: number): void {
+  saveAnswered(id: number, idx: number, bot: string, ms: number, onPurpose = false): void {
     this.db
       .prepare(
-        "insert into results (game_id, idx, bot, answered_ms) values (?, ?, ?, ?) on conflict (game_id, idx, bot) do update set answered_ms = excluded.answered_ms",
+        `insert into results (game_id, idx, bot, answered_ms, on_purpose) values (?, ?, ?, ?, ?)
+         on conflict (game_id, idx, bot) do update set answered_ms = excluded.answered_ms,
+           on_purpose = excluded.on_purpose`,
       )
-      .run(id, idx, bot, Math.round(ms))
+      .run(id, idx, bot, Math.round(ms), onPurpose ? 1 : 0)
   }
 
   saveResult(id: number, idx: number, bot: string, r: QuestionResult): void {
@@ -340,6 +345,7 @@ function toQuestion(row: Row, d: Row | undefined, results: Row[]): HistoryQuesti
         answeredMs: int(r.answered_ms),
         correct: r.correct === null ? null : Number(r.correct) === 1,
         points: int(r.points),
+        onPurpose: Number(r.on_purpose) === 1,
       })),
   }
 }

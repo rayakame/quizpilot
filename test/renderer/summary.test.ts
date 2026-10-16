@@ -27,6 +27,7 @@ const round = (index: number, over: Partial<RoundView> = {}): RoundView => ({
   decision: decision("jev"),
   results: {},
   answeredMs: {},
+  onPurpose: [],
   ...over,
 })
 
@@ -73,5 +74,20 @@ describe("gameSummary", () => {
       averageMs: null,
       cost: { usd: 0, complete: true },
     })
+  })
+})
+
+describe("misses on purpose", () => {
+  it("count as right when the other bots got it", () => {
+    const state: GameState = {
+      ...EMPTY_GAME,
+      rounds: [
+        round(0, {
+          results: { Anna: result(true), Ben: result(false) },
+          onPurpose: ["Ben"],
+        }),
+      ],
+    }
+    expect(gameSummary(state)).toMatchObject({ graded: 1, correct: 1 })
   })
 })

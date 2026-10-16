@@ -91,7 +91,7 @@ describe("HistoryRecorder", () => {
     expect(record.bots.map((b) => b.name)).toEqual(["Anna", "Ben"])
     expect(record.questions[0]).toMatchObject({
       decision,
-      results: [{ bot: "Anna", answeredMs: 700, correct: true, points: 900 }],
+      results: [{ bot: "Anna", answeredMs: 700, correct: true, points: 900, onPurpose: false }],
     })
   })
 
@@ -126,7 +126,9 @@ describe("HistoryRecorder", () => {
       },
     })
     const [q] = store.getGame(store.latestGameId()!)!.questions
-    expect(q!.results).toEqual([{ bot: "Ben", answeredMs: null, correct: false, points: 0 }])
+    expect(q!.results).toEqual([
+      { bot: "Ben", answeredMs: null, correct: false, points: 0, onPurpose: false },
+    ])
   })
 
   it("starts a new entry when the host plays the quiz again", () => {
@@ -205,5 +207,19 @@ describe("HistoryRecorder: which game", () => {
     store.close()
     for (const e of round(0)) recorder.event(e)
     expect(deps.log).toHaveBeenCalledTimes(2)
+  })
+})
+
+describe("misses on purpose", () => {
+  it("go into the history", () => {
+    const { store, recorder } = setup()
+    recorder.begin(request, null)
+    recorder.event({ type: "question", question: question(0) })
+    recorder.event({ type: "answered", bot: "Ben", index: 0, afterMs: 900, onPurpose: true })
+    const id = store.latestGameId()!
+    expect(store.getGame(id)!.questions[0]!.results[0]).toMatchObject({
+      bot: "Ben",
+      onPurpose: true,
+    })
   })
 })
