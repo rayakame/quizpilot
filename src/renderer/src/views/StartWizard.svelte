@@ -10,6 +10,7 @@
   import * as RadioGroup from "$lib/components/ui/radio-group/index.js"
   import { Switch } from "$lib/components/ui/switch/index.js"
   import { Textarea } from "$lib/components/ui/textarea/index.js"
+  import { saveDiagnostics } from "$lib/diagnostics.js"
   import { game } from "$lib/game.svelte.js"
   import { t } from "$lib/i18n.js"
   import { quizLinkText } from "$lib/messages.js"
@@ -36,6 +37,7 @@
   let form = $state(newForm(settings))
   let step = $state(0)
   let error = $state<(() => string) | null>(null)
+  let unknownJoin = $state(false)
   let starting = $state(false)
   let linkCheck = $state<LinkCheck | null>(null)
   const shownCheck = $derived(checkFor(linkCheck, form.quizLink))
@@ -44,6 +46,7 @@
     event.preventDefault()
     const problem = stepProblem(form, step)
     error = problem ? () => t.errors[problem] : null
+    unknownJoin = false
     if (problem) return
     if (step < STEPS.length - 1) step += 1
     else void start()
@@ -64,6 +67,7 @@
 
   async function start() {
     starting = true
+    unknownJoin = false
     const check = await checkLink()
     if (check && !check.ok) {
       starting = false
@@ -91,6 +95,7 @@
       failed.error === "unknown"
         ? () => `${t.errors.unknown} (${failed.message})`
         : () => t.errors[failed.error]
+    unknownJoin = failed.error === "unknown"
     if (BACK_TO_PIN.includes(result.error)) step = 0
   }
 
@@ -231,7 +236,20 @@
         {/if}
         {#if error}
           <Alert.Root variant="destructive">
-            <Alert.Description>{error()}</Alert.Description>
+            <Alert.Description>
+              <p>{error()}</p>
+              {#if unknownJoin}
+                <p>{t.start.unknownHint}</p>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  class="mt-2"
+                  onclick={() => void saveDiagnostics()}
+                >
+                  {t.about.saveDiagnostics}
+                </Button>
+              {/if}
+            </Alert.Description>
           </Alert.Root>
         {/if}
       </Card.Content>

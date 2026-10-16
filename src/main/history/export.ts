@@ -27,13 +27,16 @@ export function toCsv(record: HistoryRecord): string {
   return "\uFEFF" + lines.join("\r\n") + "\r\n"
 }
 
-export function exportName(record: HistoryRecord): string {
-  const started = new Date(record.game.startedAt)
-  const day = [
-    started.getFullYear(),
-    String(started.getMonth() + 1).padStart(2, "0"),
-    String(started.getDate()).padStart(2, "0"),
+export function localDay(date: Date): string {
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, "0"),
+    String(date.getDate()).padStart(2, "0"),
   ].join("-")
+}
+
+export function exportName(record: HistoryRecord): string {
+  const day = localDay(new Date(record.game.startedAt))
   const name = (record.game.quizTitle ?? record.game.pin)
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")

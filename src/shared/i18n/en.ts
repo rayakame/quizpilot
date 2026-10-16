@@ -178,6 +178,8 @@ export const en = {
     context: "What is the quiz about? (optional)",
     contextPlaceholder: "e.g. TUM first-semester quiz about campus life in Munich",
     previous: "Tell the AI about earlier questions",
+    unknownHint:
+      "Kahoot may have changed something. Look for a newer QuizPilot, or save a diagnostics file for a bug report.",
     joining: "Joining…",
     join: "Join game",
   },
@@ -248,6 +250,12 @@ export const en = {
     deleteFailed: "Couldn't delete the history.",
   },
   about: {
+    diagnostics: "Diagnostics",
+    diagnosticsText:
+      "If something goes wrong, save a diagnostics file and attach it to a bug report. It contains the log and your settings, but no API keys.",
+    saveDiagnostics: "Save diagnostics file",
+    diagnosticsSaved: "Diagnostics saved",
+    diagnosticsFailed: "Couldn't save the diagnostics file.",
     version: (version: string) => `Version ${version}`,
     license:
       "Open source under the MIT license. Not affiliated with Kahoot!, TypeSafe, Anthropic, OpenAI or Google.",

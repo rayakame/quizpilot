@@ -12,11 +12,13 @@ import {
   nativeTheme,
   Notification,
   shell,
+  type FileFilter,
 } from "electron"
 import { createImageLoader } from "../core/media/image-loader.js"
 import { withTimeout } from "../core/util/async.js"
 import { GAME_EVENT_CHANNEL, OPEN_SETTINGS_CHANNEL, type GameEvent } from "../shared/api.js"
 import { messagesFor, pickLanguage, type Language } from "../shared/i18n/index.js"
+import { diagnosticsName, diagnosticsReport } from "./diagnostics.js"
 import { removeFallback, saveFallback } from "./fallback.js"
 import { GameController } from "./game-controller.js"
 import type { LogEntry } from "./game-log.js"
@@ -106,6 +108,14 @@ async function confirm(message: string, button: string, cancel: string): Promise
     ? await dialog.showMessageBox(win, options)
     : await dialog.showMessageBox(options)
   return response === 0
+}
+
+async function chooseSaveFile(defaultPath: string, filters: FileFilter[]): Promise<string | null> {
+  const options = { defaultPath, filters }
+  const { canceled, filePath } = win
+    ? await dialog.showSaveDialog(win, options)
+    : await dialog.showSaveDialog(options)
+  return canceled || !filePath ? null : filePath
 }
 
 async function start(): Promise<void> {
@@ -219,6 +229,27 @@ async function start(): Promise<void> {
     pause: async (bot, paused) => controller.pause(bot, paused),
     leave: (bot) => controller.leave(bot),
     endGame: () => controller.end(),
+    saveDiagnostics: async () => {
+      const report = diagnosticsReport(
+        {
+          version: app.getVersion(),
+          electron: process.versions.electron,
+          chrome: process.versions.chrome,
+          node: process.versions.node,
+          os: `${process.platform} ${release()} ${process.arch}`,
+          systemLanguages: app.getPreferredSystemLanguages(),
+        },
+        settings.get(),
+        await log.read(),
+        new Date(),
+      )
+      const file = await chooseSaveFile(`${diagnosticsName(new Date())}.txt`, [
+        { name: text().dialogs.textFile, extensions: ["txt"] },
+      ])
+      if (!file) return "cancelled"
+      await writeFile(file, report, { mode: 0o600 })
+      return "saved"
+    },
     openExternal: async (url) => {
       if (url.startsWith("https://")) await shell.openExternal(url)
     },
@@ -228,19 +259,11 @@ async function start(): Promise<void> {
       confirm: (message, button) => confirm(message, button, text().dialogs.cancel),
       text: () => text().dialogs,
       removeImages: (id) => rm(join(historyDir, String(id)), { recursive: true, force: true }),
-      chooseFile: async (name) => {
-        const options = {
-          defaultPath: `${name}.json`,
-          filters: [
-            { name: "JSON", extensions: ["json"] },
-            { name: "CSV", extensions: ["csv"] },
-          ],
-        }
-        const { canceled, filePath } = win
-          ? await dialog.showSaveDialog(win, options)
-          : await dialog.showSaveDialog(options)
-        return canceled || !filePath ? null : filePath
-      },
+      chooseFile: (name) =>
+        chooseSaveFile(`${name}.json`, [
+          { name: "JSON", extensions: ["json"] },
+          { name: "CSV", extensions: ["csv"] },
+        ]),
       writeFile: (path, text) => writeFile(path, text),
     }),
   })

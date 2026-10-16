@@ -28,6 +28,7 @@ const api: QuizPilotApi = {
   deleteHistory: (id) => ipcRenderer.invoke(CHANNELS.deleteHistory, id),
   clearHistory: () => ipcRenderer.invoke(CHANNELS.clearHistory),
   exportHistory: (id) => ipcRenderer.invoke(CHANNELS.exportHistory, id),
+  saveDiagnostics: () => ipcRenderer.invoke(CHANNELS.saveDiagnostics),
   onGameEvent: (listener) => {
     const handler = (_event: unknown, payload: GameEvent) => listener(payload)
     ipcRenderer.on(GAME_EVENT_CHANNEL, handler)

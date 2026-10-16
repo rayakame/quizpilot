@@ -23,6 +23,7 @@ function handlers(): Handlers {
     leave: vi.fn(),
     endGame: vi.fn(),
     openExternal: vi.fn(),
+    saveDiagnostics: vi.fn(),
   }
 }
 

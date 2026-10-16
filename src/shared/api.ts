@@ -72,6 +72,7 @@ export interface NewGame {
 }
 
 export type ExportResult = "saved" | "cancelled" | "missing"
+export type SaveResult = "saved" | "cancelled"
 
 export type KeyCheck = "ok" | "invalid" | "offline" | "error"
 export type Theme = "system" | "light" | "dark"
@@ -162,6 +163,7 @@ export interface QuizPilotApi {
   deleteHistory(id: number): Promise<boolean>
   clearHistory(): Promise<boolean>
   exportHistory(id: number | null): Promise<ExportResult>
+  saveDiagnostics(): Promise<SaveResult>
   onGameEvent(listener: (event: GameEvent) => void): () => void
   onOpenSettings(listener: () => void): () => void
 }
@@ -188,6 +190,7 @@ export const CHANNELS = {
   deleteHistory: "history:delete",
   clearHistory: "history:clear",
   exportHistory: "history:export",
+  saveDiagnostics: "app:diagnostics",
 } as const satisfies Record<Invokable, string>
 
 export const GAME_EVENT_CHANNEL = "game:event"

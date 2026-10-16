@@ -175,6 +175,8 @@ export const de: Messages = {
     context: "Worum geht es im Quiz? (optional)",
     contextPlaceholder: "z. B. Erstsemester-Quiz der TUM über das Campusleben in München",
     previous: "Der KI frühere Fragen mitgeben",
+    unknownHint:
+      "Vielleicht hat Kahoot etwas geändert. Schau nach einer neueren QuizPilot-Version oder speichere eine Diagnose-Datei für einen Fehlerbericht.",
     joining: "Tritt bei…",
     join: "Spiel beitreten",
   },
@@ -244,6 +246,12 @@ export const de: Messages = {
     deleteFailed: "Der Verlauf ließ sich nicht löschen.",
   },
   about: {
+    diagnostics: "Diagnose",
+    diagnosticsText:
+      "Wenn etwas schiefgeht, speichere eine Diagnose-Datei und häng sie an einen Fehlerbericht. Sie enthält das Log und deine Einstellungen, aber keine API-Keys.",
+    saveDiagnostics: "Diagnose-Datei speichern",
+    diagnosticsSaved: "Diagnose gespeichert",
+    diagnosticsFailed: "Die Diagnose-Datei ließ sich nicht speichern.",
     version: (version) => `Version ${version}`,
     license:
       "Open Source unter der MIT-Lizenz. Nicht verbunden mit Kahoot!, TypeSafe, Anthropic, OpenAI oder Google.",
