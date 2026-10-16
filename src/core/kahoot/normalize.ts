@@ -1,4 +1,4 @@
-import type { Answer, Choice, Question, QuestionType } from "../types.js"
+import type { Answer, Choice, Question, QuestionType, SliderRange } from "../types.js"
 import { cleanText } from "./text.js"
 
 export type KahootPayload = Record<string, unknown>
@@ -34,9 +34,14 @@ const TYPES: Record<string, QuestionType> = {
   content: "content",
 }
 
+export function questionType(type: unknown, layout: unknown): QuestionType {
+  const t = TYPES[str(type) ?? ""] ?? "unknown"
+  return t === "quiz" && layout === "TRUE_FALSE" ? "true_false" : t
+}
+
 export function toQuestion(p: KahootPayload): Question {
-  let type = TYPES[str(p.gameBlockType) ?? str(p.type) ?? ""] ?? "unknown"
-  if (type === "quiz" && p.layout === "TRUE_FALSE") type = "true_false"
+  const type = questionType(str(p.gameBlockType) ?? p.type, p.layout)
+  const slider = type === "slider" ? toSlider(p) : undefined
   return {
     index: num(p.questionIndex) ?? num(p.gameBlockIndex) ?? 0,
     type,
@@ -45,6 +50,7 @@ export function toQuestion(p: KahootPayload): Question {
     image: str(p.image) ? { url: p.image as string } : null,
     imageAlt: cleanText(obj(p.imageMetadata)?.altText),
     timeLimitMs: num(p.timeAvailable) ?? 0,
+    ...(slider ? { slider } : {}),
     raw: p,
   }
 }
@@ -103,6 +109,14 @@ function toChoices(p: KahootPayload): Choice[] {
     })
   }
   return Array.from({ length: num(p.numberOfChoices) ?? 0 }, () => ({ text: null, image: null }))
+}
+
+function toSlider(p: KahootPayload): SliderRange | undefined {
+  const min = num(p.minRange)
+  const max = num(p.maxRange)
+  if (min === null || max === null || max <= min) return undefined
+  const step = num(p.step)
+  return { min, max, step: step !== null && step > 0 ? step : 1 }
 }
 
 function num(v: unknown): number | null {

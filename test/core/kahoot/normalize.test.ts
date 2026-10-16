@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs"
 import { join } from "node:path"
 import { describe, expect, it } from "vitest"
 import {
+  questionType,
   toKahootAnswer,
   toQuestion,
   toQuizEnd,
@@ -80,7 +81,11 @@ describe("toUpcoming / toQuestion", () => {
   })
 
   it("decodes text and marks unknown types", () => {
-    const q = toQuestion({ type: "quiz", title: "I = 0 &amp; U = Bel.", choices: [{ answer: "&lt;5" }] })
+    const q = toQuestion({
+      type: "quiz",
+      title: "I = 0 &amp; U = Bel.",
+      choices: [{ answer: "&lt;5" }],
+    })
     expect(q.title).toBe("I = 0 & U = Bel.")
     expect(q.choices[0]?.text).toBe("<5")
     expect(toQuestion({ type: "drop_pin" }).type).toBe("unknown")
@@ -136,5 +141,53 @@ describe("toKahootAnswer", () => {
     expect(toKahootAnswer({ kind: "number", value: 16 })).toBe(16)
     expect(toKahootAnswer({ kind: "text", value: "Paris" })).toBe("Paris")
     expect(toKahootAnswer({ kind: "none" })).toBeNull()
+  })
+})
+
+describe("slider questions", () => {
+  const slider = (over: Record<string, unknown> = {}) => ({
+    gameBlockIndex: 4,
+    type: "slider",
+    title: "In welchem Jahr?",
+    timeAvailable: 60000,
+    minRange: 2010,
+    maxRange: 2024,
+    step: 1,
+    ...over,
+  })
+
+  it("reads the range the player may pick from", () => {
+    expect(toQuestion(slider()).slider).toEqual({ min: 2010, max: 2024, step: 1 })
+  })
+
+  it("keeps decimal steps", () => {
+    expect(toQuestion(slider({ minRange: 0, maxRange: 5, step: 0.5 })).slider).toEqual({
+      min: 0,
+      max: 5,
+      step: 0.5,
+    })
+  })
+
+  it("falls back to whole steps when the step is missing", () => {
+    expect(toQuestion(slider({ step: undefined })).slider).toEqual({
+      min: 2010,
+      max: 2024,
+      step: 1,
+    })
+  })
+
+  it("leaves the range out when it is missing or broken", () => {
+    expect(toQuestion(slider({ minRange: undefined })).slider).toBeUndefined()
+    expect(toQuestion(slider({ minRange: 30, maxRange: 10 })).slider).toBeUndefined()
+  })
+})
+
+describe("questionType", () => {
+  it("maps Kahoot's block types", () => {
+    expect(questionType("quiz", "CLASSIC")).toBe("quiz")
+    expect(questionType("quiz", "TRUE_FALSE")).toBe("true_false")
+    expect(questionType("multiple_select_poll", undefined)).toBe("survey")
+    expect(questionType("drop_pin", undefined)).toBe("unknown")
+    expect(questionType(undefined, undefined)).toBe("unknown")
   })
 })
