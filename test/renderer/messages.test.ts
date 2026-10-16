@@ -85,8 +85,9 @@ describe("game over texts", () => {
   })
 
   it("lists where the answers came from", () => {
+    // Each count stays with its name when the line wraps.
     expect(sourceCounts({ jev: 8, fallback: 2, "quiz-link": 1, random: 1 })).toBe(
-      "Jev 8 · Backup AI 2 · Known 1 · Guessed 1",
+      "Jev\u00a08 · Backup AI\u00a02 · Known\u00a01 · Guessed\u00a01",
     )
     expect(sourceCounts({})).toBe("–")
   })

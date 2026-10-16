@@ -83,7 +83,9 @@ function sourceName(source: DecisionSource): string {
 const COUNTED: DecisionSource[] = ["jev", "fallback", "quiz-link", "random"]
 
 export function sourceCounts(sources: Partial<Record<DecisionSource, number>>): string {
-  const parts = COUNTED.flatMap((id) => (sources[id] ? [`${sourceName(id)} ${sources[id]}`] : []))
+  const parts = COUNTED.flatMap((id) =>
+    sources[id] ? [`${sourceName(id)}\u00a0${sources[id]}`] : [],
+  )
   return parts.length > 0 ? parts.join(" · ") : "–"
 }
 

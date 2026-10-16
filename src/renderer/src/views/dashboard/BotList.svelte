@@ -38,7 +38,7 @@
   <div class="flex-1 space-y-2 overflow-y-auto p-3">
     {#each bots as bot (bot.name)}
       <div class="space-y-1 rounded-lg border p-3">
-        <div class="flex items-center justify-between gap-2">
+        <div class="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
           <span class="truncate font-medium">{bot.name}</span>
           <Badge variant={bot.joinError || bot.status === "kicked" ? "destructive" : "secondary"}>
             {statusText(bot.status, bot.detail)}
@@ -50,7 +50,12 @@
         {#if bot.joinError}
           <p class="text-destructive text-sm">{t.errors[bot.joinError]}</p>
           {#if bot.joinError === "duplicate_name" || bot.joinError === "unknown"}
-            <Button size="sm" variant="outline" onclick={() => retry(bot)}>
+            <Button
+              size="sm"
+              variant="outline"
+              class="h-auto max-w-full py-1 text-left whitespace-normal"
+              onclick={() => retry(bot)}
+            >
               {t.game.joinAs(retryName(bot))}
             </Button>
           {/if}

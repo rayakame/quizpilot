@@ -39,7 +39,7 @@
           </li>
         {/each}
       </ol>
-      <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm [&_dd]:whitespace-nowrap">
+      <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
         <dt class="text-muted-foreground">{t.game.right}</dt>
         <dd>{t.game.of(summary.correct, summary.graded)}</dd>
         <dt class="text-muted-foreground">{t.game.answers}</dt>
