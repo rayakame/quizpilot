@@ -12,7 +12,7 @@ const CHIPS = [
 ]
 ---
 
-<section class="relative px-4 pt-36 sm:pt-44">
+<section class="relative px-4 pt-[clamp(6.5rem,16svh,11rem)]">
   <div class="mx-auto max-w-5xl text-center">
     <div data-reveal class="eyebrow">
       <span class="size-1.5 rounded-full bg-lime [animation:pulse-dot_2s_ease-in-out_infinite]"></span>
@@ -21,7 +21,7 @@ const CHIPS = [
     <h1
       data-reveal
       style="--delay: 80ms"
-      class="mt-7 font-display text-[clamp(3.2rem,10vw,8.5rem)] leading-[0.88] font-bold tracking-[-0.045em]"
+      class="mt-7 font-display text-[clamp(2.75rem,min(10vw,14svh),8.5rem)] leading-[0.88] font-bold tracking-[-0.045em]"
     >
       Kahoot on
       <br />
@@ -62,15 +62,15 @@ const CHIPS = [
     </p>
   </div>
 
-  <div class="relative mx-auto mt-20 max-w-6xl">
-    <div class="pointer-events-none absolute -inset-x-10 -top-10 bottom-0 rounded-[3rem] bg-gradient-to-b from-lime/25 via-emerald/10 to-transparent blur-3xl"></div>
+  <div class="relative mx-auto mt-[clamp(3rem,8svh,5rem)] max-w-6xl">
+    <div class="pointer-events-none absolute inset-x-0 -top-10 bottom-0 rounded-[3rem] bg-gradient-to-b from-lime/25 via-emerald/10 to-transparent blur-3xl"></div>
     <div class="tilt relative">
       <AppWindow src={dashboard} alt="QuizPilot answering a question during a game" eager />
     </div>
     {CHIPS.map((chip) => (
       <div
         class:list={[
-          "glass float absolute hidden items-center gap-2 rounded-full px-4 py-2 text-sm font-medium shadow-xl shadow-black/50 lg:flex",
+          "glass float absolute hidden items-center gap-2 rounded-full px-4 py-2 text-sm font-medium shadow-xl shadow-black/50 xl:flex",
           chip.class,
         ]}
         style={`animation-delay: ${chip.delay}`}

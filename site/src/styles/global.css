@@ -56,9 +56,17 @@
   }
 
   .glass {
-    background: linear-gradient(180deg, #ffffff0d, #ffffff05);
+    /* Opaque enough to stay readable where the blur doesn't work. */
+    background: #0b0c0fd9;
     border: 1px solid #ffffff17;
-    backdrop-filter: blur(16px) saturate(140%);
+  }
+
+  @supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+    .glass {
+      background: linear-gradient(180deg, #ffffff0d, #ffffff05);
+      -webkit-backdrop-filter: blur(16px) saturate(140%);
+      backdrop-filter: blur(16px) saturate(140%);
+    }
   }
 
   .btn-primary {
@@ -147,9 +155,11 @@
     opacity: 1;
   }
 
-  .tilt {
-    transform: perspective(1800px) rotateX(16deg) scale(0.95);
-    transform-origin: 50% 0%;
+  @media (min-width: 768px) {
+    .tilt {
+      transform: perspective(1800px) rotateX(16deg) scale(0.95);
+      transform-origin: 50% 0%;
+    }
   }
 
   .float {
@@ -177,10 +187,21 @@
 }
 
 @supports (animation-timeline: view()) {
-  .tilt {
-    animation: straighten linear both;
-    animation-timeline: view();
-    animation-range: entry 0% cover 40%;
+  @media (min-width: 768px) {
+    .tilt {
+      animation: straighten linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 40%;
+    }
+  }
+}
+
+/* Big moving blurs cost phones a lot of frames for little effect. */
+@media (max-width: 767px) {
+  .aurora {
+    animation: none;
+    filter: blur(70px);
+    opacity: 0.4;
   }
 }
 
