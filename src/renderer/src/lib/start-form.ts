@@ -1,6 +1,13 @@
 import { generateName } from "../../../core/names/names.js"
 import { MAX_BOTS } from "../../../core/session/game-session.js"
-import type { PublicSettings, StartProblem, StartRequest, Timing } from "../../../shared/api.js"
+import { parseQuizLink } from "../../../core/quiz-source/link.js"
+import type {
+  PublicSettings,
+  QuizCheck,
+  StartProblem,
+  StartRequest,
+  Timing,
+} from "../../../shared/api.js"
 import { nameProblem, parsePin, timingProblem } from "../../../shared/start.js"
 
 export interface BotField {
@@ -16,6 +23,12 @@ export interface StartForm {
   maxSeconds: number
   context: string
   includePrevious: boolean
+  quizLink: string
+}
+
+export interface LinkCheck {
+  link: string
+  result: QuizCheck | null
 }
 
 export function botName(field: BotField): string {
@@ -37,6 +50,7 @@ export function newForm(settings: PublicSettings, random: () => number = Math.ra
     maxSeconds: settings.timing.maxMs / 1000,
     context: "",
     includePrevious: settings.includePrevious,
+    quizLink: "",
   }
 }
 
@@ -47,7 +61,7 @@ export function toRequest(form: StartForm): StartRequest {
     timing: toTiming(form.human, form.minSeconds, form.maxSeconds),
     quizContext: form.context.trim() || null,
     includePrevious: form.includePrevious,
-    quizLink: null,
+    quizLink: form.quizLink.trim() || null,
   }
 }
 
@@ -69,5 +83,11 @@ export function stepProblem(form: StartForm, step: number): StartProblem | null 
     }
     return null
   }
+  const link = request.quizLink
+  if (link !== null && parseQuizLink(link) === null) return "quiz_link"
   return timingProblem(request.timing)
+}
+
+export function checkFor(check: LinkCheck | null, link: string): LinkCheck | null {
+  return check !== null && check.link === link.trim() ? check : null
 }

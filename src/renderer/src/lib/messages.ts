@@ -2,7 +2,8 @@ import type { JoinErrorCode } from "../../../core/kahoot/adapter.js"
 import { PROVIDER_NAMES, type FallbackProviderId } from "../../../core/providers/fallback/ids.js"
 import type { BotStatus } from "../../../core/session/game-session.js"
 import type { Decision, QuestionType } from "../../../core/types.js"
-import type { KeyCheck, StartProblem, Theme } from "../../../shared/api.js"
+import type { KeyCheck, QuizLinkProblem, StartProblem, Theme } from "../../../shared/api.js"
+import type { LinkCheck } from "./start-form.js"
 
 export const STATUS_TEXT: Record<BotStatus, string> = {
   joining: "Joining",
@@ -38,6 +39,20 @@ export const ERROR_TEXT: Record<StartProblem | JoinErrorCode, string> = {
   locked: "The host has locked this game.",
   duplicate_name: "Someone in the game already has this name.",
   unknown: "Couldn't join the game.",
+}
+
+export const QUIZ_LINK_TEXT: Record<QuizLinkProblem, string> = {
+  link: "This doesn't look like a Kahoot quiz link.",
+  not_found: "There's no quiz behind this link.",
+  private: "This quiz is private. Only public quizzes work.",
+  offline: "Couldn't reach Kahoot. Check your connection.",
+  unknown: "Couldn't load the quiz.",
+}
+
+export function quizLinkText({ result }: LinkCheck): string {
+  if (result === null) return "Checking…"
+  if (!result.ok) return QUIZ_LINK_TEXT[result.error]
+  return `${result.title} · ${result.questions} ${result.questions === 1 ? "question" : "questions"}`
 }
 
 export function keyText(problem: Exclude<KeyCheck, "ok">, service: string): string {
@@ -81,7 +96,7 @@ export function sourceText(decision: Decision): string {
       return [name, ...sure, ...time].join(" · ")
     }
     case "quiz-link":
-      return "Quiz link"
+      return "Known answer"
     case "random":
       return "Guessed"
     case "skip":

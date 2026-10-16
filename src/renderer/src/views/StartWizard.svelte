@@ -11,11 +11,19 @@
   import { Switch } from "$lib/components/ui/switch/index.js"
   import { Textarea } from "$lib/components/ui/textarea/index.js"
   import { game } from "$lib/game.svelte.js"
-  import { ERROR_TEXT } from "$lib/messages.js"
-  import { addField, botName, newForm, stepProblem, toRequest } from "$lib/start-form.js"
+  import { ERROR_TEXT, QUIZ_LINK_TEXT, quizLinkText } from "$lib/messages.js"
+  import {
+    addField,
+    botName,
+    checkFor,
+    newForm,
+    stepProblem,
+    toRequest,
+    type LinkCheck,
+  } from "$lib/start-form.js"
   import { generateName } from "../../../core/names/names.js"
   import { MAX_BOTS } from "../../../core/session/game-session.js"
-  import type { PublicSettings, StartResult } from "../../../shared/api.js"
+  import type { PublicSettings, QuizCheck, StartResult } from "../../../shared/api.js"
 
   let { settings }: { settings: PublicSettings } = $props()
 
@@ -27,6 +35,8 @@
   let step = $state(0)
   let error = $state<string | null>(null)
   let starting = $state(false)
+  let linkCheck = $state<LinkCheck | null>(null)
+  const shownCheck = $derived(checkFor(linkCheck, form.quizLink))
 
   function next(event: SubmitEvent) {
     event.preventDefault()
@@ -37,8 +47,27 @@
     else void start()
   }
 
+  async function checkLink(): Promise<QuizCheck | null> {
+    const link = form.quizLink.trim()
+    if (!link) return null
+    const known = checkFor(linkCheck, link)
+    if (known?.result) return known.result
+    linkCheck = { link, result: null }
+    const result = await window.quizpilot
+      .checkQuizLink(link)
+      .catch((): QuizCheck => ({ ok: false, error: "unknown" }))
+    if (linkCheck?.link === link) linkCheck = { link, result }
+    return result
+  }
+
   async function start() {
     starting = true
+    const check = await checkLink()
+    if (check && !check.ok) {
+      starting = false
+      error = QUIZ_LINK_TEXT[check.error]
+      return
+    }
     game.reset()
     let result: StartResult
     try {
@@ -160,6 +189,29 @@
                 />
                 seconds
               </div>
+            {/if}
+          </div>
+          <div class="grid gap-2">
+            <Label for="quiz-link">Quiz link (optional)</Label>
+            <Input
+              id="quiz-link"
+              bind:value={form.quizLink}
+              placeholder="create.kahoot.it/details/…"
+              onblur={() => void checkLink()}
+            />
+            {#if shownCheck}
+              <p
+                class={[
+                  "text-sm",
+                  shownCheck.result?.ok === false ? "text-destructive" : "text-muted-foreground",
+                ]}
+              >
+                {quizLinkText(shownCheck)}
+              </p>
+            {:else}
+              <p class="text-muted-foreground text-sm">
+                Public quizzes only. QuizPilot then knows the right answers.
+              </p>
             {/if}
           </div>
           <div class="grid gap-2">

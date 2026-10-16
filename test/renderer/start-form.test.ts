@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest"
 import {
   addField,
+  checkFor,
   newForm,
   stepProblem,
   toRequest,
   toTiming,
+  type LinkCheck,
 } from "../../src/renderer/src/lib/start-form.js"
 import type { PublicSettings } from "../../src/shared/api.js"
 
@@ -91,5 +93,26 @@ describe("toTiming", () => {
   it("turns seconds from the form into milliseconds", () => {
     expect(toTiming(true, 1.5, 4)).toEqual({ mode: "human", minMs: 1500, maxMs: 4000 })
     expect(toTiming(false, 1, 5)).toEqual({ mode: "instant", minMs: 1000, maxMs: 5000 })
+  })
+})
+
+describe("quiz link", () => {
+  const LINK = "https://create.kahoot.it/details/fba5cd05-96af-4506-b8ce-388ff9b33fbb"
+
+  it("sends the trimmed link or none", () => {
+    expect(toRequest({ ...newForm(settings), quizLink: `  ${LINK} ` }).quizLink).toBe(LINK)
+    expect(toRequest({ ...newForm(settings), quizLink: "  " }).quizLink).toBeNull()
+  })
+
+  it("stops on the options step when the link has no quiz in it", () => {
+    expect(stepProblem({ ...newForm(settings), quizLink: "kahoot.it" }, 2)).toBe("quiz_link")
+    expect(stepProblem({ ...newForm(settings), quizLink: LINK }, 2)).toBeNull()
+  })
+
+  it("forgets the check when the link changes", () => {
+    const check: LinkCheck = { link: LINK, result: { ok: true, title: "Geo", questions: 10 } }
+    expect(checkFor(check, ` ${LINK} `)).toBe(check)
+    expect(checkFor(check, `${LINK}x`)).toBeNull()
+    expect(checkFor(null, LINK)).toBeNull()
   })
 })

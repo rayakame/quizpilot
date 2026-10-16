@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest"
 import type { Decision } from "../../src/core/types.js"
-import { keyText, sourceText, statusText } from "../../src/renderer/src/lib/messages.js"
+import {
+  keyText,
+  QUIZ_LINK_TEXT,
+  quizLinkText,
+  sourceText,
+  statusText,
+} from "../../src/renderer/src/lib/messages.js"
 
 const decision = (over: Partial<Decision>): Decision => ({
   answer: { kind: "choice", index: 0 },
@@ -35,5 +41,31 @@ describe("statusText", () => {
     expect(statusText("joining", null)).toBe("Joining")
     expect(statusText("joining", "reconnecting")).toBe("Reconnecting")
     expect(statusText("lobby", "reconnecting")).toBe("In lobby")
+  })
+})
+
+describe("quizLinkText", () => {
+  it("shows what the check found", () => {
+    expect(quizLinkText({ link: "x", result: null })).toBe("Checking…")
+    expect(quizLinkText({ link: "x", result: { ok: true, title: "Geo", questions: 10 } })).toBe(
+      "Geo · 10 questions",
+    )
+    expect(quizLinkText({ link: "x", result: { ok: true, title: "Geo", questions: 1 } })).toBe(
+      "Geo · 1 question",
+    )
+    expect(quizLinkText({ link: "x", result: { ok: false, error: "private" } })).toBe(
+      QUIZ_LINK_TEXT.private,
+    )
+  })
+
+  it("calls answers from a known quiz known", () => {
+    expect(
+      sourceText({
+        answer: { kind: "choice", index: 0 },
+        source: "quiz-link",
+        confidence: 1,
+        usage: [],
+      }),
+    ).toBe("Known answer")
   })
 })
