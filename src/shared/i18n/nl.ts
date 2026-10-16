@@ -229,7 +229,7 @@ export const nl: Messages = {
     earlier: "Eerdere vragen",
     nothingYet: "Nog niets.",
     waiting: "Wachten op de eerste vraag…",
-    question: (n, type) => `Vraag ${n} · ${type}`,
+    question: (n, type) => `Vraag ${n} ·\u00a0${type}`,
     hidden: "De host toont de vragen niet op apparaten.",
     answer: "Antwoord:",
     thinking: "Denkt na…",

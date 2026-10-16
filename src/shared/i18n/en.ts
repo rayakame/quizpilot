@@ -232,7 +232,7 @@ export const en = {
     earlier: "Earlier questions",
     nothingYet: "Nothing yet.",
     waiting: "Waiting for the first question…",
-    question: (n: number, type: string) => `Question ${n} · ${type}`,
+    question: (n: number, type: string) => `Question ${n} ·\u00a0${type}`,
     hidden: "The host doesn't show questions on devices.",
     answer: "Answer:",
     thinking: "Thinking…",

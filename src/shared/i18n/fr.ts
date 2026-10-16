@@ -236,7 +236,7 @@ export const fr: Messages = {
     earlier: "Questions précédentes",
     nothingYet: "Rien pour l’instant.",
     waiting: "En attente de la première question…",
-    question: (n, type) => `Question ${n} · ${type}`,
+    question: (n, type) => `Question ${n} ·\u00a0${type}`,
     hidden: "L’hôte n’affiche pas les questions sur les appareils.",
     answer: `Réponse${nbsp}:`,
     thinking: "Réflexion…",

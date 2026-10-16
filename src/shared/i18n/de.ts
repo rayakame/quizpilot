@@ -229,7 +229,7 @@ export const de: Messages = {
     earlier: "Frühere Fragen",
     nothingYet: "Noch nichts.",
     waiting: "Warte auf die erste Frage…",
-    question: (n, type) => `Frage ${n} · ${type}`,
+    question: (n, type) => `Frage ${n} ·\u00a0${type}`,
     hidden: "Der Host zeigt die Fragen nicht auf den Geräten.",
     answer: "Antwort:",
     thinking: "Denkt nach…",

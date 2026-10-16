@@ -227,7 +227,7 @@ export const tr: Messages = {
     earlier: "Önceki sorular",
     nothingYet: "Henüz bir şey yok.",
     waiting: "İlk soru bekleniyor…",
-    question: (n, type) => `Soru ${n} · ${type}`,
+    question: (n, type) => `Soru ${n} ·\u00a0${type}`,
     hidden: "Oyun sahibi soruları cihazlarda göstermiyor.",
     answer: "Cevap:",
     thinking: "Düşünüyor…",

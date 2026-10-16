@@ -181,6 +181,7 @@ describe("dictionaries", () => {
     expect(backup.below("60%")).toContain("sotto il 60%")
     expect(backup.below("80%")).toContain("sotto l’80%")
     expect(backup.below("0%")).toContain("sotto lo 0%")
+    expect(backup.below("1%")).toContain("sotto l’1%")
     expect(backup.instantAt("90%")).toContain("almeno del 90%")
     expect(backup.instantAt("85%")).toContain("almeno dell’85%")
   })

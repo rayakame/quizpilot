@@ -228,7 +228,7 @@ export const pt: Messages = {
     earlier: "Perguntas anteriores",
     nothingYet: "Nada ainda.",
     waiting: "Esperando a primeira pergunta…",
-    question: (n, type) => `Pergunta ${n} · ${type}`,
+    question: (n, type) => `Pergunta ${n} ·\u00a0${type}`,
     hidden: "O anfitrião não mostra as perguntas nos aparelhos.",
     answer: "Resposta:",
     thinking: "Pensando…",

@@ -127,7 +127,8 @@
         <div class="flex items-center gap-2">
           <RadioGroup.Item value={model.id} id="model-{model.id}" />
           <Label for="model-{model.id}" class="font-normal">
-            {model.name} <span class="text-muted-foreground">· {t.backup.tiers[model.tier]}</span>
+            {model.name}
+            <span class="text-muted-foreground">·&nbsp;{t.backup.tiers[model.tier]}</span>
           </Label>
         </div>
       {/each}

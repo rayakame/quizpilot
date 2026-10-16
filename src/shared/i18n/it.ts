@@ -4,7 +4,7 @@ const locale = "it"
 const names = (list: string[]) => new Intl.ListFormat(locale, { type: "conjunction" }).format(list)
 // The article before a percentage follows how the number is said: l’80%, lo 0%, il 60%.
 const article = (share: string, il: string, l: string, lo: string) =>
-  /^(8|11)/.test(share) ? l : /^0/.test(share) ? lo : il
+  /^(8|11|1%)/.test(share) ? l : /^0/.test(share) ? lo : il
 
 export const it: Messages = {
   locale,
@@ -233,7 +233,7 @@ export const it: Messages = {
     earlier: "Domande precedenti",
     nothingYet: "Ancora niente.",
     waiting: "In attesa della prima domanda…",
-    question: (n, type) => `Domanda ${n} · ${type}`,
+    question: (n, type) => `Domanda ${n} ·\u00a0${type}`,
     hidden: "L’host non mostra le domande sui dispositivi.",
     answer: "Risposta:",
     thinking: "Ci penso…",

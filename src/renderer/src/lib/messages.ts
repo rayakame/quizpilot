@@ -8,6 +8,7 @@ import type { LinkCheck } from "./start-form.js"
 
 // Lines may break before a separator dot, never right after it.
 export const DOT = " ·\u00a0"
+
 export function statusText(status: BotStatus, detail: string | null): string {
   return status === "joining" && detail === "reconnecting"
     ? t.status.reconnecting

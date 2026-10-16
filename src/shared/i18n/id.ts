@@ -229,7 +229,7 @@ export const id: Messages = {
     earlier: "Pertanyaan sebelumnya",
     nothingYet: "Belum ada apa-apa.",
     waiting: "Menunggu pertanyaan pertama…",
-    question: (n, type) => `Pertanyaan ${n} · ${type}`,
+    question: (n, type) => `Pertanyaan ${n} ·\u00a0${type}`,
     hidden: "Host tidak menampilkan pertanyaan di perangkat.",
     answer: "Jawaban:",
     thinking: "Berpikir…",
