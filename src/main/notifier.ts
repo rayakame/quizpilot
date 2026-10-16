@@ -15,6 +15,7 @@ export class Notifier {
   private asking = false
   private over = false
   private keyWarned = false
+  private hostEnded = false
   private waiting = false
   private finished: { bot: string; rank: number }[] = []
   private readonly lost = new Set<string>()
@@ -26,6 +27,7 @@ export class Notifier {
     this.asking = false
     this.over = false
     this.keyWarned = false
+    this.hostEnded = false
     this.finished = []
     this.lost.clear()
     this.kicked.clear()
@@ -47,6 +49,7 @@ export class Notifier {
         return this.notify(text.jevKeyTitle, text.jevKeyBody)
       case "gameReset":
         this.over = false
+        this.hostEnded = false
         this.finished = []
         return
       case "ended":
@@ -54,9 +57,11 @@ export class Notifier {
         this.finished.push({ bot: e.bot, rank: e.end.rank })
         return this.soon()
       case "status":
-        if (e.status === "disconnected") this.lost.add(e.bot)
-        else if (e.status === "kicked") this.kicked.add(e.bot)
-        else return
+        if (e.status === "kicked") this.kicked.add(e.bot)
+        // Only bots that were in the game have a cause; a failed join has none.
+        else if (e.status !== "disconnected" || !e.cause) return
+        else if (e.cause === "ended") this.hostEnded = true
+        else this.lost.add(e.bot)
         return this.soon()
     }
   }
@@ -72,9 +77,9 @@ export class Notifier {
     this.waiting = false
     const text = this.deps.text()
     const best = [...this.finished].sort((a, b) => a.rank - b.rank)[0]
-    if (best && !this.over) {
+    if ((best || this.hostEnded) && !this.over) {
       this.over = true
-      this.notify(text.overTitle, text.overBody(best.bot, best.rank))
+      this.notify(text.overTitle, best ? text.overBody(best.bot, best.rank) : text.hostEnded)
     }
     if (this.lost.size > 0) this.notify(text.lostTitle, text.lostBody([...this.lost]))
     if (this.kicked.size > 0) this.notify(text.kickedTitle, text.kickedBody([...this.kicked]))

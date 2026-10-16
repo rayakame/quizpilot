@@ -1,5 +1,5 @@
 import { answerText } from "../../../core/answer/describe.js"
-import type { JoinErrorCode } from "../../../core/kahoot/adapter.js"
+import type { DisconnectCause, JoinErrorCode } from "../../../core/kahoot/adapter.js"
 import type { QuestionResult } from "../../../core/kahoot/normalize.js"
 import type { BotStatus } from "../../../core/session/game-session.js"
 import type { Decision } from "../../../core/types.js"
@@ -9,6 +9,7 @@ export interface BotView {
   name: string
   status: BotStatus
   detail: string | null
+  cause: DisconnectCause | null
   joinError: JoinErrorCode | null
   totalScore: number
   rank: number | null
@@ -50,6 +51,7 @@ export function reduce(state: GameState, event: GameEvent): GameState {
         ...b,
         status: event.status,
         detail: event.detail ?? null,
+        cause: event.cause ?? null,
         joinError: event.status === "joining" ? null : b.joinError,
       }))
     case "joinFailed":
@@ -185,5 +187,13 @@ function withRound(
 }
 
 function newBot(name: string): BotView {
-  return { name, status: "joining", detail: null, joinError: null, totalScore: 0, rank: null }
+  return {
+    name,
+    status: "joining",
+    detail: null,
+    cause: null,
+    joinError: null,
+    totalScore: 0,
+    rank: null,
+  }
 }

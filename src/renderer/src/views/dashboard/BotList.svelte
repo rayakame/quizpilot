@@ -54,8 +54,8 @@
               {t.game.joinAs(retryName(bot))}
             </Button>
           {/if}
-        {:else if bot.detail && bot.status !== "joining"}
-          <p class="text-muted-foreground text-sm">{bot.detail}</p>
+        {:else if bot.status === "disconnected" && bot.cause}
+          <p class="text-muted-foreground text-sm">{t.game.causes[bot.cause]}</p>
         {/if}
         {#if canPause(bot) || canLeave(bot)}
           <div class="flex gap-1">

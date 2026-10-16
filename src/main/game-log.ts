@@ -20,6 +20,11 @@ export function logEntry(event: SessionEvent): LogEntry | null {
         return { level: "info", message: `${event.bot} was removed by the host` }
       }
       if (event.status === "disconnected") {
+        // Without a cause the join failed, and its joinFailed event says why.
+        if (!event.cause) return null
+        if (event.cause === "ended") {
+          return { level: "info", message: `The host ended the game for ${event.bot}` }
+        }
         const entry: LogEntry = { level: "warn", message: `${event.bot} lost the connection` }
         return event.detail ? { ...entry, detail: event.detail } : entry
       }

@@ -180,10 +180,14 @@ describe("join, answer and disconnect", () => {
     client.fire("Disconnect", "Kicked")
     client.fire("Disconnect", "Lost Connection")
     client.fire("Disconnect", "Session Ended")
+    client.fire("Disconnect", "Quiz Locked")
+    client.fire("Disconnect", "Some server text")
     expect(of("disconnected")).toEqual([
-      { reason: "Kicked", kicked: true, retryable: false },
-      { reason: "Lost Connection", kicked: false, retryable: true },
-      { reason: "Session Ended", kicked: false, retryable: false },
+      { reason: "Kicked", kicked: true, retryable: false, cause: "other" },
+      { reason: "Lost Connection", kicked: false, retryable: true, cause: "network" },
+      { reason: "Session Ended", kicked: false, retryable: false, cause: "ended" },
+      { reason: "Quiz Locked", kicked: false, retryable: false, cause: "locked" },
+      { reason: "Some server text", kicked: false, retryable: false, cause: "other" },
     ])
   })
 })

@@ -34,12 +34,25 @@ describe("logEntry", () => {
       logEntry({ type: "joinFailed", bot: "Ada", code: "locked", message: "Game is locked" }),
     ).toEqual({ level: "warn", message: "Ada couldn't join (locked)", detail: "Game is locked" })
     expect(
-      logEntry({ type: "status", bot: "Ada", status: "disconnected", detail: "socket closed" }),
+      logEntry({
+        type: "status",
+        bot: "Ada",
+        status: "disconnected",
+        detail: "socket closed",
+        cause: "other",
+      }),
     ).toEqual({ level: "warn", message: "Ada lost the connection", detail: "socket closed" })
+    expect(
+      logEntry({ type: "status", bot: "Ada", status: "disconnected", cause: "ended" }),
+    ).toEqual({ level: "info", message: "The host ended the game for Ada" })
     expect(logEntry({ type: "status", bot: "Ada", status: "kicked" })?.message).toBe(
       "Ada was removed by the host",
     )
     expect(logEntry({ type: "status", bot: "Ada", status: "playing" })).toBeNull()
+    // A failed join is logged by its joinFailed event.
+    expect(
+      logEntry({ type: "status", bot: "Ada", status: "disconnected", detail: "Name is taken" }),
+    ).toBeNull()
   })
 
   it("notes where answers came from", () => {

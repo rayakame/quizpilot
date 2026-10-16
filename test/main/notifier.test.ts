@@ -39,7 +39,7 @@ describe("Notifier", () => {
   it("says nothing while the window is in front", () => {
     const { notifier, deps, tick } = setup({ focused: () => true })
     notifier.event({ type: "twoStepRequired" })
-    notifier.event({ type: "status", bot: "Ada", status: "disconnected" })
+    notifier.event({ type: "status", bot: "Ada", status: "disconnected", cause: "network" })
     tick()
     expect(deps.show).not.toHaveBeenCalled()
   })
@@ -52,9 +52,9 @@ describe("Notifier", () => {
 
   it("sums up bots that drop out together", () => {
     const { notifier, deps, tick } = setup()
-    notifier.event({ type: "status", bot: "Ada", status: "disconnected" })
-    notifier.event({ type: "status", bot: "Bo", status: "disconnected" })
-    notifier.event({ type: "status", bot: "Cy", status: "disconnected" })
+    notifier.event({ type: "status", bot: "Ada", status: "disconnected", cause: "network" })
+    notifier.event({ type: "status", bot: "Bo", status: "disconnected", cause: "network" })
+    notifier.event({ type: "status", bot: "Cy", status: "disconnected", cause: "network" })
     tick()
     expect(deps.show).toHaveBeenCalledTimes(1)
     expect(deps.show).toHaveBeenCalledWith(
@@ -86,13 +86,31 @@ describe("Notifier", () => {
   it("speaks the user's language", () => {
     const { notifier, deps, tick } = setup({ text: () => de.notify })
     notifier.event({ type: "status", bot: "Ada", status: "kicked" })
-    notifier.event({ type: "status", bot: "Bo", status: "disconnected" })
-    notifier.event({ type: "status", bot: "Cy", status: "disconnected" })
+    notifier.event({ type: "status", bot: "Bo", status: "disconnected", cause: "network" })
+    notifier.event({ type: "status", bot: "Cy", status: "disconnected", cause: "network" })
     tick()
     expect(deps.show).toHaveBeenCalledWith(de.notify.kickedTitle, "Der Host hat Ada entfernt.")
     expect(deps.show).toHaveBeenCalledWith(
       de.notify.lostTitle,
       "Bo und Cy haben die Verbindung verloren.",
     )
+  })
+
+  it("stays quiet about bots that never got in", () => {
+    const { notifier, deps, tick } = setup()
+    notifier.event({ type: "status", bot: "Bo", status: "joining" })
+    notifier.event({ type: "status", bot: "Bo", status: "disconnected", detail: "Name is taken" })
+    notifier.event({ type: "joinFailed", bot: "Bo", code: "duplicate_name", message: "taken" })
+    tick()
+    expect(deps.show).not.toHaveBeenCalled()
+  })
+
+  it("calls a game the host ended a game over, once", () => {
+    const { notifier, deps, tick } = setup()
+    notifier.event({ type: "status", bot: "Ada", status: "disconnected", cause: "ended" })
+    notifier.event({ type: "status", bot: "Bo", status: "disconnected", cause: "ended" })
+    tick()
+    expect(deps.show).toHaveBeenCalledTimes(1)
+    expect(deps.show).toHaveBeenCalledWith(en.notify.overTitle, en.notify.hostEnded)
   })
 })

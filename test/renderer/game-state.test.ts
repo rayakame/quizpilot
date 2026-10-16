@@ -61,8 +61,24 @@ describe("reduce", () => {
       { type: "result", bot: "Anna", result: result() },
     )
     expect(state.bots).toEqual([
-      { name: "Anna", status: "lobby", detail: null, joinError: null, totalScore: 950, rank: 1 },
-      { name: "Ben", status: "joining", detail: null, joinError: null, totalScore: 0, rank: null },
+      {
+        name: "Anna",
+        status: "lobby",
+        detail: null,
+        cause: null,
+        joinError: null,
+        totalScore: 950,
+        rank: 1,
+      },
+      {
+        name: "Ben",
+        status: "joining",
+        detail: null,
+        cause: null,
+        joinError: null,
+        totalScore: 0,
+        rank: null,
+      },
     ])
   })
 
@@ -200,5 +216,14 @@ describe("notices", () => {
     const once = reduce(EMPTY_GAME, { type: "notice", notice: "jev_key" })
     const twice = reduce(once, { type: "notice", notice: "jev_key" })
     expect(twice.notices).toEqual(["jev_key"])
+  })
+})
+
+describe("disconnects", () => {
+  it("keeps why a bot was disconnected", () => {
+    const state = play({ type: "status", bot: "Ada", status: "disconnected", cause: "ended" })
+    expect(state.bots[0]?.cause).toBe("ended")
+    const back = reduce(state, { type: "status", bot: "Ada", status: "joining" })
+    expect(back.bots[0]?.cause).toBeNull()
   })
 })

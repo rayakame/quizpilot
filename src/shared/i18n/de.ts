@@ -216,6 +216,12 @@ export const de: Messages = {
     exported: "Spiel exportiert",
     notInHistory: "Dieses Spiel ist nicht im Verlauf.",
     exportFailed: "Das Spiel ließ sich nicht exportieren.",
+    causes: {
+      network: "Die Verbindung ist abgebrochen.",
+      ended: "Der Host hat das Spiel beendet.",
+      locked: "Der Host hat das Spiel gesperrt.",
+      other: "Kahoot hat die Verbindung beendet.",
+    },
     jevKey:
       "TypeSafe akzeptiert deinen Key nicht, die Bots raten deshalb. Verlass das Spiel und ändere den Key in den Einstellungen.",
   },
@@ -272,6 +278,7 @@ export const de: Messages = {
     twoStepBody: "Gib die Symbole vom Bildschirm des Hosts ein.",
     overTitle: "Spiel vorbei",
     overBody: (bot, rank) => `${bot} ist auf Platz ${rank}.`,
+    hostEnded: "Der Host hat das Spiel beendet.",
     lostTitle: "Verbindung verloren",
     lostBody: (bots) =>
       `${names(bots)} ${bots.length === 1 ? "hat" : "haben"} die Verbindung verloren.`,

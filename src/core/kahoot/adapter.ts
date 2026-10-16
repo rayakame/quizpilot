@@ -28,6 +28,14 @@ export interface KahootClientLike {
   quiz?: { currentQuestion?: Record<string, unknown> }
 }
 
+export type DisconnectCause = "network" | "ended" | "locked" | "other"
+
+const CAUSES: Record<string, DisconnectCause> = {
+  "Lost Connection": "network",
+  "Session Ended": "ended",
+  "Quiz Locked": "locked",
+}
+
 export interface AdapterEvents {
   joined: Record<string, never>
   twoStepRequired: Record<string, never>
@@ -38,7 +46,7 @@ export interface AdapterEvents {
   questionEnded: QuestionResult
   quizEnded: QuizEnd
   gameReset: Record<string, never>
-  disconnected: { reason: string; kicked: boolean; retryable: boolean }
+  disconnected: { reason: string; kicked: boolean; retryable: boolean; cause: DisconnectCause }
 }
 
 export interface KahootAdapterLike {
@@ -109,6 +117,7 @@ export class KahootAdapter extends Emitter<AdapterEvents> implements KahootAdapt
         reason,
         kicked: reason === "Kicked",
         retryable: reason === "Lost Connection",
+        cause: CAUSES[reason] ?? "other",
       }),
     )
   }

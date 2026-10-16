@@ -68,7 +68,12 @@ function statusOf(events: SessionEvent[], bot: string) {
   return own.at(-1)
 }
 
-const lost = { reason: "Lost Connection", kicked: false, retryable: true }
+const lost = {
+  reason: "Lost Connection",
+  kicked: false,
+  retryable: true,
+  cause: "network",
+} as const
 
 describe("joining", () => {
   it("allows one to five bots", async () => {
@@ -149,6 +154,7 @@ describe("joining", () => {
       status: "disconnected",
       detail: "Name is already taken",
     })
+    expect(statusOf(events, "bad")?.cause).toBeUndefined()
   })
 })
 
@@ -255,7 +261,12 @@ describe("answering", () => {
     await session.join("123456", ["Anna"])
     await session.leave("Anna")
     expect(adapters[0]!.leave).toHaveBeenCalledTimes(1)
-    adapters[0]!.emit("disconnected", { reason: "Client Left", kicked: false, retryable: false })
+    adapters[0]!.emit("disconnected", {
+      reason: "Client Left",
+      kicked: false,
+      retryable: false,
+      cause: "other",
+    })
     expect(statusOf(events, "Anna")?.status).toBe("left")
   })
 })
@@ -352,7 +363,7 @@ describe("reconnecting", () => {
     expect(adapters[0]!.reconnect).toHaveBeenCalledTimes(2)
     await vi.advanceTimersByTimeAsync(9000)
     expect(adapters[0]!.reconnect).toHaveBeenCalledTimes(3)
-    expect(statusOf(events, "Anna")?.status).toBe("disconnected")
+    expect(statusOf(events, "Anna")).toMatchObject({ status: "disconnected", cause: "network" })
   })
 
   it("ignores the disconnect kahoot.js fires when a reconnect attempt fails", async () => {
@@ -393,7 +404,12 @@ describe("reconnecting", () => {
   it("does not reconnect kicked bots or when reconnecting is off", async () => {
     const kicked = setup()
     await kicked.session.join("123456", ["Anna"])
-    kicked.adapters[0]!.emit("disconnected", { reason: "Kicked", kicked: true, retryable: false })
+    kicked.adapters[0]!.emit("disconnected", {
+      reason: "Kicked",
+      kicked: true,
+      retryable: false,
+      cause: "other",
+    })
     expect(statusOf(kicked.events, "Anna")?.status).toBe("kicked")
 
     const off = setup({ reconnect: false })

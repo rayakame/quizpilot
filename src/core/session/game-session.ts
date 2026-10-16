@@ -3,6 +3,7 @@ import { answerText, correctAnswer } from "../answer/describe.js"
 import {
   JoinError,
   type AdapterEvents,
+  type DisconnectCause,
   type JoinErrorCode,
   type KahootAdapterLike,
 } from "../kahoot/adapter.js"
@@ -43,7 +44,7 @@ export type JoinOutcome =
   { name: string; ok: true } | { name: string; ok: false; code: JoinErrorCode; message: string }
 
 export type SessionEvent =
-  | { type: "status"; bot: string; status: BotStatus; detail?: string }
+  | { type: "status"; bot: string; status: BotStatus; detail?: string; cause?: DisconnectCause }
   | { type: "joinFailed"; bot: string; code: JoinErrorCode; message: string }
   | { type: "twoStepRequired" }
   | { type: "twoStepResult"; ok: boolean }
@@ -262,7 +263,7 @@ export class GameSession {
     if (bot.reconnecting || GONE.includes(bot.status) || bot.status === "disconnected") return
     if (d.kicked) return this.setStatus(bot, "kicked")
     if (!bot.joined || !d.retryable || !this.settings.reconnect) {
-      return this.setStatus(bot, "disconnected", d.reason)
+      return this.setStatus(bot, "disconnected", d.reason, d.cause)
     }
     bot.reconnecting = true
     for (const wait of RECONNECT_DELAYS_MS) {
@@ -278,7 +279,7 @@ export class GameSession {
       }
     }
     bot.reconnecting = false
-    if (!GONE.includes(bot.status)) this.setStatus(bot, "disconnected", d.reason)
+    if (!GONE.includes(bot.status)) this.setStatus(bot, "disconnected", d.reason, d.cause)
   }
 
   private delay(): number {
@@ -286,9 +287,15 @@ export class GameSession {
     return mode === "human" ? minMs + this.deps.random() * (maxMs - minMs) : 0
   }
 
-  private setStatus(bot: Bot, status: BotStatus, detail?: string): void {
+  private setStatus(bot: Bot, status: BotStatus, detail?: string, cause?: DisconnectCause): void {
     bot.status = status
-    this.emit({ type: "status", bot: bot.name, status, ...(detail ? { detail } : {}) })
+    this.emit({
+      type: "status",
+      bot: bot.name,
+      status,
+      ...(detail ? { detail } : {}),
+      ...(cause ? { cause } : {}),
+    })
   }
 
   private emit(event: SessionEvent): void {

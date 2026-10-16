@@ -241,7 +241,12 @@ describe("recording", () => {
     const { controller, adapters } = setup(undefined, undefined, undefined, log)
     await controller.start(request)
     await flush()
-    adapters[1]!.emit("disconnected", { reason: "socket closed", kicked: false, retryable: false })
+    adapters[1]!.emit("disconnected", {
+      reason: "socket closed",
+      kicked: false,
+      retryable: false,
+      cause: "other",
+    })
     expect(log).toHaveBeenCalledWith({ level: "info", message: "Joining 916240 with 2 bots" })
     expect(log).toHaveBeenCalledWith({
       level: "warn",

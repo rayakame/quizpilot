@@ -219,6 +219,12 @@ export const en = {
     exported: "Game exported",
     notInHistory: "This game isn't in the history.",
     exportFailed: "Couldn't export the game.",
+    causes: {
+      network: "The connection dropped.",
+      ended: "The host ended the game.",
+      locked: "The host locked the game.",
+      other: "Kahoot closed the connection.",
+    },
     jevKey:
       "TypeSafe doesn't accept your key, so the bots are guessing. Leave the game and change the key in the settings.",
   },
@@ -276,6 +282,7 @@ export const en = {
     twoStepBody: "Enter the symbols from the host's screen.",
     overTitle: "Game over",
     overBody: (bot: string, rank: number) => `${bot} finished #${rank}.`,
+    hostEnded: "The host ended the game.",
     lostTitle: "Connection lost",
     lostBody: (bots: string[]) => `${names(bots)} lost the connection.`,
     kickedTitle: "Removed from the game",
