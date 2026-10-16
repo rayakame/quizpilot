@@ -199,7 +199,7 @@ describe("language", () => {
   it("shows and changes the language", () => {
     expect(toPublic(freshConfig("de")).language).toBe("de")
     expect(applyPatch(DEFAULT_CONFIG, { language: "de" }).ui.language).toBe("de")
-    expect(applyPatch(DEFAULT_CONFIG, { language: "fr" as never }).ui.language).toBe("en")
+    expect(applyPatch(DEFAULT_CONFIG, { language: "sv" as never }).ui.language).toBe("en")
   })
 })
 

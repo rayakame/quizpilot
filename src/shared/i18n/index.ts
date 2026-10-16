@@ -1,13 +1,23 @@
 import { de } from "./de.js"
 import { en, type Messages } from "./en.js"
+import { es } from "./es.js"
+import { fr } from "./fr.js"
+import { pt } from "./pt.js"
 
 export type { Messages }
-export type Language = "en" | "de"
+export type Language = "en" | "de" | "es" | "fr" | "pt"
 
-export const LANGUAGES: Language[] = ["en", "de"]
-export const LANGUAGE_NAMES: Record<Language, string> = { en: "English", de: "Deutsch" }
+// In the order of their names, the way the menu lists them.
+export const LANGUAGES: Language[] = ["de", "en", "es", "fr", "pt"]
+export const LANGUAGE_NAMES: Record<Language, string> = {
+  de: "Deutsch",
+  en: "English",
+  es: "Español",
+  fr: "Français",
+  pt: "Português (Brasil)",
+}
 
-const MESSAGES: Record<Language, Messages> = { en, de }
+const MESSAGES: Record<Language, Messages> = { en, de, es, fr, pt }
 
 export function messagesFor(language: Language): Messages {
   return MESSAGES[language]

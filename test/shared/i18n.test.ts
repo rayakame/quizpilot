@@ -21,9 +21,13 @@ const SAME = new Set([
   "Name",
   "Text",
   "Minimal",
+  "Zoom",
 ])
 // Words that only read the same in one language.
-const ALSO_SAME: Partial<Record<Language, string[]>> = {}
+const ALSO_SAME: Partial<Record<Language, string[]>> = {
+  fr: ["Services", "Options"],
+  pt: ["Slide"],
+}
 
 // Lists for the functions that take bot names, numbers for everything else.
 const LISTS = new Set(["notify.lostBody", "notify.kickedBody"])
@@ -49,6 +53,12 @@ describe("pickLanguage", () => {
     expect(pickLanguage(["en_GB"])).toBe("en")
   })
 
+  it("knows regional variants", () => {
+    expect(pickLanguage(["es-419"])).toBe("es")
+    expect(pickLanguage(["pt-PT"])).toBe("pt")
+    expect(pickLanguage(["fr-CA", "de"])).toBe("fr")
+  })
+
   it("falls back to English", () => {
     expect(pickLanguage(["sv-SE", "ko"])).toBe("en")
     expect(pickLanguage(["zh-Hant-TW"])).toBe("en")
@@ -68,6 +78,17 @@ describe("dictionaries", () => {
     expect(de.dialogs.deleteGames(1)).toBe("Das gespeicherte Spiel löschen?")
     expect(de.dialogs.deleteGames(3)).toBe("Alle 3 gespeicherten Spiele löschen?")
   })
+
+  it("counts in Spanish, Portuguese and French", () => {
+    const { es, pt, fr } = { es: messagesFor("es"), pt: messagesFor("pt"), fr: messagesFor("fr") }
+    expect(es.dialogs.deleteGames(1)).toBe("¿Borrar la partida guardada?")
+    expect(es.dialogs.deleteGames(3)).toBe("¿Borrar las 3 partidas guardadas?")
+    expect(pt.dialogs.deleteGames(1)).toBe("Excluir a partida salva?")
+    expect(pt.dialogs.deleteGames(3)).toBe("Excluir as 3 partidas salvas?")
+    expect(fr.dialogs.deleteGames(1)).toBe("Supprimer la partie enregistrée\u00a0?")
+    expect(fr.dialogs.deleteGames(3)).toBe("Supprimer les 3 parties enregistrées\u00a0?")
+    expect(fr.settings.gamesSaved(0)).toBe("0 partie enregistrée")
+  })
 })
 
 describe.each(LANGUAGES.filter((l) => l !== "en"))("%s", (language) => {
@@ -77,7 +98,9 @@ describe.each(LANGUAGES.filter((l) => l !== "en"))("%s", (language) => {
     const same = new Set([...SAME, ...(ALSO_SAME[language] ?? [])])
     const translated = new Map(strings(messages))
     const untranslated = strings(en)
-      .filter(([path, text]) => path !== "locale" && translated.get(path) === text && !same.has(text))
+      .filter(
+        ([path, text]) => path !== "locale" && translated.get(path) === text && !same.has(text),
+      )
       .map(([path]) => path)
     expect(untranslated).toEqual([])
   })
@@ -87,7 +110,10 @@ describe.each(LANGUAGES.filter((l) => l !== "en"))("%s", (language) => {
     const lost = functions(en).flatMap(([path, fn]) => {
       const args = LISTS.has(path) ? [["Ada", "Bo"]] : [7, 8].slice(0, fn.length)
       const text = own.get(path)?.(...args) ?? ""
-      return args.flat().filter((value) => !text.includes(String(value))).map(() => path)
+      return args
+        .flat()
+        .filter((value) => !text.includes(String(value)))
+        .map(() => path)
     })
     expect(lost).toEqual([])
   })
