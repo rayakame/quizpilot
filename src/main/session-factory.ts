@@ -8,10 +8,16 @@ import { AnswerKey } from "../core/quiz-source/answer-key.js"
 import type { KnownQuiz } from "../core/quiz-source/link.js"
 import { GameSession } from "../core/session/game-session.js"
 import type { StartRequest } from "../shared/api.js"
+import { MAX_MISTAKES } from "../shared/start.js"
 import { fallbackFor } from "./fallback.js"
 import type { LogEntry } from "./game-log.js"
 import { watchJev } from "./jev-watch.js"
 import type { Config } from "./settings.js"
+
+export function mistakeRate(value: unknown): number {
+  if (typeof value !== "number" || Number.isNaN(value)) return 0
+  return Math.min(MAX_MISTAKES, Math.max(0, value))
+}
 
 export interface SessionHooks {
   log?(entry: LogEntry): void
@@ -42,6 +48,7 @@ export function createSession(
       quizContext: request.quizContext,
       includePrevious: request.includePrevious,
       reconnect: config.behavior.reconnect,
+      mistakes: mistakeRate(request.mistakes),
     },
     {
       createAdapter: () => new KahootAdapter(new Kahoot()),

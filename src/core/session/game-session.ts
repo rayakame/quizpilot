@@ -1,5 +1,6 @@
 import type { AskContext, PreviousQuestion } from "../answer/context.js"
 import { answerText, correctAnswer } from "../answer/describe.js"
+import { wrongAnswer } from "../answer/mistakes.js"
 import {
   JoinError,
   type AdapterEvents,
@@ -30,6 +31,8 @@ export interface SessionSettings {
   quizContext: string | null
   includePrevious: boolean
   reconnect: boolean
+  /** Share of answers, 0 to 0.5, that each bot gets wrong on purpose. */
+  mistakes: number
 }
 
 export interface SessionDeps {
@@ -50,7 +53,7 @@ export type SessionEvent =
   | { type: "twoStepResult"; ok: boolean }
   | { type: "question"; question: Question }
   | { type: "decision"; index: number; decision: Decision }
-  | { type: "answered"; bot: string; index: number; afterMs: number }
+  | { type: "answered"; bot: string; index: number; afterMs: number; onPurpose?: true }
   | { type: "result"; bot: string; result: QuestionResult }
   | { type: "ended"; bot: string; end: QuizEnd }
   | { type: "gameReset" }
@@ -229,12 +232,18 @@ export class GameSession {
     const [decision] = await Promise.all([round.decision, sleep(this.delay())])
     if (!decision || decision.answer.kind === "none") return
     if (bot.paused || bot.current !== question.index || GONE.includes(bot.status)) return
-    await bot.adapter.answer(decision.answer).catch(() => {})
+    const { mistakes } = this.settings
+    const wrong =
+      mistakes > 0 && this.deps.random() < mistakes
+        ? wrongAnswer(decision.answer, round.question, this.deps.random)
+        : null
+    await bot.adapter.answer(wrong ?? decision.answer).catch(() => {})
     this.emit({
       type: "answered",
       bot: bot.name,
       index: question.index,
       afterMs: this.deps.now() - start,
+      ...(wrong ? { onPurpose: true as const } : {}),
     })
   }
 

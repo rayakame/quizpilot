@@ -15,6 +15,7 @@ const request: StartRequest = {
   quizContext: "TUM",
   includePrevious: true,
   quizLink: null,
+  mistakes: 0,
 }
 
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0))
@@ -37,6 +38,7 @@ function setup(
           quizContext: r.quizContext,
           includePrevious: r.includePrevious,
           reconnect: true,
+          mistakes: 0,
         },
         {
           createAdapter: () => {

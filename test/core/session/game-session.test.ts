@@ -16,6 +16,7 @@ const defaults: SessionSettings = {
   quizContext: null,
   includePrevious: true,
   reconnect: true,
+  mistakes: 0,
 }
 
 const question = (index: number, over: Partial<Question> = {}): Question => ({
@@ -40,7 +41,12 @@ function after<T>(ms: number, value: T): Promise<T> {
   return new Promise((resolve) => setTimeout(() => resolve(value), ms))
 }
 
-function setup(over: Partial<SessionSettings> = {}, decideMs = 300, decision: Decision = pick(1)) {
+function setup(
+  over: Partial<SessionSettings> = {},
+  decideMs = 300,
+  decision: Decision = pick(1),
+  random: () => number = () => 0.5,
+) {
   const adapters: FakeAdapter[] = []
   const decide = vi.fn<SessionDeps["decide"]>(() => after(decideMs, decision))
   const session = new GameSession(
@@ -53,7 +59,7 @@ function setup(over: Partial<SessionSettings> = {}, decideMs = 300, decision: De
       },
       decide,
       now: () => Date.now(),
-      random: () => 0.5,
+      random,
     },
   )
   const events: SessionEvent[] = []
@@ -436,5 +442,62 @@ describe("quiz start", () => {
     const info = { randomQuestions: false, randomAnswers: true, first: null }
     adapter.emit("quizStarted", info)
     expect(quizStarted).toHaveBeenCalledWith(info)
+  })
+})
+
+describe("mistakes on purpose", () => {
+  const sequence = (...values: number[]) => {
+    let i = 0
+    return () => values[i++ % values.length]!
+  }
+  const answered = (events: SessionEvent[]) =>
+    events.filter((e): e is Extract<SessionEvent, { type: "answered" }> => e.type === "answered")
+
+  async function play(session: GameSession, adapters: FakeAdapter[], q = question(0)) {
+    for (const a of adapters) a.emit("questionReady", { question: q, startsInMs: 0 })
+    for (const a of adapters) a.emit("questionStarted", { question: q })
+    await vi.advanceTimersByTimeAsync(400)
+  }
+
+  it("sends a wrong answer and says so", async () => {
+    const { session, adapters, events } = setup({ mistakes: 1 })
+    await session.join("123456", ["Anna"])
+    await play(session, adapters)
+    const sent = adapters[0]!.answer.mock.calls[0]?.[0]
+    expect(sent).toEqual({ kind: "choice", index: 2 })
+    expect(answered(events)[0]?.onPurpose).toBe(true)
+  })
+
+  it("answers right when mistakes are off", async () => {
+    const { session, adapters, events } = setup({ mistakes: 0 })
+    await session.join("123456", ["Anna"])
+    await play(session, adapters)
+    expect(adapters[0]!.answer).toHaveBeenCalledWith({ kind: "choice", index: 1 })
+    expect(answered(events)[0]?.onPurpose).toBeUndefined()
+  })
+
+  it("lets every bot decide for itself", async () => {
+    const { session, adapters, events } = setup(
+      { mistakes: 0.3 },
+      300,
+      pick(1),
+      sequence(0.1, 0, 0.9),
+    )
+    await session.join("123456", ["Anna", "Ben"])
+    await play(session, adapters)
+    expect(adapters[0]!.answer).toHaveBeenCalledWith({ kind: "choice", index: 0 })
+    expect(adapters[1]!.answer).toHaveBeenCalledWith({ kind: "choice", index: 1 })
+    expect(answered(events).map((e) => [e.bot, e.onPurpose])).toEqual([
+      ["Anna", true],
+      ["Ben", undefined],
+    ])
+  })
+
+  it("answers polls normally", async () => {
+    const { session, adapters, events } = setup({ mistakes: 1 })
+    await session.join("123456", ["Anna"])
+    await play(session, adapters, question(0, { type: "survey" }))
+    expect(adapters[0]!.answer).toHaveBeenCalledWith({ kind: "choice", index: 1 })
+    expect(answered(events)[0]?.onPurpose).toBeUndefined()
   })
 })

@@ -17,6 +17,7 @@ const settings: PublicSettings = {
   includePrevious: false,
   reconnect: true,
   notify: true,
+  mistakes: 0.2,
   theme: "system",
   language: "en",
   saveHistory: true,
@@ -47,6 +48,7 @@ describe("start form", () => {
       minSeconds: 1,
       maxSeconds: 5,
       includePrevious: false,
+      mistakes: 0.2,
     })
     expect(form.bots).toHaveLength(1)
     expect(form.bots[0]!.placeholder).not.toBe("")
@@ -75,6 +77,7 @@ describe("start form", () => {
       quizContext: null,
       includePrevious: false,
       quizLink: null,
+      mistakes: 0.2,
     })
   })
 

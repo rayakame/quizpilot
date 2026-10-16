@@ -92,6 +92,7 @@ export interface PublicSettings {
   includePrevious: boolean
   reconnect: boolean
   notify: boolean
+  mistakes: number
   theme: Theme
   language: Language
   saveHistory: boolean
@@ -118,6 +119,7 @@ export interface SettingsPatch {
   includePrevious?: boolean
   reconnect?: boolean
   notify?: boolean
+  mistakes?: number
   theme?: Theme
   language?: Language
   fallbackBelow?: number
@@ -136,6 +138,7 @@ export interface StartRequest {
   quizContext: string | null
   includePrevious: boolean
   quizLink: string | null
+  mistakes: number
 }
 
 export type QuizLinkProblem = QuizLoadProblem

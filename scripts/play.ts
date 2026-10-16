@@ -28,6 +28,7 @@ const session = new GameSession(
     quizContext: args.context,
     includePrevious: args.includePrevious,
     reconnect: true,
+    mistakes: 0,
   },
   {
     createAdapter: () => {
@@ -74,7 +75,9 @@ session.on((e) => {
     }
     case "question":
       questions.set(e.question.index, e.question)
-      console.log(`\nQ${e.question.index + 1} [${e.question.type}] ${e.question.title ?? "(no text)"}`)
+      console.log(
+        `\nQ${e.question.index + 1} [${e.question.type}] ${e.question.title ?? "(no text)"}`,
+      )
       break
     case "decision": {
       const q = questions.get(e.index)

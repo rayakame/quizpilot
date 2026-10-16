@@ -11,6 +11,7 @@ const request: StartRequest = {
   quizContext: "TUM",
   includePrevious: true,
   quizLink: null,
+  mistakes: 0,
 }
 
 const question = (index: number, over: Partial<QuestionView> = {}): QuestionView => ({

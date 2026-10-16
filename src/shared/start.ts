@@ -37,3 +37,7 @@ export function startProblem(request: StartRequest): StartProblem | null {
   if (request.quizLink !== null && parseQuizLink(request.quizLink) === null) return "quiz_link"
   return timingProblem(request.timing)
 }
+
+/** The mistake rates the window offers. */
+export const MISTAKE_STEPS = [0, 0.1, 0.2, 0.3]
+export const MAX_MISTAKES = 0.5

@@ -35,6 +35,7 @@ describe("parseConfig", () => {
         timing: { mode: "human", minMs: 500, maxMs: 2000 },
         reconnect: false,
         notify: false,
+        mistakes: 0.1,
       },
       ui: { language: "de", theme: "dark" },
       history: { enabled: false },
@@ -109,6 +110,7 @@ describe("toPublic", () => {
       includePrevious: true,
       reconnect: true,
       notify: true,
+      mistakes: 0,
       theme: "system",
       language: "en",
       saveHistory: true,
@@ -143,6 +145,7 @@ describe("applyPatch", () => {
       timing: { mode: "human", minMs: 500, maxMs: 2500 },
       reconnect: false,
       notify: true,
+      mistakes: 0,
     })
     expect(next.context.includePrevious).toBe(false)
     expect(next.ui).toEqual({ language: "en", theme: "dark" })
@@ -206,5 +209,16 @@ describe("notifications", () => {
     expect(applyPatch(DEFAULT_CONFIG, { notify: false }).behavior.notify).toBe(false)
     expect(applyPatch(DEFAULT_CONFIG, { notify: "no" as never }).behavior.notify).toBe(true)
     expect(parseConfig({ version: 1, behavior: {} }).behavior.notify).toBe(true)
+  })
+})
+
+describe("mistakes on purpose", () => {
+  it("are off unless set, and only take 0 to 50%", () => {
+    expect(toPublic(DEFAULT_CONFIG).mistakes).toBe(0)
+    expect(applyPatch(DEFAULT_CONFIG, { mistakes: 0.2 }).behavior.mistakes).toBe(0.2)
+    expect(applyPatch(DEFAULT_CONFIG, { mistakes: 0.9 }).behavior.mistakes).toBe(0)
+    expect(applyPatch(DEFAULT_CONFIG, { mistakes: "x" as never }).behavior.mistakes).toBe(0)
+    expect(parseConfig({ version: 1, behavior: {} }).behavior.mistakes).toBe(0)
+    expect(parseConfig({ version: 1, behavior: { mistakes: 0.3 } }).behavior.mistakes).toBe(0.3)
   })
 })

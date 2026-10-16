@@ -47,6 +47,7 @@ describe("startProblem", () => {
     quizContext: null,
     includePrevious: true,
     quizLink: null,
+    mistakes: 0,
   }
 
   it("accepts a complete request", () => {

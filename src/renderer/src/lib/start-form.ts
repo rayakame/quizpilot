@@ -24,6 +24,7 @@ export interface StartForm {
   context: string
   includePrevious: boolean
   quizLink: string
+  mistakes: number
 }
 
 export interface LinkCheck {
@@ -51,6 +52,7 @@ export function newForm(settings: PublicSettings, random: () => number = Math.ra
     context: "",
     includePrevious: settings.includePrevious,
     quizLink: "",
+    mistakes: settings.mistakes,
   }
 }
 
@@ -62,6 +64,7 @@ export function toRequest(form: StartForm): StartRequest {
     quizContext: form.context.trim() || null,
     includePrevious: form.includePrevious,
     quizLink: form.quizLink.trim() || null,
+    mistakes: form.mistakes,
   }
 }
 

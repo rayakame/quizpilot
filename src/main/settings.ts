@@ -10,7 +10,7 @@ import {
   type Timing,
 } from "../shared/api.js"
 import { LANGUAGES, type Language } from "../shared/i18n/index.js"
-import { MAX_DELAY_MS, timingProblem } from "../shared/start.js"
+import { MAX_DELAY_MS, MAX_MISTAKES, timingProblem } from "../shared/start.js"
 
 export interface Config {
   version: 1
@@ -24,7 +24,7 @@ export interface Config {
     webSearch: boolean
   }
   context: { includePrevious: boolean }
-  behavior: { timing: Timing; reconnect: boolean; notify: boolean }
+  behavior: { timing: Timing; reconnect: boolean; notify: boolean; mistakes: number }
   ui: { language: Language; theme: Theme }
   history: { enabled: boolean }
 }
@@ -45,6 +45,7 @@ export const DEFAULT_CONFIG: Config = {
     timing: { mode: "instant", minMs: 1000, maxMs: 5000 },
     reconnect: true,
     notify: true,
+    mistakes: 0,
   },
   ui: { language: "en", theme: "system" },
   history: { enabled: true },
@@ -117,6 +118,7 @@ export function parseConfig(raw: unknown): Config {
       timing: timing(behavior.timing) ?? { ...d.behavior.timing },
       reconnect: bool(behavior.reconnect, d.behavior.reconnect),
       notify: bool(behavior.notify, d.behavior.notify),
+      mistakes: num(behavior.mistakes, d.behavior.mistakes, 0, MAX_MISTAKES),
     },
     ui: {
       language: oneOf(ui.language, LANGUAGES, d.ui.language),
@@ -133,6 +135,7 @@ export function toPublic(config: Config): PublicSettings {
     includePrevious: config.context.includePrevious,
     reconnect: config.behavior.reconnect,
     notify: config.behavior.notify,
+    mistakes: config.behavior.mistakes,
     theme: config.ui.theme,
     language: config.ui.language,
     saveHistory: config.history.enabled,
@@ -162,6 +165,10 @@ export function applyPatch(config: Config, patch: SettingsPatch): Config {
   }
   if (typeof reconnect === "boolean") next.behavior.reconnect = reconnect
   if (typeof patch.notify === "boolean") next.behavior.notify = patch.notify
+  const { mistakes } = patch
+  if (typeof mistakes === "number" && mistakes >= 0 && mistakes <= MAX_MISTAKES) {
+    next.behavior.mistakes = mistakes
+  }
   if (typeof includePrevious === "boolean") next.context.includePrevious = includePrevious
   if (theme && THEMES.includes(theme)) next.ui.theme = theme
   if (isShare(fallbackBelow)) next.fallback.below = fallbackBelow
