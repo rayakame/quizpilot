@@ -58,6 +58,7 @@ export const ja: Messages = {
     apiKey: "APIキー",
     to: "〜",
     seconds: "秒",
+    inSeconds: (value) => `${value}秒`,
     noText: "（テキストなし）",
     points: (n) => `${n}ポイント`,
   },

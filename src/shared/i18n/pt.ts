@@ -57,6 +57,7 @@ export const pt: Messages = {
     apiKey: "Chave de API",
     to: "a",
     seconds: "segundos",
+    inSeconds: (value) => `${value} s`,
     noText: "(sem texto)",
     points: (n) => (n === 1 ? "1 ponto" : `${n} pontos`),
   },

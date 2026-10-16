@@ -58,6 +58,7 @@ export const nl: Messages = {
     apiKey: "API-sleutel",
     to: "tot",
     seconds: "seconden",
+    inSeconds: (value) => `${value} s`,
     noText: "(geen tekst)",
     points: (n) => (n === 1 ? "1 punt" : `${n} punten`),
   },

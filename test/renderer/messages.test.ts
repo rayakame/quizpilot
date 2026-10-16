@@ -94,6 +94,9 @@ describe("game over texts", () => {
 
   it("shows seconds with one decimal", () => {
     expect(secondsText(1234)).toBe("1.2 s")
+    setLanguage("ja")
+    expect(secondsText(1234)).toBe("1.2秒")
+    setLanguage("en")
   })
 })
 

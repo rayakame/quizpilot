@@ -72,6 +72,12 @@ describe("setupRows", () => {
       "Deutsch",
     ])
   })
+
+  it("puts the seconds unit the Japanese way", () => {
+    setLanguage("ja")
+    const rows = setupRows(settings({ timing: { mode: "human", minMs: 1500, maxMs: 4000 } }))
+    expect(rows.find((r) => r.id === "timing")?.value).toBe("人間らしく、1.5–4秒")
+  })
 })
 
 describe("recentGames", () => {

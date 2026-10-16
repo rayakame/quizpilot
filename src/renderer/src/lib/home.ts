@@ -32,7 +32,9 @@ function answersText({ fallback }: PublicSettings): string {
 function timingText({ mode, minMs, maxMs }: Timing): string {
   if (mode === "instant") return t.home.instant
   const seconds = new Intl.NumberFormat(t.locale, { maximumFractionDigits: 1 })
-  return t.home.human(`${seconds.format(minMs / 1000)}–${seconds.format(maxMs / 1000)} s`)
+  return t.home.human(
+    t.common.inSeconds(`${seconds.format(minMs / 1000)}–${seconds.format(maxMs / 1000)}`),
+  )
 }
 
 export function setupRows(s: PublicSettings): SetupRow[] {

@@ -61,6 +61,7 @@ export const en = {
     apiKey: "API key",
     to: "to",
     seconds: "seconds",
+    inSeconds: (value: string) => `${value} s`,
     noText: "(no text)",
     points: (n: number) => (n === 1 ? "1 point" : `${n} points`),
   },

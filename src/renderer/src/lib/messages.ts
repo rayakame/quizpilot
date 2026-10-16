@@ -33,7 +33,7 @@ export function secondsText(ms: number): string {
     minimumFractionDigits: 1,
     maximumFractionDigits: 1,
   })
-  return `${seconds.format(ms / 1000)} s`
+  return t.common.inSeconds(seconds.format(ms / 1000))
 }
 
 export function dateText(ms: number): string {

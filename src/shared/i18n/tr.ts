@@ -58,6 +58,7 @@ export const tr: Messages = {
     apiKey: "API anahtarı",
     to: "ile",
     seconds: "saniye",
+    inSeconds: (value) => `${value} s`,
     noText: "(metin yok)",
     points: (n) => `${n} puan`,
   },

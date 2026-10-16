@@ -58,6 +58,7 @@ export const it: Messages = {
     apiKey: "Chiave API",
     to: "a",
     seconds: "secondi",
+    inSeconds: (value) => `${value} s`,
     noText: "(nessun testo)",
     points: (n) => (n === 1 ? "1 punto" : `${n} punti`),
   },

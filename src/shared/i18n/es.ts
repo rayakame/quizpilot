@@ -58,6 +58,7 @@ export const es: Messages = {
     apiKey: "Clave de API",
     to: "a",
     seconds: "segundos",
+    inSeconds: (value) => `${value} s`,
     noText: "(sin texto)",
     points: (n) => (n === 1 ? "1 punto" : `${n} puntos`),
   },

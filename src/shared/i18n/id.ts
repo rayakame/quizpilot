@@ -58,6 +58,7 @@ export const id: Messages = {
     apiKey: "Kunci API",
     to: "sampai",
     seconds: "detik",
+    inSeconds: (value) => `${value} s`,
     noText: "(tanpa teks)",
     points: (n) => `${n} poin`,
   },

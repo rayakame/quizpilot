@@ -64,6 +64,7 @@ export const pl: Messages = {
     apiKey: "Klucz API",
     to: "do",
     seconds: "sekund",
+    inSeconds: (value) => `${value} s`,
     noText: "(brak tekstu)",
     points: (n) => count(n, "punkt", "punkty", "punktów"),
   },
