@@ -1,29 +1,83 @@
 name: release
 
 on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version, like 0.2.0
+        required: true
+      publish:
+        description: Publish right away instead of leaving a draft
+        type: boolean
+        default: false
   push:
     tags: ["v*"]
 
 permissions:
   contents: write
 
+concurrency: release
+
 jobs:
-  # Three jobs creating the release at once can end up with two drafts.
-  draft:
+  prepare:
     runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Set the version
+        id: version
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          test "$GITHUB_REF" = refs/heads/main || { echo "Start releases from main."; exit 1; }
+          pnpm exec tsx scripts/release-version.ts "$VERSION" >> "$GITHUB_OUTPUT"
       - name: Check the tag matches package.json
+        if: github.event_name == 'push'
         run: test "$GITHUB_REF_NAME" = "v$(node -p "require('./package.json').version")"
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - name: Commit and tag
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          BUMP: ${{ steps.version.outputs.bump }}
+        run: |
+          git config user.name "$(git log -1 --format=%an)"
+          git config user.email "$(git log -1 --format=%ae)"
+          if [ "$BUMP" = true ]; then git commit -am "Release $VERSION"; fi
+          git tag "v$VERSION"
+          git push --atomic origin HEAD:main "v$VERSION"
+      - id: tag
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if [ -n "$VERSION" ]; then tag="v$VERSION"; else tag="$GITHUB_REF_NAME"; fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+  # Three jobs creating the release at once can end up with two drafts.
+  draft:
+    needs: prepare
+    runs-on: ubuntu-latest
+    steps:
       - run: >-
-          gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" ||
-          gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --draft
-          --title "$GITHUB_REF_NAME" --notes ""
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" ||
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --draft
+          --title "$TAG" --generate-notes
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ needs.prepare.outputs.tag }}
 
   build:
-    needs: draft
+    needs: [prepare, draft]
     strategy:
       fail-fast: false
       matrix:
@@ -37,6 +91,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.tag }}
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
@@ -48,3 +104,13 @@ jobs:
       - run: pnpm exec electron-builder ${{ matrix.target }} --publish always
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish:
+    needs: [prepare, build]
+    if: github.event_name == 'workflow_dispatch' && inputs.publish
+    runs-on: ubuntu-latest
+    steps:
+      - run: gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --draft=false --latest
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ needs.prepare.outputs.tag }}

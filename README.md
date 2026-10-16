@@ -52,8 +52,10 @@ pnpm test     # also: pnpm lint, pnpm typecheck
 pnpm dist     # build installers into dist/
 ```
 
-Pushing a tag like `v0.2.0` (same as the version in `package.json`) builds the installers
-for all three systems and puts them into a draft release.
+To release, run the release workflow on GitHub (Actions → release → Run workflow) with the
+new version. It runs the checks, tags the commit, builds the installers for all three systems
+and puts them into a release, as a draft unless you tick "publish". Pushing a tag like
+`v0.2.0` works too.
 
 ## License
 
