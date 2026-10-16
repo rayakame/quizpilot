@@ -225,7 +225,10 @@ async function start(): Promise<void> {
     autoUpdater.on("update-downloaded", (info) => updates.downloaded(info.version))
     autoUpdater.on("error", (err) => log.warn("Update failed", err))
     downloader = {
-      check: async () => void (await autoUpdater.checkForUpdates()),
+      check: async () => {
+        const result = await autoUpdater.checkForUpdates()
+        return result?.isUpdateAvailable ? result.updateInfo.version : null
+      },
       install: () => autoUpdater.quitAndInstall(),
     }
   }

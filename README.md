@@ -18,7 +18,8 @@ signed, so your system will complain the first time:
 - **Windows:** SmartScreen shows "Windows protected your PC". Click "More info", then
   "Run anyway".
 - **Linux:** make the AppImage executable (`chmod +x QuizPilot-*.AppImage`) and start it.
-  Some distros need `libfuse2` for that.
+  Some distros need `libfuse2` for that. If it closes right away on Ubuntu 24.04 or newer,
+  start it with `--no-sandbox`.
 
 Windows and Linux update themselves. On macOS QuizPilot tells you when a new version is out.
 

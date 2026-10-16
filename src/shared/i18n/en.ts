@@ -298,6 +298,8 @@ export const en = {
     check: "Check for updates",
     checking: "Checking…",
     upToDate: "You have the latest version.",
+    failed: "Couldn't check for updates.",
+    downloading: (version: string) => `Downloading QuizPilot ${version}…`,
   },
   colors: {
     red: "red triangle",

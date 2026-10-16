@@ -31,8 +31,12 @@
             {update.checking ? t.updates.checking : t.updates.check}
           </Button>
           {#if update.checked && !update.checking}
-            <span class="text-muted-foreground">{t.updates.upToDate}</span>
+            <span class="text-muted-foreground">
+              {update.failed ? t.updates.failed : t.updates.upToDate}
+            </span>
           {/if}
+        {:else if update.state.kind === "downloading"}
+          <span class="text-muted-foreground">{t.updates.downloading(update.state.version)}</span>
         {:else}
           <UpdateActions />
         {/if}

@@ -10,7 +10,8 @@ export interface Release {
 }
 
 export interface Downloader {
-  check(): Promise<void>
+  /** Resolves to the version being downloaded, or null when there is none. */
+  check(): Promise<string | null>
   install(): void
 }
 
@@ -75,12 +76,13 @@ export class Updates {
     this.listeners.add(fn)
   }
 
-  async check(): Promise<UpdateState> {
+  async check(): Promise<UpdateState | null> {
     const { mode, downloader } = this.deps
     if (mode === "off" || this.current.kind === "ready") return this.current
     try {
       if (mode === "download" && downloader) {
-        await downloader.check()
+        const version = await downloader.check()
+        if (version && this.current.kind === "none") this.set({ kind: "downloading", version })
         return this.current
       }
       const release = await this.deps.latest()
@@ -89,6 +91,7 @@ export class Updates {
       }
     } catch (err) {
       this.deps.log("Update check failed", err)
+      return null
     }
     return this.current
   }

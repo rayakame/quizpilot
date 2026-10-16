@@ -88,15 +88,15 @@ describe("Updates", () => {
     const same = setup({ latest: async () => ({ version: "0.1.0", url: PAGE }) })
     expect(await same.updates.check()).toEqual({ kind: "none" })
     const failing = setup({ latest: async () => Promise.reject(new Error("offline")) })
-    expect(await failing.updates.check()).toEqual({ kind: "none" })
+    expect(await failing.updates.check()).toBeNull()
+    expect(failing.updates.state).toEqual({ kind: "none" })
     expect(failing.deps.log).toHaveBeenCalled()
   })
 
   it("lets electron-updater download on Windows and Linux", async () => {
-    const downloader = { check: vi.fn(async () => {}), install: vi.fn() }
+    const downloader = { check: vi.fn(async () => "0.2.0"), install: vi.fn() }
     const { updates, deps } = setup({ mode: "download", downloader })
-    await updates.check()
-    expect(downloader.check).toHaveBeenCalled()
+    expect(await updates.check()).toEqual({ kind: "downloading", version: "0.2.0" })
     expect(deps.latest).not.toHaveBeenCalled()
     updates.downloaded("0.2.0")
     expect(updates.state).toEqual({ kind: "ready", version: "0.2.0" })
@@ -104,7 +104,7 @@ describe("Updates", () => {
 
   it("leaves the game before installing", async () => {
     const order: string[] = []
-    const downloader = { check: async () => {}, install: () => void order.push("install") }
+    const downloader = { check: async () => null, install: () => void order.push("install") }
     const { updates } = setup({
       mode: "download",
       downloader,
@@ -122,9 +122,20 @@ describe("Updates", () => {
   })
 
   it("only installs a downloaded update", async () => {
-    const downloader = { check: async () => {}, install: vi.fn() }
+    const downloader = { check: async () => null, install: vi.fn() }
     const { updates } = setup({ mode: "download", downloader })
     await updates.install()
     expect(downloader.install).not.toHaveBeenCalled()
+  })
+
+  it("tells a failed download check from an up-to-date app", async () => {
+    const downloader = { check: async () => Promise.reject(new Error("offline")), install: vi.fn() }
+    const { updates } = setup({ mode: "download", downloader })
+    expect(await updates.check()).toBeNull()
+    const quiet = setup({
+      mode: "download",
+      downloader: { check: async () => null, install: vi.fn() },
+    })
+    expect(await quiet.updates.check()).toEqual({ kind: "none" })
   })
 })

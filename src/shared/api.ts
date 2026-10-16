@@ -78,6 +78,7 @@ export type UpdateState =
   | { kind: "off" }
   | { kind: "none" }
   | { kind: "available"; version: string; url: string }
+  | { kind: "downloading"; version: string }
   | { kind: "ready"; version: string }
 
 export type KeyCheck = "ok" | "invalid" | "offline" | "error"
@@ -171,7 +172,8 @@ export interface QuizPilotApi {
   exportHistory(id: number | null): Promise<ExportResult>
   saveDiagnostics(): Promise<SaveResult>
   getUpdate(): Promise<UpdateState>
-  checkForUpdates(): Promise<UpdateState>
+  /** Resolves to null when the check failed. */
+  checkForUpdates(): Promise<UpdateState | null>
   installUpdate(): Promise<void>
   onGameEvent(listener: (event: GameEvent) => void): () => void
   onOpenSettings(listener: () => void): () => void

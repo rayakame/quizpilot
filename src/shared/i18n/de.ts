@@ -295,6 +295,8 @@ export const de: Messages = {
     check: "Nach Updates suchen",
     checking: "Wird geprüft…",
     upToDate: "Du hast die neueste Version.",
+    failed: "Die Suche nach Updates hat nicht geklappt.",
+    downloading: (version) => `QuizPilot ${version} wird heruntergeladen…`,
   },
   colors: {
     red: "rotes Dreieck",
