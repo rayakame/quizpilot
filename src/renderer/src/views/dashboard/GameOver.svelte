@@ -26,11 +26,11 @@
 </script>
 
 <div class="p-6 pb-0">
-  <Card.Root>
+  <Card.Root class="@container">
     <Card.Header>
       <Card.Title>{t.game.over}</Card.Title>
     </Card.Header>
-    <Card.Content class="grid gap-4 sm:grid-cols-2">
+    <Card.Content class="grid gap-4 @md:grid-cols-2">
       <ol class="space-y-1 text-sm">
         {#each standings as bot (bot.name)}
           <li>
@@ -39,7 +39,7 @@
           </li>
         {/each}
       </ol>
-      <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
+      <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm [&_dd]:whitespace-nowrap">
         <dt class="text-muted-foreground">{t.game.right}</dt>
         <dd>{t.game.of(summary.correct, summary.graded)}</dd>
         <dt class="text-muted-foreground">{t.game.answers}</dt>
@@ -50,7 +50,7 @@
         <dd>{costText(summary.cost)}</dd>
       </dl>
     </Card.Content>
-    <Card.Footer class="gap-2">
+    <Card.Footer class="flex-wrap gap-2">
       <Button onclick={onNewGame}>{t.game.newGame}</Button>
       {#if onReview}
         <Button variant="outline" onclick={onReview}>{t.game.review}</Button>

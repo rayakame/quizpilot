@@ -299,7 +299,7 @@ export const fr: Messages = {
   history: {
     filters: { all: "Toutes", wrong: "Fausses", unsure: "Incertaines", image: "Images" },
     game: (pin) => `Partie ${pin}`,
-    right: (correct, graded) => `${correct} sur ${graded} justes`,
+    right: (correct, graded) => `Justes${nbsp}: ${correct} sur ${graded}`,
     pin: (pin) => `PIN ${pin}`,
     noGames: "Aucune partie pour l’instant.",
     loadFailed: "Impossible de charger l’historique.",

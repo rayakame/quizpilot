@@ -124,7 +124,7 @@ export const pl: Messages = {
     joining: "Dołącza",
     twoStep: "Czeka na kod",
     lobby: "W poczekalni",
-    playing: "Gra",
+    playing: "W grze",
     paused: "Wstrzymany",
     left: "Wyszedł",
     kicked: "Usunięty przez prowadzącego",
