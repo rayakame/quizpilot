@@ -18,6 +18,7 @@
     "probe:typesafe": "tsx scripts/probe-typesafe.ts",
     "probe:fallback": "tsx scripts/probe-fallback.ts",
     "play": "tsx scripts/play.ts",
+    "eval:history": "tsx scripts/eval-history.ts",
     "icons": "tsx scripts/make-icons.ts"
   },
   "dependencies": {
