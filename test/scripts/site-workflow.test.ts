@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from "node:fs"
 import { describe, expect, it } from "vitest"
 
 const FILE = ".github/workflows/site.yml"
-const workflow = existsSync(FILE) ? readFileSync(FILE, "utf8") : ""
+const workflow = existsSync(FILE) ? readFileSync(FILE, "utf8").replace(/\r\n/g, "\n") : ""
 
 describe("site workflow", () => {
   it("only runs when the website changes or by hand", () => {

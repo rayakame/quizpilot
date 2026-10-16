@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs"
 import { describe, expect, it } from "vitest"
 
-const workflow = readFileSync(".github/workflows/release.yml", "utf8")
+const workflow = readFileSync(".github/workflows/release.yml", "utf8").replace(/\r\n/g, "\n")
 const job = (name: string) => {
   const start = workflow.indexOf(`\n  ${name}:`)
   const next = workflow.slice(start + 1).search(/\n {2}[a-z]+:\n/)

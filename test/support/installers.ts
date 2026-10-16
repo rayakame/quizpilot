@@ -1,8 +1,8 @@
 import { readFileSync } from "node:fs"
 
-const yml = readFileSync("electron-builder.yml", "utf8")
+const config = () => readFileSync("electron-builder.yml", "utf8")
 
-function artifactName(section: string | null): string {
+function artifactName(yml: string, section: string | null): string {
   let scope = yml
   if (section !== null) {
     const start = yml.indexOf(`\n${section}:\n`)
@@ -25,14 +25,16 @@ const fill = (pattern: string, arch: string, ext: string) =>
     .replaceAll("${ext}", ext)
 
 /** The installer file names electron-builder writes for each release. */
-export function installerNames(): string[] {
-  const top = artifactName(null)
+export function installerNames(text = config()): string[] {
+  // Git on Windows checks files out with CRLF line endings.
+  const yml = text.replace(/\r\n/g, "\n")
+  const top = artifactName(yml, null)
   return [
     fill(top, "arm64", "dmg"),
     fill(top, "x64", "dmg"),
-    fill(artifactName("nsis"), "x64", "exe"),
-    fill(artifactName("appImage"), "x86_64", "AppImage"),
+    fill(artifactName(yml, "nsis"), "x64", "exe"),
+    fill(artifactName(yml, "appImage"), "x86_64", "AppImage"),
   ]
 }
 
-export const usesVersion = () => yml.includes("${version}")
+export const usesVersion = () => config().includes("${version}")
