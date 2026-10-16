@@ -105,7 +105,7 @@ describe("decide: precedence", () => {
     expect(r).toMatchObject({ answer: { kind: "choice", index: 2 }, source: "random" })
   })
 
-  it("does nothing for word clouds and slides, guesses polls", async () => {
+  it("does nothing for slides and word clouds without a backup AI, guesses polls", async () => {
     expect((await run(quiz({ type: "word_cloud" }), deps())).source).toBe("skip")
     expect((await run(quiz({ type: "content" }), deps())).source).toBe("skip")
     expect((await run(quiz({ type: "survey" }), deps())).source).toBe("random")
@@ -288,6 +288,17 @@ describe("decide: image questions", () => {
 })
 
 describe("decide: free text", () => {
+  it("lets the backup AI fill in word clouds that show their question", async () => {
+    const cloud = quiz({ type: "word_cloud", choices: [] })
+    const fb = fallbackAnswering({ answer: { kind: "text", value: "Brezn" } })
+    expect(await run(cloud, deps({ fallback: fb.provider }))).toMatchObject({
+      answer: { kind: "text", value: "Brezn" },
+      source: "fallback",
+    })
+    const hidden = quiz({ type: "word_cloud", choices: [], title: null })
+    expect((await run(hidden, deps({ fallback: fb.provider }))).source).toBe("skip")
+  })
+
   it("skips without a fallback and uses it when available", async () => {
     const open = quiz({ type: "open_ended", choices: [] })
     expect((await run(open, deps())).source).toBe("skip")

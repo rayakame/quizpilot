@@ -109,6 +109,10 @@ describe("buildRequest", () => {
       ),
     ).toContain("from 0 to 10 in steps of 1")
     expect(keys(question({ type: "open_ended", choices: [] }))).toEqual(["text", "confidence"])
+    expect(keys(question({ type: "word_cloud", choices: [] }))).toEqual(["text", "confidence"])
+    expect(textOf(input({ question: question({ type: "word_cloud", choices: [] }) }))).toContain(
+      "There is no right answer",
+    )
     expect(() => buildRequest(input({ question: question({ type: "survey" }) }), false)).toThrow()
   })
 
@@ -145,6 +149,14 @@ describe("parseAnswer", () => {
     expect(() =>
       parseAnswer(question({ type: "open_ended" }), '{"text":"  ","confidence":1}'),
     ).toThrow()
+  })
+
+  it("reads a word for word clouds", () => {
+    const cloud = question({ type: "word_cloud", choices: [] })
+    expect(parseAnswer(cloud, '{"text":" Oktoberfest ","confidence":0.6}').answer).toEqual({
+      kind: "text",
+      value: "Oktoberfest",
+    })
   })
 
   it("turns every question type into a Kahoot answer", () => {

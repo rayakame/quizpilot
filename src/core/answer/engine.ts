@@ -87,7 +87,8 @@ export async function decide(
 
   const known = deps.solutions?.answerFor(q) ?? null
   if (known) return { answer: known, source: "quiz-link", confidence: 1, usage: [] }
-  if (q.type === "word_cloud" || q.type === "content") return skip()
+  if (q.type === "content") return skip()
+  if (q.type === "word_cloud" && (!fallback || q.title === null)) return skip()
   if (q.type === "survey" || q.type === "unknown" || q.title === null) return guess(q, deps)
   if (CHOICE_TYPES.has(q.type) && q.choices.length === 0) return guess(q, deps)
 
@@ -111,7 +112,7 @@ export async function decide(
   const enoughForFallback = () => remaining() >= TIMING.fallbackMinRemainingMs
   const usage: Usage[] = []
 
-  if (q.type === "open_ended") {
+  if (q.type === "open_ended" || q.type === "word_cloud") {
     if (!fallback || !enoughForFallback()) return skip()
     const r = await startFallback(fallback, fallbackInput(null), settings, remaining, deps).result
     return r ? fromFallback(r, null, usage) : skip()

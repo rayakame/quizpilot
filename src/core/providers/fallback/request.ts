@@ -17,6 +17,8 @@ export interface ParsedAnswer {
   confidence: number | null
 }
 
+const CHOICE_TYPES: Question["type"][] = ["quiz", "true_false", "multiple_select_quiz", "jumble"]
+
 // Kahoot cuts typed answers after 20 characters.
 export const MAX_TEXT_ANSWER = 20
 
@@ -36,7 +38,7 @@ export function buildRequest(input: FallbackInput, webSearch: boolean): Fallback
   lines.push(`Question ${q.index + 1}: ${q.title ?? ""}`)
   if (input.questionImage) lines.push("The question has an image, see below.")
   if (q.imageAlt) lines.push(`Image description: ${q.imageAlt}`)
-  if (q.choices.length > 0 && q.type !== "slider" && q.type !== "open_ended") {
+  if (q.choices.length > 0 && CHOICE_TYPES.includes(q.type)) {
     lines.push("Options:")
     q.choices.forEach((c, i) => {
       const picture = input.optionImages[i] ? `(picture ${i + 1}, see below)` : ""
@@ -100,7 +102,8 @@ export function parseAnswer(q: Question, raw: string): ParsedAnswer {
         confidence,
       }
     }
-    case "open_ended": {
+    case "open_ended":
+    case "word_cloud": {
       const text = typeof data.text === "string" ? data.text.trim().slice(0, MAX_TEXT_ANSWER) : ""
       if (!text) throw new Error("Fallback sent no text")
       return { answer: { kind: "text", value: text }, confidence }
@@ -143,6 +146,11 @@ function answerShape(q: Question): { task: string; schema: Record<string, unknow
     case "open_ended":
       return {
         task: `Answer with the exact text to type, at most ${MAX_TEXT_ANSWER} characters, in "text".`,
+        schema: object({ text: { type: "string" } }),
+      }
+    case "word_cloud":
+      return {
+        task: `There is no right answer. Write a short, fitting word or phrase like a player would, at most ${MAX_TEXT_ANSWER} characters, in "text".`,
         schema: object({ text: { type: "string" } }),
       }
     default:
