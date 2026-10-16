@@ -5,6 +5,8 @@ import { CHANNELS } from "../../src/shared/api.js"
 function handlers(): Handlers {
   return {
     getSettings: vi.fn(),
+    saveSettings: vi.fn(),
+    getAppInfo: vi.fn(),
     saveTypesafeKey: vi.fn(),
     saveFallback: vi.fn(),
     removeFallback: vi.fn(),

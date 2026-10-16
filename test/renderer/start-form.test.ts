@@ -6,9 +6,13 @@ const settings: PublicSettings = {
   hasTypesafeKey: true,
   timing: { mode: "human", minMs: 1000, maxMs: 5000 },
   includePrevious: false,
+  reconnect: true,
+  theme: "system",
   fallback: {
     provider: "anthropic",
     webSearch: true,
+    below: 0.6,
+    imageInstantAt: 0.9,
     savedKeys: [],
     choices: {
       anthropic: { model: "claude-sonnet-5-5", effort: "low" },

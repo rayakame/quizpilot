@@ -9,14 +9,21 @@ export type QuestionView = Omit<Question, "raw">
 export type GameEvent =
   Exclude<SessionEvent, { type: "question" }> | { type: "question"; question: QuestionView }
 export type KeyCheck = "ok" | "invalid" | "offline" | "error"
+export type Theme = "system" | "light" | "dark"
+
+export const THEMES: Theme[] = ["system", "light", "dark"]
 
 export interface PublicSettings {
   hasTypesafeKey: boolean
   timing: Timing
   includePrevious: boolean
+  reconnect: boolean
+  theme: Theme
   fallback: {
     provider: FallbackProviderId
     webSearch: boolean
+    below: number
+    imageInstantAt: number
     savedKeys: FallbackProviderId[]
     choices: Record<FallbackProviderId, ModelChoice>
   }
@@ -28,6 +35,19 @@ export interface FallbackSetup {
   webSearch: boolean
   model: string
   effort: Effort | null
+}
+
+export interface SettingsPatch {
+  timing?: Timing
+  includePrevious?: boolean
+  reconnect?: boolean
+  theme?: Theme
+  fallbackBelow?: number
+  imageInstantAt?: number
+}
+
+export interface AppInfo {
+  version: string
 }
 
 export interface StartRequest {
@@ -45,6 +65,8 @@ export type StartResult =
 
 export interface QuizPilotApi {
   getSettings(): Promise<PublicSettings>
+  saveSettings(patch: SettingsPatch): Promise<PublicSettings>
+  getAppInfo(): Promise<AppInfo>
   saveTypesafeKey(key: string): Promise<KeyCheck>
   saveFallback(setup: FallbackSetup): Promise<KeyCheck>
   removeFallback(): Promise<void>
@@ -56,12 +78,15 @@ export interface QuizPilotApi {
   endGame(): Promise<void>
   openExternal(url: string): Promise<void>
   onGameEvent(listener: (event: GameEvent) => void): () => void
+  onOpenSettings(listener: () => void): () => void
 }
 
-export type Invokable = Exclude<keyof QuizPilotApi, "onGameEvent">
+export type Invokable = Exclude<keyof QuizPilotApi, "onGameEvent" | "onOpenSettings">
 
 export const CHANNELS = {
   getSettings: "settings:get",
+  saveSettings: "settings:save",
+  getAppInfo: "app:info",
   saveTypesafeKey: "settings:typesafe-key",
   saveFallback: "settings:fallback",
   removeFallback: "settings:fallback-remove",
@@ -75,3 +100,4 @@ export const CHANNELS = {
 } as const satisfies Record<Invokable, string>
 
 export const GAME_EVENT_CHANNEL = "game:event"
+export const OPEN_SETTINGS_CHANNEL = "app:open-settings"

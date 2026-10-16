@@ -7,6 +7,7 @@ import {
   loadConfig,
   parseConfig,
   saveConfig,
+  applyPatch,
   SettingsStore,
   toPublic,
 } from "../../src/main/settings.js"
@@ -100,9 +101,13 @@ describe("toPublic", () => {
       hasTypesafeKey: true,
       timing: DEFAULT_CONFIG.behavior.timing,
       includePrevious: true,
+      reconnect: true,
+      theme: "system",
       fallback: {
         provider: "anthropic",
         webSearch: true,
+        below: 0.6,
+        imageInstantAt: 0.9,
         savedKeys: ["openai"],
         choices: {
           anthropic: { model: "claude-sonnet-5-5", effort: "low" },
@@ -112,5 +117,40 @@ describe("toPublic", () => {
       },
     })
     expect(JSON.stringify(view)).not.toContain("secret")
+  })
+})
+
+describe("applyPatch", () => {
+  it("changes only what the patch names", () => {
+    const next = applyPatch(DEFAULT_CONFIG, {
+      timing: { mode: "human", minMs: 500, maxMs: 2500 },
+      reconnect: false,
+      includePrevious: false,
+      theme: "dark",
+      fallbackBelow: 0.75,
+      imageInstantAt: 0.95,
+    })
+    expect(next.behavior).toEqual({
+      timing: { mode: "human", minMs: 500, maxMs: 2500 },
+      reconnect: false,
+    })
+    expect(next.context.includePrevious).toBe(false)
+    expect(next.ui).toEqual({ language: "en", theme: "dark" })
+    expect(next.fallback).toMatchObject({
+      below: 0.75,
+      imageInstantAt: 0.95,
+      provider: "anthropic",
+    })
+    expect(next.keys).toEqual(DEFAULT_CONFIG.keys)
+    expect(DEFAULT_CONFIG.ui.theme).toBe("system")
+  })
+
+  it("keeps the old value when a new one is out of range", () => {
+    const next = applyPatch(DEFAULT_CONFIG, {
+      timing: { mode: "human", minMs: 5000, maxMs: 1000 },
+      fallbackBelow: 1.5,
+      theme: "pink" as never,
+    })
+    expect(next).toEqual(DEFAULT_CONFIG)
   })
 })

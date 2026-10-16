@@ -2,8 +2,14 @@ import { chmod, mkdir, readFile, rename, writeFile } from "node:fs/promises"
 import { dirname } from "node:path"
 import { FALLBACK_PROVIDERS, type FallbackProviderId } from "../core/providers/fallback/ids.js"
 import { resolveChoice, type ModelChoice } from "../core/providers/fallback/models.js"
-import type { PublicSettings, Timing } from "../shared/api.js"
-import { MAX_DELAY_MS } from "../shared/start.js"
+import {
+  THEMES,
+  type PublicSettings,
+  type SettingsPatch,
+  type Theme,
+  type Timing,
+} from "../shared/api.js"
+import { MAX_DELAY_MS, timingProblem } from "../shared/start.js"
 
 export interface Config {
   version: 1
@@ -18,7 +24,7 @@ export interface Config {
   }
   context: { includePrevious: boolean }
   behavior: { timing: Timing; reconnect: boolean }
-  ui: { language: "en" | "de"; theme: "system" | "light" | "dark" }
+  ui: { language: "en" | "de"; theme: Theme }
 }
 
 export const DEFAULT_CONFIG: Config = {
@@ -96,7 +102,7 @@ export function parseConfig(raw: unknown): Config {
     },
     ui: {
       language: oneOf(ui.language, ["en", "de"], d.ui.language),
-      theme: oneOf(ui.theme, ["system", "light", "dark"], d.ui.theme),
+      theme: oneOf(ui.theme, THEMES, d.ui.theme),
     },
   }
 }
@@ -106,15 +112,38 @@ export function toPublic(config: Config): PublicSettings {
     hasTypesafeKey: config.keys.typesafe !== "",
     timing: config.behavior.timing,
     includePrevious: config.context.includePrevious,
+    reconnect: config.behavior.reconnect,
+    theme: config.ui.theme,
     fallback: {
       provider: config.fallback.provider,
       webSearch: config.fallback.webSearch,
+      below: config.fallback.below,
+      imageInstantAt: config.fallback.imageInstantAt,
       savedKeys: FALLBACK_PROVIDERS.filter((p) => config.keys[p] !== ""),
       choices: Object.fromEntries(
         FALLBACK_PROVIDERS.map((p) => [p, choiceFor(config, p)]),
       ) as Record<FallbackProviderId, ModelChoice>,
     },
   }
+}
+
+export function applyPatch(config: Config, patch: SettingsPatch): Config {
+  const next = structuredClone(config)
+  const { timing, reconnect, includePrevious, theme, fallbackBelow, imageInstantAt } = patch
+  // The delay range is kept even in instant mode, so check it like human mode.
+  if (timing && timingProblem({ ...timing, mode: "human" }) === null) {
+    next.behavior.timing = {
+      mode: timing.mode === "human" ? "human" : "instant",
+      minMs: timing.minMs,
+      maxMs: timing.maxMs,
+    }
+  }
+  if (typeof reconnect === "boolean") next.behavior.reconnect = reconnect
+  if (typeof includePrevious === "boolean") next.context.includePrevious = includePrevious
+  if (theme && THEMES.includes(theme)) next.ui.theme = theme
+  if (isShare(fallbackBelow)) next.fallback.below = fallbackBelow
+  if (isShare(imageInstantAt)) next.fallback.imageInstantAt = imageInstantAt
+  return next
 }
 
 export function choiceFor(config: Config, provider: FallbackProviderId): ModelChoice {
@@ -152,6 +181,10 @@ function timing(value: unknown): Timing | null {
   const maxMs = num(t.maxMs, null, 0, MAX_DELAY_MS)
   if (mode === null || minMs === null || maxMs === null || minMs > maxMs) return null
   return { mode, minMs, maxMs }
+}
+
+function isShare(value: unknown): value is number {
+  return typeof value === "number" && value >= 0 && value <= 1
 }
 
 type Obj = Record<string, unknown>

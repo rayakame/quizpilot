@@ -1,16 +1,18 @@
 import { rename } from "node:fs/promises"
 import { join } from "node:path"
-import { app, BrowserWindow, dialog, ipcMain, shell } from "electron"
+import { app, BrowserWindow, dialog, ipcMain, Menu, nativeImage, shell } from "electron"
 import { withTimeout } from "../core/util/async.js"
-import { GAME_EVENT_CHANNEL } from "../shared/api.js"
+import { GAME_EVENT_CHANNEL, OPEN_SETTINGS_CHANNEL } from "../shared/api.js"
 import { removeFallback, saveFallback } from "./fallback.js"
 import { GameController } from "./game-controller.js"
 import { registerIpc } from "./ipc.js"
+import { menuTemplate } from "./menu.js"
 import { createSession } from "./session-factory.js"
-import { DEFAULT_CONFIG, loadConfig, SettingsStore, toPublic } from "./settings.js"
+import { applyPatch, DEFAULT_CONFIG, loadConfig, SettingsStore, toPublic } from "./settings.js"
 import { checkTypesafeKey } from "./typesafe.js"
 
 let win: BrowserWindow | null = null
+const icon = () => join(app.getAppPath(), "resources/icon.png")
 
 function createWindow(): BrowserWindow {
   const w = new BrowserWindow({
@@ -19,6 +21,7 @@ function createWindow(): BrowserWindow {
     minWidth: 960,
     minHeight: 640,
     title: "QuizPilot",
+    icon: icon(),
     show: false,
     webPreferences: { preload: join(import.meta.dirname, "../preload/index.cjs") },
   })
@@ -60,6 +63,11 @@ async function start(): Promise<void> {
 
   registerIpc(ipcMain, {
     getSettings: async () => toPublic(settings.get()),
+    saveSettings: async (patch) => {
+      await settings.update((c) => applyPatch(c, patch))
+      return toPublic(settings.get())
+    },
+    getAppInfo: async () => ({ version: app.getVersion() }),
     saveTypesafeKey: async (key) => {
       const check = await checkTypesafeKey(key)
       if (check === "ok") {
@@ -100,6 +108,18 @@ async function start(): Promise<void> {
   })
   app.on("window-all-closed", () => app.quit())
 
+  const isMac = process.platform === "darwin"
+  // Packaged builds take the dock icon from the bundle.
+  const dockIcon = nativeImage.createFromPath(icon())
+  if (isMac && !app.isPackaged && !dockIcon.isEmpty()) app.dock?.setIcon(dockIcon)
+  Menu.setApplicationMenu(
+    Menu.buildFromTemplate(
+      menuTemplate(isMac, () => {
+        if (win && !win.isDestroyed()) win.webContents.send(OPEN_SETTINGS_CHANNEL)
+      }),
+    ),
+  )
+
   win = createWindow()
 }
 
@@ -111,5 +131,14 @@ if (!app.requestSingleInstanceLock()) {
     if (win.isMinimized()) win.restore()
     win.focus()
   })
-  void app.whenReady().then(start)
+  app
+    .whenReady()
+    .then(start)
+    .catch((err: unknown) => {
+      dialog.showErrorBox(
+        "QuizPilot couldn't start",
+        err instanceof Error ? err.message : String(err),
+      )
+      app.quit()
+    })
 }
