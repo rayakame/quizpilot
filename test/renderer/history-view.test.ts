@@ -88,7 +88,7 @@ describe("game labels", () => {
   })
 
   it("sums up a game in one line", () => {
-    expect(gameLine(game)).toBe("7 of 9 right · ≈\u00a0$0.012")
+    expect(gameLine(game)).toBe("7 of 9 right ·\u00a0≈\u00a0$0.012")
   })
 })
 
@@ -98,7 +98,7 @@ describe("German labels", () => {
   it("names and sums up games in German", () => {
     setLanguage("de")
     expect(gameTitle(game)).toBe("Spiel 916240")
-    expect(gameLine(game)).toBe("7 von 9 richtig · ≈\u00a00,012\u00a0$")
+    expect(gameLine(game)).toBe("7 von 9 richtig ·\u00a0≈\u00a00,012\u00a0$")
   })
 
   it("offers the filters in a fixed order", () => {

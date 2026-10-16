@@ -32,7 +32,7 @@
             </div>
             {#if round.decision}
               <div class="text-muted-foreground truncate">
-                {answerSummary(round)} · {sourceText(round.decision)}
+                {answerSummary(round)} ·&nbsp;{sourceText(round.decision)}
               </div>
             {/if}
           </div>

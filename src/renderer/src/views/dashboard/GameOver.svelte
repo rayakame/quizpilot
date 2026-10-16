@@ -37,7 +37,7 @@
             <span class="font-medium"
               >{bot.rank ? t.common.rank(bot.rank) : "–"}&nbsp;{bot.name}</span
             >
-            <span class="text-muted-foreground">· {t.common.points(bot.totalScore)}</span>
+            <span class="text-muted-foreground">·&nbsp;{t.common.points(bot.totalScore)}</span>
           </li>
         {/each}
       </ol>

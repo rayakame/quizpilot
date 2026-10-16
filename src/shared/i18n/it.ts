@@ -2,6 +2,9 @@ import type { Messages } from "./en.js"
 
 const locale = "it"
 const names = (list: string[]) => new Intl.ListFormat(locale, { type: "conjunction" }).format(list)
+// The article before a percentage follows how the number is said: l’80%, lo 0%, il 60%.
+const article = (share: string, il: string, l: string, lo: string) =>
+  /^(8|11)/.test(share) ? l : /^0/.test(share) ? lo : il
 
 export const it: Messages = {
   locale,
@@ -116,9 +119,10 @@ export const it: Messages = {
     turnOff: "Disattiva",
     tiers: { best: "il più preciso", balanced: "bilanciato", fast: "il più veloce" },
     efforts: { minimal: "Minimo", low: "Basso", medium: "Medio", high: "Alto" },
-    below: (share) => `Chiedi all’IA di riserva quando la sicurezza di Jev è sotto il ${share}`,
+    below: (share) =>
+      `Chiedi all’IA di riserva quando la sicurezza di Jev è sotto ${article(share, "il ", "l’", "lo ")}${share}`,
     instantAt: (share) =>
-      `Nelle domande con immagine, non aspettarla quando la sicurezza di Jev è almeno del ${share}`,
+      `Nelle domande con immagine, non aspettarla quando la sicurezza di Jev è almeno ${article(share, "del ", "dell’", "dello ")}${share}`,
   },
   status: {
     joining: "Connessione",

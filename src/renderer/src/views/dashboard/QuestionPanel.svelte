@@ -90,7 +90,7 @@
             <span class="text-muted-foreground">
               +{result.points ?? 0}
               {#if round.answeredMs[bot] !== undefined}
-                · {t.game.answeredAfter(secondsText(round.answeredMs[bot]))}
+                ·&nbsp;{t.game.answeredAfter(secondsText(round.answeredMs[bot]))}
               {/if}
             </span>
             {#if round.onPurpose.includes(bot)}

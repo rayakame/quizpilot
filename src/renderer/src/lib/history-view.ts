@@ -1,7 +1,7 @@
 import type { HistoryGame, HistoryQuestion } from "../../../shared/api.js"
 import { questionOutcome } from "../../../shared/history.js"
 import { t } from "./i18n.js"
-import { costText } from "./messages.js"
+import { costText, DOT } from "./messages.js"
 
 export type HistoryFilter = "all" | "wrong" | "unsure" | "image"
 
@@ -31,5 +31,5 @@ export function gameTitle(g: HistoryGame): string {
 
 export function gameLine(g: HistoryGame): string {
   const cost = costText({ usd: g.costUsd, complete: g.costComplete })
-  return `${t.history.right(g.correct, g.graded)} · ${cost}`
+  return `${t.history.right(g.correct, g.graded)}${DOT}${cost}`
 }

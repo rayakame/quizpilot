@@ -136,7 +136,7 @@ export const pl: Messages = {
     kicked: "Usunięty przez prowadzącego",
     disconnected: "Rozłączony",
     finished: "Skończył",
-    reconnecting: "Łączy ponownie",
+    reconnecting: "Łączy się ponownie",
   },
   themes: {
     system: "Jak w systemie",

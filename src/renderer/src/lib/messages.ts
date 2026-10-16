@@ -6,6 +6,8 @@ import type { KeyCheck } from "../../../shared/api.js"
 import { t } from "./i18n.js"
 import type { LinkCheck } from "./start-form.js"
 
+// Lines may break before a separator dot, never right after it.
+export const DOT = " ·\u00a0"
 export function statusText(status: BotStatus, detail: string | null): string {
   return status === "joining" && detail === "reconnecting"
     ? t.status.reconnecting
@@ -15,7 +17,7 @@ export function statusText(status: BotStatus, detail: string | null): string {
 export function quizLinkText({ result }: LinkCheck): string {
   if (result === null) return t.start.checking
   if (!result.ok) return t.quizLink[result.error]
-  return `${result.title} · ${t.start.questions(result.questions)}`
+  return `${result.title}${DOT}${t.start.questions(result.questions)}`
 }
 
 export function keyText(problem: Exclude<KeyCheck, "ok">, service: string): string {
@@ -47,14 +49,14 @@ export function dayText(ms: number): string {
 export function sourceText(decision: Decision): string {
   switch (decision.source) {
     case "jev":
-      return decision.confidence === null ? "Jev" : `Jev · ${percent(decision.confidence)}`
+      return decision.confidence === null ? "Jev" : `Jev${DOT}${percent(decision.confidence)}`
     case "fallback": {
       const id = decision.fallback?.provider as FallbackProviderId | undefined
       const name = (id && PROVIDER_NAMES[id]) ?? t.sources.backupAi
       const sure = decision.confidence === null ? [] : [percent(decision.confidence)]
       const ms = decision.fallback?.latencyMs
       const time = ms === undefined ? [] : [secondsText(ms)]
-      return [name, ...sure, ...time].join(" · ")
+      return [name, ...sure, ...time].join(DOT)
     }
     case "quiz-link":
       return t.sources.knownAnswer
@@ -86,7 +88,7 @@ export function sourceCounts(sources: Partial<Record<DecisionSource, number>>): 
   const parts = COUNTED.flatMap((id) =>
     sources[id] ? [`${sourceName(id)}\u00a0${sources[id]}`] : [],
   )
-  return parts.length > 0 ? parts.join(" · ") : "–"
+  return parts.length > 0 ? parts.join(DOT) : "–"
 }
 
 function money(usd: number, digits = 2): string {

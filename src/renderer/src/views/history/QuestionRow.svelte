@@ -30,7 +30,7 @@
       <div class="font-medium">{q.index + 1}. {q.title ?? t.common.noText}</div>
       {#if item.decision}
         <div class="text-muted-foreground truncate">
-          {answerText(item.decision.answer, q)} · {sourceText(item.decision)}
+          {answerText(item.decision.answer, q)} ·&nbsp;{sourceText(item.decision)}
         </div>
       {/if}
     </div>
@@ -60,7 +60,7 @@
               {/if}
               {#if item.decision?.jev?.probabilities?.[i] !== undefined}
                 <span class="text-muted-foreground">
-                  · {percent(item.decision.jev.probabilities[i]!)}
+                  ·&nbsp;{percent(item.decision.jev.probabilities[i]!)}
                 </span>
               {/if}
             </li>
@@ -79,9 +79,9 @@
                     ? t.history.result.right
                     : t.history.result.wrong,
               )}
-              {#if r.points !== null}· {t.common.points(r.points)}{/if}
-              {#if r.answeredMs !== null}· {secondsText(r.answeredMs)}{/if}
-              {#if r.onPurpose}· {t.game.onPurpose}{/if}
+              {#if r.points !== null}·&nbsp;{t.common.points(r.points)}{/if}
+              {#if r.answeredMs !== null}·&nbsp;{secondsText(r.answeredMs)}{/if}
+              {#if r.onPurpose}·&nbsp;{t.game.onPurpose}{/if}
             </li>
           {/each}
         </ul>

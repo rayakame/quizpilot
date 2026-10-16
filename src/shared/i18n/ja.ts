@@ -46,7 +46,9 @@ export const ja: Messages = {
     startFailed: "QuizPilotを起動できませんでした",
     deleteGame: "このゲームを履歴から削除しますか？",
     deleteGames: (n) =>
-      n === 1 ? "保存したゲームを削除しますか？" : `保存した${n}件のゲームをすべて削除しますか？`,
+      n === 1
+        ? "保存したゲームを削除しますか？"
+        : `保存した${n}${join}件のゲームをすべて削除しますか？`,
     delete: "削除",
     textFile: "テキスト",
   },
@@ -188,7 +190,7 @@ export const ja: Messages = {
   },
   start: {
     checking: "確認中…",
-    questions: (n) => `${n}問`,
+    questions: (n) => `${n}${join}問`,
     title: "新しいゲーム",
     steps: { game: "ゲーム", bots: "ボット", options: "オプション" },
     pin: "ゲームPIN",
@@ -240,7 +242,7 @@ export const ja: Messages = {
     answers: "回答数",
     answerTime: "回答時間",
     aiCost: "AIの費用",
-    of: (correct, graded) => `${graded}問中${correct}問`,
+    of: (correct, graded) => `${graded}${join}問中${correct}${join}問`,
     newGame: "新しいゲーム",
     review: "問題を見直す",
     exported: "ゲームを書き出しました",
@@ -277,7 +279,7 @@ export const ja: Messages = {
     historyText: "プレイしたゲームは、問題・回答・費用と一緒にこのコンピュータに保存されます。",
     saveGames: "プレイしたゲームを保存する",
     deleteAll: "すべてのゲームを削除",
-    gamesSaved: (n) => `${n}件のゲームを保存済み`,
+    gamesSaved: (n) => `${n}${join}件のゲームを保存済み`,
     historyDeleted: "履歴を削除しました",
     deleteFailed: "履歴を削除できませんでした。",
   },
@@ -295,7 +297,7 @@ export const ja: Messages = {
   history: {
     filters: { all: "すべて", wrong: "不正解", unsure: "自信なし", image: "画像" },
     game: (pin) => `ゲーム ${pin}`,
-    right: (correct, graded) => `${graded}問中${correct}問正解`,
+    right: (correct, graded) => `${graded}${join}問中${correct}${join}問正解`,
     pin: (pin) => `PIN ${pin}`,
     noGames: "まだゲームがありません。",
     loadFailed: "履歴を読み込めませんでした。",

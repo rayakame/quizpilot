@@ -79,7 +79,7 @@
       >
         <div class="truncate font-medium">{gameTitle(g)}</div>
         <div class="text-muted-foreground text-xs">
-          {dateText(g.startedAt)} · {gameLine(g)}
+          {dateText(g.startedAt)} ·&nbsp;{gameLine(g)}
         </div>
       </button>
     {/each}
@@ -91,8 +91,7 @@
           <div>
             <h2 class="text-lg font-semibold">{gameTitle(record.game)}</h2>
             <p class="text-muted-foreground text-sm">
-              {t.history.pin(record.game.pin)} · {dateText(record.game.startedAt)} ·
-              {t.common.list(
+              {t.history.pin(record.game.pin)} ·&nbsp;{dateText(record.game.startedAt)} ·&nbsp;{t.common.list(
                 record.bots.map((b) =>
                   b.rank ? `${t.common.rank(b.rank)}\u00a0${b.name}` : b.name,
                 ),

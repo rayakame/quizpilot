@@ -155,8 +155,8 @@ describe("dictionaries", () => {
   it("counts without plural endings in Turkish, Indonesian and Japanese", () => {
     expect(messagesFor("tr").start.questions(3)).toBe("3 soru")
     expect(messagesFor("id").start.questions(3)).toBe("3 pertanyaan")
-    expect(messagesFor("ja").start.questions(3)).toBe("3問")
-    expect(messagesFor("ja").start.questions(1)).toBe("1問")
+    expect(messagesFor("ja").start.questions(3)).toBe("3\u2060問")
+    expect(messagesFor("ja").start.questions(1)).toBe("1\u2060問")
   })
 
   it("writes ranks and ranges the local way", () => {
@@ -174,6 +174,19 @@ describe("dictionaries", () => {
     expect(messagesFor("fr").common.pair("Ada", "juste")).toBe("Ada\u00a0: juste")
     expect(en.common.list(["Ada", "Bo"])).toBe("Ada, Bo")
     expect(messagesFor("ja").common.list(["Ada", "Bo"])).toBe("Ada、Bo")
+  })
+
+  it("elides the Italian article before 8 and 0", () => {
+    const backup = messagesFor("it").backup
+    expect(backup.below("60%")).toContain("sotto il 60%")
+    expect(backup.below("80%")).toContain("sotto l’80%")
+    expect(backup.below("0%")).toContain("sotto lo 0%")
+    expect(backup.instantAt("90%")).toContain("almeno del 90%")
+    expect(backup.instantAt("85%")).toContain("almeno dell’85%")
+  })
+
+  it("says a Polish bot is reconnecting itself", () => {
+    expect(messagesFor("pl").status.reconnecting).toBe("Łączy się ponownie")
   })
 
   it("offers every language it has a name for", () => {

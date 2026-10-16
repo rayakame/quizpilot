@@ -26,12 +26,12 @@ describe("sourceText", () => {
   it("names the backup AI and how sure it was", () => {
     const fallback = { provider: "anthropic", model: "claude-opus-5-5", latencyMs: 2100 }
     expect(sourceText(decision({ source: "fallback", confidence: 0.72, fallback }))).toBe(
-      "Claude · 72% · 2.1\u00a0s",
+      "Claude ·\u00a072% ·\u00a02.1\u00a0s",
     )
     expect(sourceText(decision({ source: "fallback", confidence: null, fallback }))).toBe(
-      "Claude · 2.1\u00a0s",
+      "Claude ·\u00a02.1\u00a0s",
     )
-    expect(sourceText(decision({ source: "jev", confidence: 0.9 }))).toBe("Jev · 90%")
+    expect(sourceText(decision({ source: "jev", confidence: 0.9 }))).toBe("Jev ·\u00a090%")
   })
 })
 
@@ -54,10 +54,10 @@ describe("quizLinkText", () => {
   it("shows what the check found", () => {
     expect(quizLinkText({ link: "x", result: null })).toBe("Checking…")
     expect(quizLinkText({ link: "x", result: { ok: true, title: "Geo", questions: 10 } })).toBe(
-      "Geo · 10 questions",
+      "Geo ·\u00a010 questions",
     )
     expect(quizLinkText({ link: "x", result: { ok: true, title: "Geo", questions: 1 } })).toBe(
-      "Geo · 1 question",
+      "Geo ·\u00a01 question",
     )
     expect(quizLinkText({ link: "x", result: { ok: false, error: "private" } })).toBe(
       "This quiz is private. Only public quizzes work.",
@@ -87,7 +87,7 @@ describe("game over texts", () => {
   it("lists where the answers came from", () => {
     // Each count stays with its name when the line wraps.
     expect(sourceCounts({ jev: 8, fallback: 2, "quiz-link": 1, random: 1 })).toBe(
-      "Jev\u00a08 · Backup AI\u00a02 · Known\u00a01 · Guessed\u00a01",
+      "Jev\u00a08 ·\u00a0Backup AI\u00a02 ·\u00a0Known\u00a01 ·\u00a0Guessed\u00a01",
     )
     expect(sourceCounts({})).toBe("–")
   })
@@ -126,7 +126,7 @@ describe("German", () => {
 
   it("counts questions", () => {
     const result = { ok: true as const, title: "Campus", questions: 1 }
-    expect(quizLinkText({ link: "x", result })).toBe("Campus · 1 Frage")
+    expect(quizLinkText({ link: "x", result })).toBe("Campus ·\u00a01 Frage")
   })
 })
 
