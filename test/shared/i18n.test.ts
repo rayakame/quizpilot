@@ -26,6 +26,8 @@ const SAME = new Set([
 // Words that only read the same in one language.
 const ALSO_SAME: Partial<Record<Language, string[]>> = {
   fr: ["Services", "Options"],
+  nl: ["Model"],
+  pl: ["Model"],
   pt: ["Slide"],
 }
 
@@ -57,6 +59,7 @@ describe("pickLanguage", () => {
     expect(pickLanguage(["es-419"])).toBe("es")
     expect(pickLanguage(["pt-PT"])).toBe("pt")
     expect(pickLanguage(["fr-CA", "de"])).toBe("fr")
+    expect(pickLanguage(["nl-BE"])).toBe("nl")
   })
 
   it("falls back to English", () => {
@@ -88,6 +91,25 @@ describe("dictionaries", () => {
     expect(fr.dialogs.deleteGames(1)).toBe("Supprimer la partie enregistrée\u00a0?")
     expect(fr.dialogs.deleteGames(3)).toBe("Supprimer les 3 parties enregistrées\u00a0?")
     expect(fr.settings.gamesSaved(0)).toBe("0 partie enregistrée")
+  })
+
+  it("counts in Polish", () => {
+    const pl = messagesFor("pl")
+    expect([1, 2, 5, 12, 22].map((n) => pl.settings.gamesSaved(n))).toEqual([
+      "Zapisano 1 grę",
+      "Zapisano 2 gry",
+      "Zapisano 5 gier",
+      "Zapisano 12 gier",
+      "Zapisano 22 gry",
+    ])
+    expect([1, 2, 5].map((n) => pl.common.points(n))).toEqual(["1 punkt", "2 punkty", "5 punktów"])
+  })
+
+  it("counts in Italian and Dutch", () => {
+    expect(messagesFor("it").start.questions(1)).toBe("1 domanda")
+    expect(messagesFor("it").start.questions(3)).toBe("3 domande")
+    expect(messagesFor("nl").start.questions(1)).toBe("1 vraag")
+    expect(messagesFor("nl").start.questions(3)).toBe("3 vragen")
   })
 })
 
