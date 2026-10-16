@@ -9,7 +9,7 @@
     type SettingsPatch,
     type Theme,
   } from "../../../../shared/api.js"
-  import { LANGUAGE_NAMES, LANGUAGES, type Language } from "../../../../shared/i18n/index.js"
+  import LanguageSelect from "../forms/LanguageSelect.svelte"
 
   let { settings, patch }: { settings: PublicSettings; patch: (p: SettingsPatch) => void } =
     $props()
@@ -18,21 +18,16 @@
 <section class="space-y-6">
   <h2 class="text-lg font-semibold">{t.settings.sections.appearance}</h2>
   <div class="grid gap-2">
-    <Label>{t.settings.language}</Label>
-    <RadioGroup.Root
+    <Label for="language">{t.settings.language}</Label>
+    <LanguageSelect
+      id="language"
       value={settings.language}
-      onValueChange={(v) => {
-        setLanguage(v as Language)
-        patch({ language: v as Language })
+      onChange={(language) => {
+        setLanguage(language)
+        patch({ language })
       }}
-    >
-      {#each LANGUAGES as option (option)}
-        <div class="flex items-center gap-2">
-          <RadioGroup.Item value={option} id="language-{option}" />
-          <Label for="language-{option}" class="font-normal">{LANGUAGE_NAMES[option]}</Label>
-        </div>
-      {/each}
-    </RadioGroup.Root>
+      class="w-56"
+    />
   </div>
   <div class="grid gap-2">
     <Label>{t.settings.theme}</Label>

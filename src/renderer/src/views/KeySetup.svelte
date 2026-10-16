@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { Button } from "$lib/components/ui/button/index.js"
   import * as Card from "$lib/components/ui/card/index.js"
   import { currentLanguage, setLanguage, t } from "$lib/i18n.js"
   import Logo from "$lib/Logo.svelte"
-  import { LANGUAGE_NAMES, LANGUAGES, type Language } from "../../../shared/i18n/index.js"
+  import type { Language } from "../../../shared/i18n/index.js"
   import KeyForm from "./forms/KeyForm.svelte"
+  import LanguageSelect from "./forms/LanguageSelect.svelte"
 
   let { onDone }: { onDone: () => void } = $props()
 
@@ -19,17 +19,7 @@
     <Card.Header>
       <div class="mb-2 flex items-start justify-between">
         <Logo class="size-12" />
-        <div class="flex gap-1">
-          {#each LANGUAGES as language (language)}
-            <Button
-              size="sm"
-              variant={currentLanguage() === language ? "secondary" : "ghost"}
-              onclick={() => choose(language)}
-            >
-              {LANGUAGE_NAMES[language]}
-            </Button>
-          {/each}
-        </div>
+        <LanguageSelect value={currentLanguage()} onChange={choose} class="w-44" />
       </div>
       <Card.Title>{t.setup.welcome}</Card.Title>
       <Card.Description>{t.setup.welcomeText}</Card.Description>
