@@ -17,6 +17,7 @@
     botName,
     checkFor,
     newForm,
+    reusableCheck,
     stepProblem,
     toRequest,
     type LinkCheck,
@@ -50,8 +51,8 @@
   async function checkLink(): Promise<QuizCheck | null> {
     const link = form.quizLink.trim()
     if (!link) return null
-    const known = checkFor(linkCheck, link)
-    if (known?.result) return known.result
+    const known = reusableCheck(linkCheck, link)
+    if (known) return known
     linkCheck = { link, result: null }
     const result = await window.quizpilot
       .checkQuizLink(link)

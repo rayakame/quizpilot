@@ -3,6 +3,7 @@ import {
   addField,
   checkFor,
   newForm,
+  reusableCheck,
   stepProblem,
   toRequest,
   toTiming,
@@ -114,5 +115,14 @@ describe("quiz link", () => {
     expect(checkFor(check, ` ${LINK} `)).toBe(check)
     expect(checkFor(check, `${LINK}x`)).toBeNull()
     expect(checkFor(null, LINK)).toBeNull()
+  })
+
+  it("checks a link again when the last check failed", () => {
+    const failed: LinkCheck = { link: LINK, result: { ok: false, error: "offline" } }
+    const passed: LinkCheck = { link: LINK, result: { ok: true, title: "Geo", questions: 10 } }
+    expect(reusableCheck(failed, LINK)).toBeNull()
+    expect(reusableCheck({ link: LINK, result: null }, LINK)).toBeNull()
+    expect(reusableCheck(passed, ` ${LINK}`)).toEqual(passed.result)
+    expect(reusableCheck(passed, "other")).toBeNull()
   })
 })

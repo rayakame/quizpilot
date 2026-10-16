@@ -91,3 +91,8 @@ export function stepProblem(form: StartForm, step: number): StartProblem | null 
 export function checkFor(check: LinkCheck | null, link: string): LinkCheck | null {
   return check !== null && check.link === link.trim() ? check : null
 }
+
+export function reusableCheck(check: LinkCheck | null, link: string): QuizCheck | null {
+  const result = checkFor(check, link)?.result
+  return result?.ok ? result : null
+}

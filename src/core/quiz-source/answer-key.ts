@@ -19,39 +19,58 @@ interface KnownChoice {
   correct: boolean
 }
 
+interface Entry {
+  k: KnownQuestion
+  index: number
+  live: boolean
+}
+
 export class AnswerKey implements QuizSolutions {
   private game: QuizStartInfo = { randomQuestions: null, randomAnswers: null, first: null }
+  private wrongLink = false
 
   constructor(private readonly questions: KnownQuestion[]) {}
 
   start(info: QuizStartInfo): void {
     this.game = info
+    const first = info.first
+    // Kahoot's own first question shows whether the link belongs to this game at all.
+    if (first && this.questions.length > 0 && !this.questions.some((k) => sameQuestion(k, first))) {
+      this.wrongLink = true
+    }
   }
 
   answerFor(q: Question): Answer | null {
-    const k = this.find(q)
-    return k ? this.solve(k, q) : null
+    const answers = this.find(q).map((e) => this.solve(e.k, q))
+    const [answer] = answers
+    if (!answer) return null
+    const same = answers.every((a) => a !== null && JSON.stringify(a) === JSON.stringify(answer))
+    return same ? answer : null
   }
 
-  private find(q: Question): KnownQuestion | null {
-    const all = this.questions.map((k, index) => ({ k, index }))
-    if (this.game.first) all.push({ k: this.game.first, index: 0 })
-    const fits = all.filter(({ k }) => questionType(k.type, k.layout) === q.type)
+  private find(q: Question): Entry[] {
+    const all: Entry[] = this.game.first ? [{ k: this.game.first, index: 0, live: true }] : []
+    if (!this.wrongLink) all.push(...this.questions.map((k, index) => ({ k, index, live: false })))
+    const fits = all.filter(
+      ({ k }) => questionType(k.type, k.layout) === q.type && choicesAgree(k, q),
+    )
+    const keepsOrder = this.game.randomQuestions === false
     if (q.title !== null) {
       const title = normalize(q.title)
-      const same = fits.filter(({ k }) => normalize(cleanText(k.question) ?? "") === title)
-      const hit = same.find((e) => e.index === q.index) ?? (same.length === 1 ? same[0] : undefined)
-      return hit?.k ?? null
+      const same = fits.filter(({ k }) => titleOf(k) === title)
+      const atIndex = keepsOrder ? same.filter((e) => e.index === q.index) : []
+      return atIndex.length > 0 ? preferLive(atIndex) : same
     }
     // Without the question text only its position tells, so everything else has to match too.
-    if (this.game.randomQuestions !== false) return null
-    const hit = fits.find(
-      ({ k, index }) =>
-        index === q.index &&
-        k.time === q.timeLimitMs &&
-        (!CHOICE_TYPES.has(q.type) || knownChoices(k).length === q.choices.length),
+    if (!keepsOrder) return []
+    return preferLive(
+      fits.filter(
+        ({ k, index }) =>
+          index === q.index &&
+          k.time === q.timeLimitMs &&
+          (!CHOICE_TYPES.has(q.type) || knownChoices(k).length === q.choices.length),
+      ),
     )
-    return hit?.k ?? null
   }
 
   private solve(k: KnownQuestion, q: Question): Answer | null {
@@ -122,6 +141,36 @@ function knownChoices(k: KnownQuestion): KnownChoice[] {
       correct: c?.correct === true,
     }
   })
+}
+
+function preferLive(entries: Entry[]): Entry[] {
+  const live = entries.filter((e) => e.live)
+  return live.length > 0 ? live : entries
+}
+
+function sameQuestion(a: KnownQuestion, b: KnownQuestion): boolean {
+  return (
+    questionType(a.type, a.layout) === questionType(b.type, b.layout) && titleOf(a) === titleOf(b)
+  )
+}
+
+function titleOf(k: KnownQuestion): string {
+  return normalize(cleanText(k.question) ?? "")
+}
+
+// Visible answers that differ from the known ones mean it is not the same question.
+function choicesAgree(k: KnownQuestion, q: Question): boolean {
+  if (!CHOICE_TYPES.has(q.type)) return true
+  if (q.choices.length === 0 || q.choices.some((g) => g.text === null && g.image === null)) {
+    return true
+  }
+  const known = knownChoices(k)
+    .map((c) => (c.image !== null ? `image:${MEDIA}${c.image}` : `text:${normalize(c.text ?? "")}`))
+    .sort()
+  const shown = q.choices
+    .map((g) => (g.image !== null ? `image:${g.image.url}` : `text:${normalize(g.text ?? "")}`))
+    .sort()
+  return known.length === shown.length && known.every((c, i) => c === shown[i])
 }
 
 function sameChoice(c: KnownChoice, g: Choice): boolean {

@@ -220,3 +220,49 @@ describe("AnswerKey: choosing the answer", () => {
     ).toBeNull()
   })
 })
+
+describe("AnswerKey: guarding against the wrong quiz", () => {
+  const genf = ["Zürich", "Bern", "Genf", "Basel"].map((answer) => ({
+    answer,
+    correct: answer === "Genf",
+  }))
+
+  it("trusts Kahoot's own first question over the link", () => {
+    const k = key([known({ choices: genf })], { ...KEEPS_ORDER, first: known() })
+    expect(k.answerFor(live({ title: null, choices: hidden(4) }))).toEqual({
+      kind: "choice",
+      index: 1,
+    })
+    expect(k.answerFor(live())).toEqual({ kind: "choice", index: 1 })
+  })
+
+  it("drops a link whose quiz does not contain the first question", () => {
+    const link = [known({ question: "Andere Frage?" }), known({ question: "Noch eine?" })]
+    const k = key(link, { ...KEEPS_ORDER, first: known() })
+    expect(k.answerFor(live({ index: 1, title: null, choices: hidden(4) }))).toBeNull()
+    expect(k.answerFor(live({ index: 1, title: "Noch eine?" }))).toBeNull()
+  })
+
+  it("keeps a dropped link dropped when the quiz start arrives again without data", () => {
+    const k = key([known({ question: "Andere Frage?" })], { ...KEEPS_ORDER, first: known() })
+    k.start(KEEPS_ORDER)
+    expect(k.answerFor(live({ title: "Andere Frage?" }))).toBeNull()
+  })
+
+  it("does not pick between same-titled questions by position when the host shuffles them", () => {
+    const k = key([known(), known({ choices: genf })], SHUFFLES)
+    expect(k.answerFor(live({ index: 0 }))).toBeNull()
+  })
+
+  it("answers same-titled questions that share the answer", () => {
+    const k = key([known(), known()], SHUFFLES)
+    expect(k.answerFor(live({ index: 5 }))).toEqual({ kind: "choice", index: 1 })
+  })
+
+  it("ignores a same-titled question whose answers differ from the game's", () => {
+    const q = live({
+      choices: ["Bern", "Wien", "Prag", "Rom"].map((text) => ({ text, image: null })),
+    })
+    expect(key([known()]).answerFor(q)).toBeNull()
+  })
+})
