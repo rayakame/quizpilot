@@ -1,4 +1,6 @@
 ---
+import display from "@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-wght-normal.woff2?url"
+import text from "@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url"
 import { url } from "../lib/url"
 import "../styles/global.css"
 
@@ -24,6 +26,8 @@ const image = new URL(url("og.png"), Astro.site).href
     <meta property="og:image" content={image} />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" type="image/svg+xml" href={url("favicon.svg")} />
+    <link rel="preload" href={display} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={text} as="font" type="font/woff2" crossorigin />
     <script is:inline>
       document.documentElement.classList.add("js")
     </script>

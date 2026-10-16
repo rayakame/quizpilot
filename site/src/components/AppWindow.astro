@@ -6,10 +6,9 @@ interface Props {
   src: ImageMetadata
   alt: string
   class?: string
-  eager?: boolean
 }
 
-const { src, alt, class: className = "", eager = false } = Astro.props
+const { src, alt, class: className = "" } = Astro.props
 ---
 
 <figure
@@ -29,7 +28,7 @@ const { src, alt, class: className = "", eager = false } = Astro.props
     alt={alt}
     widths={[640, 1024, 1600, 2560]}
     sizes="(min-width: 1200px) 1100px, 92vw"
-    loading={eager ? "eager" : "lazy"}
+    loading="lazy"
     class="block h-auto w-full"
   />
 </figure>

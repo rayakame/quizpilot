@@ -30,7 +30,12 @@
     background-size: 220% 100%;
     background-clip: text;
     color: transparent;
-    animation: shine 8s linear infinite;
+    /* One pass instead of a loop: moving the gradient repaints the text every frame. */
+    animation: shine 2.4s ease-out 1;
+  }
+
+  .text-gradient:hover {
+    animation: shine-again 2.4s ease-out 1;
   }
 
   .aurora {
@@ -187,6 +192,18 @@
   transform: none;
 }
 
+.js [data-reveal] .text-gradient {
+  animation: none;
+}
+
+.js [data-reveal].is-visible .text-gradient {
+  animation: shine 2.4s ease-out 0.3s 1 both;
+}
+
+.js [data-reveal].is-visible .text-gradient:hover {
+  animation: shine-again 2.4s ease-out 1;
+}
+
 @supports (animation-timeline: view()) {
   @media (min-width: 768px) {
     .tilt {
@@ -216,6 +233,13 @@
 }
 
 @keyframes shine {
+  to {
+    background-position: -220% 0;
+  }
+}
+
+/* Same motion under another name, so hovering starts it again. */
+@keyframes shine-again {
   to {
     background-position: -220% 0;
   }
