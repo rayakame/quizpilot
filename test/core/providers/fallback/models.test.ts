@@ -3,7 +3,7 @@ import { MODELS, resolveChoice } from "../../../../src/core/providers/fallback/m
 
 describe("resolveChoice", () => {
   it("starts with the default model at low effort", () => {
-    expect(resolveChoice("anthropic")).toEqual({ model: "claude-opus-5-5", effort: "low" })
+    expect(resolveChoice("anthropic")).toEqual({ model: "claude-sonnet-5-5", effort: "low" })
     expect(resolveChoice("openai")).toEqual({ model: "gpt-6.1-sol", effort: "low" })
     expect(resolveChoice("gemini")).toEqual({ model: "gemini-3.8-flash", effort: "low" })
   })

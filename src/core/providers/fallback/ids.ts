@@ -9,7 +9,7 @@ export const PROVIDER_NAMES: Record<FallbackProviderId, string> = {
 }
 
 export const DEFAULT_MODELS: Record<FallbackProviderId, string> = {
-  anthropic: "claude-opus-5-5",
+  anthropic: "claude-sonnet-5-5",
   openai: "gpt-6.1-sol",
   gemini: "gemini-3.8-flash",
 }

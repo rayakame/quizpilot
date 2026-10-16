@@ -38,7 +38,7 @@ function claude(message: Partial<Anthropic.Beta.BetaMessage>, choice?: ModelChoi
           create: async (params, options) => {
             calls.push({ params, signal: options?.signal })
             return {
-              model: "claude-opus-5-5",
+              model: "claude-sonnet-5-5",
               stop_reason: "end_turn",
               content: [{ type: "text", text: answer, citations: null }],
               usage: { input_tokens: 900, output_tokens: 40 },
@@ -54,23 +54,23 @@ function claude(message: Partial<Anthropic.Beta.BetaMessage>, choice?: ModelChoi
 }
 
 describe("Claude fallback", () => {
-  it("asks Opus with low effort, a JSON schema and the image", async () => {
+  it("asks Sonnet by default with low effort, a JSON schema and the image", async () => {
     const { provider, calls } = claude({})
     const r = await provider.decide(input, { signal, webSearch: false })
     expect(r).toEqual({
       answer: { kind: "choice", index: 0 },
       confidence: 0.9,
       provider: "anthropic",
-      model: "claude-opus-5-5",
+      model: "claude-sonnet-5-5",
       usage: {
         provider: "anthropic",
-        model: "claude-opus-5-5",
+        model: "claude-sonnet-5-5",
         inputTokens: 900,
         outputTokens: 40,
       },
     })
     const { params } = calls[0]!
-    expect(params.model).toBe("claude-opus-5-5")
+    expect(params.model).toBe("claude-sonnet-5-5")
     expect(params.fallbacks).toBe("default")
     expect(params.betas).toEqual(["server-side-fallback-2026-07-01"])
     expect(params.output_config?.effort).toBe("low")
@@ -106,10 +106,10 @@ describe("Claude fallback", () => {
   })
 
   it("uses the chosen model and effort", async () => {
-    const { provider, calls } = claude({}, { model: "claude-sonnet-5-5", effort: "medium" })
+    const { provider, calls } = claude({}, { model: "claude-opus-5-5", effort: "medium" })
     await provider.decide(input, { signal, webSearch: false })
     expect(calls[0]!.params).toMatchObject({
-      model: "claude-sonnet-5-5",
+      model: "claude-opus-5-5",
       fallbacks: "default",
       output_config: { effort: "medium" },
     })

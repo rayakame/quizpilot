@@ -132,7 +132,7 @@ describe("saveFallback", () => {
     })
     await saveFallback(s, { ...setup, key: "", model: "claude-3" }, check)
     expect(toPublic(s.get()).fallback.choices.anthropic).toEqual({
-      model: "claude-opus-5-5",
+      model: "claude-sonnet-5-5",
       effort: "high",
     })
   })

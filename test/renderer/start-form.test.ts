@@ -11,7 +11,7 @@ const settings: PublicSettings = {
     webSearch: true,
     savedKeys: [],
     choices: {
-      anthropic: { model: "claude-opus-5-5", effort: "low" },
+      anthropic: { model: "claude-sonnet-5-5", effort: "low" },
       openai: { model: "gpt-6.1-sol", effort: "low" },
       gemini: { model: "gemini-3.8-flash", effort: "low" },
     },
