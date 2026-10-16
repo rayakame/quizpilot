@@ -65,11 +65,15 @@ export async function removeFallback(store: SettingsStore): Promise<void> {
   await store.update((c) => ({ ...c, keys: { ...c.keys, [c.fallback.provider]: "" } }))
 }
 
-export function fallbackFor(config: Config): FallbackProvider | null {
+export function fallbackFor(
+  config: Config,
+  log: (message: string) => void = console.warn,
+): FallbackProvider | null {
   const provider = config.fallback.provider
   const key = config.keys[provider]
   if (!key) return null
-  return retryWithoutSearch(logFailures(createFallback(provider, key, choiceFor(config, provider))))
+  const backup = createFallback(provider, key, choiceFor(config, provider))
+  return retryWithoutSearch(logFailures(backup, log))
 }
 
 // The engine treats a failed backup answer like a missing one; keep the reason visible.

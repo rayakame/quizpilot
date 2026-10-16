@@ -215,6 +215,8 @@ export const en = {
     exported: "Game exported",
     notInHistory: "This game isn't in the history.",
     exportFailed: "Couldn't export the game.",
+    jevKey:
+      "TypeSafe doesn't accept your key, so the bots are guessing. Leave the game and change the key in the settings.",
   },
   settings: {
     sections: {

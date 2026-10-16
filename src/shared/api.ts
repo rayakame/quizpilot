@@ -8,8 +8,11 @@ import type { Language } from "./i18n/index.js"
 
 export type Timing = SessionSettings["timing"]
 export type QuestionView = Omit<Question, "raw">
+export type GameNotice = "jev_key"
 export type GameEvent =
-  Exclude<SessionEvent, { type: "question" }> | { type: "question"; question: QuestionView }
+  | Exclude<SessionEvent, { type: "question" }>
+  | { type: "question"; question: QuestionView }
+  | { type: "notice"; notice: GameNotice }
 export interface HistoryGame {
   id: number
   pin: string

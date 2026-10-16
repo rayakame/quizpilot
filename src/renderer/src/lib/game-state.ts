@@ -3,7 +3,7 @@ import type { JoinErrorCode } from "../../../core/kahoot/adapter.js"
 import type { QuestionResult } from "../../../core/kahoot/normalize.js"
 import type { BotStatus } from "../../../core/session/game-session.js"
 import type { Decision } from "../../../core/types.js"
-import type { GameEvent, QuestionView } from "../../../shared/api.js"
+import type { GameEvent, GameNotice, QuestionView } from "../../../shared/api.js"
 
 export interface BotView {
   name: string
@@ -25,6 +25,7 @@ export interface GameState {
   bots: BotView[]
   rounds: RoundView[]
   twoStep: "none" | "asking" | "wrong"
+  notices: GameNotice[]
 }
 
 export interface ChoiceRow {
@@ -37,7 +38,7 @@ export interface ChoiceRow {
   correct: boolean | null
 }
 
-export const EMPTY_GAME: GameState = { bots: [], rounds: [], twoStep: "none" }
+export const EMPTY_GAME: GameState = { bots: [], rounds: [], twoStep: "none", notices: [] }
 
 const DONE: BotStatus[] = ["finished", "left", "kicked", "disconnected"]
 const ACTIVE: BotStatus[] = ["lobby", "playing", "paused"]
@@ -98,6 +99,9 @@ export function reduce(state: GameState, event: GameEvent): GameState {
         totalScore: event.end.totalScore,
         rank: event.end.rank,
       }))
+    case "notice":
+      if (state.notices.includes(event.notice)) return state
+      return { ...state, notices: [...state.notices, event.notice] }
     case "gameReset":
       return {
         ...state,

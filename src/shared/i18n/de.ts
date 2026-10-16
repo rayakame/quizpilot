@@ -212,6 +212,8 @@ export const de: Messages = {
     exported: "Spiel exportiert",
     notInHistory: "Dieses Spiel ist nicht im Verlauf.",
     exportFailed: "Das Spiel ließ sich nicht exportieren.",
+    jevKey:
+      "TypeSafe akzeptiert deinen Key nicht, die Bots raten deshalb. Verlass das Spiel und ändere den Key in den Einstellungen.",
   },
   settings: {
     sections: {

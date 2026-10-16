@@ -9,16 +9,27 @@ import type { KnownQuiz } from "../core/quiz-source/link.js"
 import { GameSession } from "../core/session/game-session.js"
 import type { StartRequest } from "../shared/api.js"
 import { fallbackFor } from "./fallback.js"
+import type { LogEntry } from "./game-log.js"
+import { watchJev } from "./jev-watch.js"
 import type { Config } from "./settings.js"
+
+export interface SessionHooks {
+  log?(entry: LogEntry): void
+  keyRejected?(): void
+}
 
 export function createSession(
   request: StartRequest,
   config: Config,
   quiz: KnownQuiz | null,
+  hooks: SessionHooks = {},
 ): GameSession {
   const answers = new AnswerKey(quiz?.questions ?? [])
-  const jev = createJev(new TypeSafeClient({ apiKey: config.keys.typesafe }))
-  const fallback = fallbackFor(config)
+  const jev = watchJev(createJev(new TypeSafeClient({ apiKey: config.keys.typesafe })), {
+    failed: (err) => hooks.log?.({ level: "warn", message: "Jev failed", detail: err }),
+    keyRejected: () => hooks.keyRejected?.(),
+  })
+  const fallback = fallbackFor(config, (message) => hooks.log?.({ level: "warn", message }))
   const loadImage = createImageLoader()
   const engine: EngineSettings = {
     fallbackBelow: config.fallback.below,

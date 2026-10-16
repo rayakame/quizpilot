@@ -14,10 +14,11 @@ import {
 } from "electron"
 import { createImageLoader } from "../core/media/image-loader.js"
 import { withTimeout } from "../core/util/async.js"
-import { GAME_EVENT_CHANNEL, OPEN_SETTINGS_CHANNEL } from "../shared/api.js"
+import { GAME_EVENT_CHANNEL, OPEN_SETTINGS_CHANNEL, type GameEvent } from "../shared/api.js"
 import { messagesFor, pickLanguage, type Language } from "../shared/i18n/index.js"
 import { removeFallback, saveFallback } from "./fallback.js"
 import { GameController } from "./game-controller.js"
+import type { LogEntry } from "./game-log.js"
 import { historyHandlers } from "./history/handlers.js"
 import { HistoryRecorder } from "./history/recorder.js"
 import { HistoryStore } from "./history/store.js"
@@ -148,13 +149,20 @@ async function start(): Promise<void> {
     : undefined
 
   const quizzes = new QuizCache()
+  const writeEntry = (entry: LogEntry) => log.write(entry.level, entry.message, entry.detail)
+  const emit = (event: GameEvent) => {
+    if (win && !win.isDestroyed()) win.webContents.send(GAME_EVENT_CHANNEL, event)
+  }
   const controller = new GameController({
-    createSession: (request, quiz) => createSession(request, settings.get(), quiz),
+    createSession: (request, quiz) =>
+      createSession(request, settings.get(), quiz, {
+        log: writeEntry,
+        keyRejected: () => emit({ type: "notice", notice: "jev_key" }),
+      }),
     loadQuiz: (link) => quizzes.get(link),
-    send: (event) => {
-      if (win && !win.isDestroyed()) win.webContents.send(GAME_EVENT_CHANNEL, event)
-    },
+    send: emit,
     recorder,
+    log: writeEntry,
   })
 
   registerIpc(ipcMain, {

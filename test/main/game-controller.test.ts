@@ -4,6 +4,7 @@ import { QuizLoadError, type KnownQuiz } from "../../src/core/quiz-source/link.j
 import { GameSession } from "../../src/core/session/game-session.js"
 import type { Question } from "../../src/core/types.js"
 import { GameController, toGameEvent, type GameRecorder } from "../../src/main/game-controller.js"
+import type { LogEntry } from "../../src/main/game-log.js"
 import type { GameEvent, StartRequest } from "../../src/shared/api.js"
 import { FakeAdapter } from "../support/fake-adapter.js"
 
@@ -24,6 +25,7 @@ function setup(
     throw new QuizLoadError("unknown")
   },
   recorder?: GameRecorder,
+  log?: (entry: LogEntry) => void,
 ) {
   const adapters: FakeAdapter[] = []
   const sent: GameEvent[] = []
@@ -56,6 +58,7 @@ function setup(
     loadQuiz,
     send: (e) => sent.push(e),
     recorder,
+    log,
   })
   return { controller, createSession, adapters, sent }
 }
@@ -231,5 +234,30 @@ describe("recording", () => {
     const { controller } = setup("not_found", undefined, r)
     await controller.start(request)
     expect(r.begin).not.toHaveBeenCalled()
+  })
+
+  it("logs the start and what happens in the game", async () => {
+    const log = vi.fn()
+    const { controller, adapters } = setup(undefined, undefined, undefined, log)
+    await controller.start(request)
+    await flush()
+    adapters[1]!.emit("disconnected", { reason: "socket closed", kicked: false, retryable: false })
+    expect(log).toHaveBeenCalledWith({ level: "info", message: "Joining 916240 with 2 bots" })
+    expect(log).toHaveBeenCalledWith({
+      level: "warn",
+      message: "Ben lost the connection",
+      detail: "socket closed",
+    })
+  })
+
+  it("logs why a game couldn't start", async () => {
+    const log = vi.fn()
+    const { controller } = setup("not_found", undefined, undefined, log)
+    await controller.start(request)
+    expect(log).toHaveBeenCalledWith({
+      level: "warn",
+      message: "Couldn't join: not_found",
+      detail: "nope",
+    })
   })
 })

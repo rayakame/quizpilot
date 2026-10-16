@@ -1,8 +1,16 @@
 import { parseSequence } from "../core/kahoot/two-step.js"
 import type { KnownQuiz } from "../core/quiz-source/link.js"
 import type { GameSession, JoinOutcome, SessionEvent } from "../core/session/game-session.js"
-import type { GameEvent, QuestionView, StartRequest, StartResult } from "../shared/api.js"
+import type { JoinErrorCode } from "../core/kahoot/adapter.js"
+import type {
+  GameEvent,
+  QuestionView,
+  StartProblem,
+  StartRequest,
+  StartResult,
+} from "../shared/api.js"
 import { startProblem } from "../shared/start.js"
+import { logEntry, type LogEntry } from "./game-log.js"
 
 export interface GameRecorder {
   begin(request: StartRequest, quiz: KnownQuiz | null): void
@@ -15,6 +23,7 @@ export interface ControllerDeps {
   loadQuiz(link: string): Promise<KnownQuiz>
   send(event: GameEvent): void
   recorder?: GameRecorder
+  log?(entry: LogEntry): void
 }
 
 export class GameController {
@@ -31,12 +40,14 @@ export class GameController {
   async start(request: StartRequest): Promise<StartResult> {
     const problem = startProblem(request)
     if (problem) return { ok: false, error: problem, message: problem }
+    const n = request.names.length
+    this.deps.log?.({ level: "info", message: `Joining ${request.pin} with ${n} bots` })
     let quiz: KnownQuiz | null = null
     if (request.quizLink !== null) {
       try {
         quiz = await this.deps.loadQuiz(request.quizLink)
       } catch (err) {
-        return { ok: false, error: "quiz_link", message: errorText(err) }
+        return this.failed("quiz_link", errorText(err))
       }
     }
     await this.end()
@@ -44,11 +55,13 @@ export class GameController {
     try {
       session = this.deps.createSession(request, quiz)
     } catch (err) {
-      return { ok: false, error: "unknown", message: errorText(err) }
+      return this.failed("unknown", errorText(err))
     }
     this.session = session
     this.pin = request.pin
     this.unsubscribe = session.on((event) => {
+      const entry = logEntry(event)
+      if (entry) this.deps.log?.(entry)
       const e = toGameEvent(event)
       this.deps.send(e)
       this.deps.recorder?.event(e)
@@ -57,11 +70,16 @@ export class GameController {
     const [outcome] = await session.join(request.pin, [first!])
     if (outcome && !outcome.ok && outcome.code !== "duplicate_name") {
       await this.end()
-      return { ok: false, error: outcome.code, message: outcome.message }
+      return this.failed(outcome.code, outcome.message)
     }
     this.deps.recorder?.begin(request, quiz)
     if (rest.length > 0) void session.join(request.pin, rest).catch(() => {})
     return { ok: true }
+  }
+
+  private failed(error: StartProblem | JoinErrorCode, message: string): StartResult {
+    this.deps.log?.({ level: "warn", message: `Couldn't join: ${error}`, detail: message })
+    return { ok: false, error, message }
   }
 
   async addBot(name: string): Promise<JoinOutcome> {

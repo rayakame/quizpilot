@@ -194,3 +194,11 @@ describe("answerSummary and outcome", () => {
     expect(outcome(round)).toBe("mixed")
   })
 })
+
+describe("notices", () => {
+  it("remembers a notice once", () => {
+    const once = reduce(EMPTY_GAME, { type: "notice", notice: "jev_key" })
+    const twice = reduce(once, { type: "notice", notice: "jev_key" })
+    expect(twice.notices).toEqual(["jev_key"])
+  })
+})
