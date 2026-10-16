@@ -290,6 +290,15 @@ export const en = {
     jevKeyTitle: "TypeSafe key rejected",
     jevKeyBody: "The bots are guessing. Change the key in the settings.",
   },
+  updates: {
+    available: (version: string) => `QuizPilot ${version} is out.`,
+    ready: (version: string) => `QuizPilot ${version} is ready to install.`,
+    download: "Download",
+    restart: "Restart now",
+    check: "Check for updates",
+    checking: "Checking…",
+    upToDate: "You have the latest version.",
+  },
   colors: {
     red: "red triangle",
     blue: "blue diamond",

@@ -287,6 +287,15 @@ export const de: Messages = {
     jevKeyTitle: "TypeSafe-Key abgelehnt",
     jevKeyBody: "Die Bots raten. Ändere den Key in den Einstellungen.",
   },
+  updates: {
+    available: (version) => `QuizPilot ${version} ist da.`,
+    ready: (version) => `QuizPilot ${version} ist bereit zur Installation.`,
+    download: "Herunterladen",
+    restart: "Jetzt neu starten",
+    check: "Nach Updates suchen",
+    checking: "Wird geprüft…",
+    upToDate: "Du hast die neueste Version.",
+  },
   colors: {
     red: "rotes Dreieck",
     blue: "blaue Raute",

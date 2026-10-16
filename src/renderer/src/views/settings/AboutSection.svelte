@@ -3,6 +3,8 @@
   import { saveDiagnostics } from "$lib/diagnostics.js"
   import { t } from "$lib/i18n.js"
   import Logo from "$lib/Logo.svelte"
+  import { update } from "$lib/updates.svelte.js"
+  import UpdateActions from "../UpdateActions.svelte"
 
   let version = $state("")
   void window.quizpilot.getAppInfo().then((info) => (version = info.version))
@@ -17,6 +19,25 @@
         <p class="text-muted-foreground text-sm">{t.about.version(version)}</p>
       </div>
     </div>
+    {#if update.state.kind !== "off"}
+      <div class="flex flex-wrap items-center gap-3 text-sm">
+        {#if update.state.kind === "none"}
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={update.checking}
+            onclick={() => void update.check()}
+          >
+            {update.checking ? t.updates.checking : t.updates.check}
+          </Button>
+          {#if update.checked && !update.checking}
+            <span class="text-muted-foreground">{t.updates.upToDate}</span>
+          {/if}
+        {:else}
+          <UpdateActions />
+        {/if}
+      </div>
+    {/if}
     <p class="text-muted-foreground text-sm">{t.about.license}</p>
   </div>
   <div class="grid gap-3 border-t pt-6">

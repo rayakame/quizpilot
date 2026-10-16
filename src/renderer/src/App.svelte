@@ -15,6 +15,7 @@
   import SettingsPage from "./views/settings/Settings.svelte"
   import StartWizard from "./views/StartWizard.svelte"
   import TwoStepDialog from "./views/TwoStepDialog.svelte"
+  import UpdateBar from "./views/UpdateBar.svelte"
 
   let settings = $state<PublicSettings | null>(null)
   let view = $state<"fallback-setup" | "settings" | "history" | null>(null)
@@ -79,6 +80,9 @@
       </div>
     {/if}
   </header>
+  {#if !game.started}
+    <UpdateBar />
+  {/if}
   <main class="min-h-0 flex-1">
     {#if !settings}
       <div class="flex h-full items-center justify-center">
