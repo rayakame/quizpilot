@@ -6,14 +6,14 @@
   import HistoryList from "./dashboard/HistoryList.svelte"
   import QuestionPanel from "./dashboard/QuestionPanel.svelte"
 
-  let { onNewGame }: { onNewGame: () => void } = $props()
+  let { onNewGame, onReview }: { onNewGame: () => void; onReview: (() => void) | null } = $props()
 </script>
 
 <div class="grid h-full grid-cols-[16rem_1fr_19rem] divide-x">
   <BotList {onNewGame} />
   <div class="min-h-0 overflow-y-auto">
     {#if isOver(game.state)}
-      <GameOver {onNewGame} />
+      <GameOver {onNewGame} {onReview} />
     {/if}
     <QuestionPanel round={currentRound(game.state)} />
   </div>

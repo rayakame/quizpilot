@@ -14,7 +14,7 @@
   import TwoStepDialog from "./views/TwoStepDialog.svelte"
 
   let settings = $state<PublicSettings | null>(null)
-  let view = $state<"fallback-setup" | "settings" | null>(null)
+  let view = $state<"fallback-setup" | "settings" | "history" | null>(null)
 
   const canOpenSettings = $derived(settings?.hasTypesafeKey === true && !game.started)
 
@@ -88,7 +88,10 @@
         onClose={() => (view = null)}
       />
     {:else if game.started}
-      <Dashboard onNewGame={newGame} />
+      <Dashboard
+        onNewGame={newGame}
+        onReview={settings.saveHistory ? () => (view = "history") : null}
+      />
     {:else}
       {#key settings}
         <StartWizard {settings} />

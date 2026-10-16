@@ -1,9 +1,12 @@
 import { describe, expect, it } from "vitest"
 import type { Decision } from "../../src/core/types.js"
 import {
+  costText,
   keyText,
   QUIZ_LINK_TEXT,
   quizLinkText,
+  secondsText,
+  sourceCounts,
   sourceText,
   statusText,
 } from "../../src/renderer/src/lib/messages.js"
@@ -67,5 +70,25 @@ describe("quizLinkText", () => {
         usage: [],
       }),
     ).toBe("Known answer")
+  })
+})
+
+describe("game over texts", () => {
+  it("shows costs as an estimate", () => {
+    expect(costText({ usd: 0.0123, complete: true })).toBe("≈ $0.012")
+    expect(costText({ usd: 0.0000126, complete: true })).toBe("< $0.001")
+    expect(costText({ usd: 0, complete: true })).toBe("$0")
+    expect(costText({ usd: 1.5, complete: false })).toBe("≈ $1.50 or more")
+  })
+
+  it("lists where the answers came from", () => {
+    expect(sourceCounts({ jev: 8, fallback: 2, "quiz-link": 1, random: 1 })).toBe(
+      "Jev 8 · Backup AI 2 · Known 1 · Guessed 1",
+    )
+    expect(sourceCounts({})).toBe("–")
+  })
+
+  it("shows seconds with one decimal", () => {
+    expect(secondsText(1234)).toBe("1.2 s")
   })
 })

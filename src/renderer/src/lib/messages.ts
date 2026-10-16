@@ -1,7 +1,8 @@
 import type { JoinErrorCode } from "../../../core/kahoot/adapter.js"
 import { PROVIDER_NAMES, type FallbackProviderId } from "../../../core/providers/fallback/ids.js"
 import type { BotStatus } from "../../../core/session/game-session.js"
-import type { Decision, QuestionType } from "../../../core/types.js"
+import type { Cost } from "../../../core/cost/prices.js"
+import type { Decision, DecisionSource, QuestionType } from "../../../core/types.js"
 import type { KeyCheck, QuizLinkProblem, StartProblem, Theme } from "../../../shared/api.js"
 import type { LinkCheck } from "./start-form.js"
 
@@ -102,4 +103,29 @@ export function sourceText(decision: Decision): string {
     case "skip":
       return "Skipped"
   }
+}
+
+const SOURCE_NAMES: [DecisionSource, string][] = [
+  ["jev", "Jev"],
+  ["fallback", "Backup AI"],
+  ["quiz-link", "Known"],
+  ["random", "Guessed"],
+]
+
+export function costText({ usd, complete }: Cost): string {
+  const more = complete ? "" : " or more"
+  if (usd === 0) return complete ? "$0" : "unknown"
+  if (usd < 0.001) return `< $0.001${more}`
+  return `≈ $${usd < 1 ? usd.toPrecision(2) : usd.toFixed(2)}${more}`
+}
+
+export function sourceCounts(sources: Partial<Record<DecisionSource, number>>): string {
+  const parts = SOURCE_NAMES.flatMap(([id, name]) =>
+    sources[id] ? [`${name} ${sources[id]}`] : [],
+  )
+  return parts.length > 0 ? parts.join(" · ") : "–"
+}
+
+export function secondsText(ms: number): string {
+  return `${(ms / 1000).toFixed(1)} s`
 }
