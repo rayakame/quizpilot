@@ -5,8 +5,8 @@ const names = (list: string[]) => new Intl.ListFormat("nl", { type: "conjunction
 export const nl: Messages = {
   locale: "nl",
   menu: {
-    file: "Archief",
-    edit: "Wijzig",
+    file: "Bestand",
+    edit: "Bewerken",
     view: "Weergave",
     window: "Venster",
     about: "Over QuizPilot",
@@ -16,7 +16,7 @@ export const nl: Messages = {
     hideOthers: "Verberg andere",
     showAll: "Toon alles",
     quit: "Stop QuizPilot",
-    undo: "Herstel",
+    undo: "Ongedaan maken",
     redo: "Opnieuw",
     cut: "Knip",
     copy: "Kopieer",
@@ -116,7 +116,7 @@ export const nl: Messages = {
       `Bij vragen met een afbeelding niet wachten als Jev minstens ${share} zeker is`,
   },
   status: {
-    joining: "Deelnemen",
+    joining: "Neemt deel",
     twoStep: "Wacht op code",
     lobby: "In de lobby",
     playing: "Speelt",
@@ -201,7 +201,7 @@ export const nl: Messages = {
     previous: "De AI over eerdere vragen vertellen",
     unknownHint:
       "Misschien heeft Kahoot iets veranderd. Zoek een nieuwere QuizPilot of sla een diagnosebestand op voor een bugmelding.",
-    joining: "Deelnemen…",
+    joining: "Bezig met deelnemen…",
     join: "Deelnemen",
   },
   twoStep: {

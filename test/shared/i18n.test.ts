@@ -27,6 +27,7 @@ const SAME = new Set([
 const ALSO_SAME: Partial<Record<Language, string[]>> = {
   fr: ["Services", "Options"],
   id: ["Model", "Slide"],
+  it: ["File"],
   nl: ["Model"],
   pl: ["Model"],
   pt: ["Slide"],

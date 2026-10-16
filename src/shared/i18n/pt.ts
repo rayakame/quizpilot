@@ -101,7 +101,7 @@ export const pt: Messages = {
   },
   backup: {
     keySaved: "Salva, deixe vazio para manter",
-    getKey: (company) => `Pegue uma chave na ${company}`,
+    getKey: (company) => `Pegue uma chave de API (${company})`,
     model: "Modelo",
     effort: "Esforço",
     noEffort: (model) => `${model} não tem ajuste de esforço.`,
@@ -152,9 +152,9 @@ export const pt: Messages = {
     unknown: "Não foi possível carregar o quiz.",
   },
   keys: {
-    invalid: (service) => `A ${service} não aceita esta chave.`,
-    offline: (service) => `Não foi possível acessar a ${service}. Verifique sua conexão.`,
-    error: (service) => `A ${service} teve um problema. Tente de novo daqui a pouco.`,
+    invalid: (service) => `${service} não aceita esta chave.`,
+    offline: (service) => `Sem conexão com ${service}. Verifique sua internet.`,
+    error: (service) => `${service} teve um problema. Tente de novo daqui a pouco.`,
   },
   types: {
     quiz: "Quiz",

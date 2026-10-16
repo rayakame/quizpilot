@@ -117,9 +117,9 @@ export const pl: Messages = {
     turnOff: "Wyłącz",
     tiers: { best: "najdokładniejszy", balanced: "zrównoważony", fast: "najszybszy" },
     efforts: { minimal: "Minimalny", low: "Niski", medium: "Średni", high: "Wysoki" },
-    below: (share) => `Pytaj zapasowe AI, gdy Jev jest pewny w mniej niż ${share}`,
+    below: (share) => `Pytaj zapasowe AI, gdy pewność Jev jest poniżej ${share}`,
     instantAt: (share) =>
-      `Przy pytaniach z obrazkiem nie czekaj na nie, gdy Jev jest pewny w co najmniej ${share}`,
+      `Przy pytaniach z obrazkiem nie czekaj na nie, gdy pewność Jev wynosi co najmniej ${share}`,
   },
   status: {
     joining: "Dołącza",

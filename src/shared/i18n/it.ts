@@ -5,8 +5,8 @@ const names = (list: string[]) => new Intl.ListFormat("it", { type: "conjunction
 export const it: Messages = {
   locale: "it",
   menu: {
-    file: "Archivio",
-    edit: "Composizione",
+    file: "File",
+    edit: "Modifica",
     view: "Vista",
     window: "Finestra",
     about: "Informazioni su QuizPilot",
@@ -30,7 +30,7 @@ export const it: Messages = {
     zoomIn: "Ingrandisci",
     zoomOut: "Riduci",
     fullScreen: "Schermo intero",
-    minimize: "Contrai",
+    minimize: "Riduci a icona",
     zoom: "Zoom",
     front: "Porta tutto in primo piano",
     close: "Chiudi finestra",
@@ -116,7 +116,7 @@ export const it: Messages = {
       `Nelle domande con immagine, non aspettarla quando Jev è sicuro almeno al ${share}`,
   },
   status: {
-    joining: "Ingresso",
+    joining: "In ingresso",
     twoStep: "In attesa del codice",
     lobby: "In attesa",
     playing: "In gioco",
@@ -201,7 +201,7 @@ export const it: Messages = {
     previous: "Racconta all'IA le domande precedenti",
     unknownHint:
       "Forse Kahoot ha cambiato qualcosa. Cerca una versione più recente di QuizPilot o salva un file di diagnostica per segnalare il bug.",
-    joining: "Ingresso…",
+    joining: "Ingresso in corso…",
     join: "Entra nella partita",
   },
   twoStep: {

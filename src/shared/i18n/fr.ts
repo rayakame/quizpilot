@@ -35,7 +35,7 @@ export const fr: Messages = {
     zoomIn: "Zoom avant",
     zoomOut: "Zoom arrière",
     fullScreen: "Plein écran",
-    minimize: "Placer dans le Dock",
+    minimize: "Réduire",
     zoom: "Zoom",
     front: "Tout ramener au premier plan",
     close: "Fermer la fenêtre",
@@ -214,8 +214,7 @@ export const fr: Messages = {
   twoStep: {
     title: "Connexion en deux étapes",
     text: "Touchez les quatre symboles dans l’ordre affiché sur l’écran de l’hôte.",
-    wrong:
-      "Ce n’était pas le bon code. Il change toutes les quelques secondes, regardez l’écran et réessayez.",
+    wrong: "Ce n’était pas le bon code. Il change souvent, alors regardez l’écran et réessayez.",
     clear: "Effacer",
     send: "Envoyer le code",
   },

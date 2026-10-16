@@ -5,7 +5,7 @@ const names = (list: string[]) => new Intl.ListFormat("id", { type: "conjunction
 export const id: Messages = {
   locale: "id",
   menu: {
-    file: "Arsip",
+    file: "Berkas",
     edit: "Sunting",
     view: "Tampilan",
     window: "Jendela",
@@ -316,7 +316,7 @@ export const id: Messages = {
   mistakes: {
     title: "Sengaja menjawab salah",
     hint: "Sesekali bot memilih jawaban yang salah supaya terlihat seperti manusia. Setiap bot memutuskan sendiri.",
-    off: "Tidak",
+    off: "Nonaktif",
     about: (share) => `Sekitar ${share}`,
   },
   updates: {

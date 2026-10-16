@@ -30,7 +30,7 @@ export const ja: Messages = {
     zoomIn: "拡大",
     zoomOut: "縮小",
     fullScreen: "フルスクリーン",
-    minimize: "しまう",
+    minimize: "最小化",
     zoom: "ズーム",
     front: "すべてを手前に移動",
     close: "ウインドウを閉じる",
@@ -86,7 +86,7 @@ export const ja: Messages = {
     jevWith: (model) => `Jev + ${model}`,
     instant: "すぐに",
     human: (range) => `人間らしく、${range}`,
-    saved: "保存する",
+    saved: "オン",
     off: "オフ",
   },
   setup: {

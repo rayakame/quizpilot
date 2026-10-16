@@ -111,9 +111,9 @@ export const es: Messages = {
     turnOff: "Desactivar",
     tiers: { best: "más preciso", balanced: "equilibrado", fast: "más rápido" },
     efforts: { minimal: "Mínimo", low: "Bajo", medium: "Medio", high: "Alto" },
-    below: (share) => `Preguntar a la IA de respaldo si Jev está seguro en menos de un ${share}`,
+    below: (share) => `Preguntar a la IA de respaldo si la confianza de Jev es menor del ${share}`,
     instantAt: (share) =>
-      `En preguntas con imagen, no esperarla si Jev está seguro en al menos un ${share}`,
+      `En preguntas con imagen, no esperarla si la confianza de Jev es de al menos el ${share}`,
   },
   status: {
     joining: "Entrando",
