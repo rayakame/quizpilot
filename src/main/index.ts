@@ -114,7 +114,7 @@ async function start(): Promise<void> {
   if (isMac && !app.isPackaged && !dockIcon.isEmpty()) app.dock?.setIcon(dockIcon)
   Menu.setApplicationMenu(
     Menu.buildFromTemplate(
-      menuTemplate(isMac, () => {
+      menuTemplate(isMac, !app.isPackaged, () => {
         if (win && !win.isDestroyed()) win.webContents.send(OPEN_SETTINGS_CHANNEL)
       }),
     ),

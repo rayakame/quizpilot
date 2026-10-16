@@ -12,7 +12,7 @@ function flatten(items: MenuItemConstructorOptions[]): MenuItemConstructorOption
 describe("menuTemplate", () => {
   it.each([true, false])("opens the settings with Cmd/Ctrl+, (mac: %s)", (isMac) => {
     const openSettings = vi.fn()
-    const items = flatten(menuTemplate(isMac, openSettings))
+    const items = flatten(menuTemplate(isMac, false, openSettings))
     const settings = items.find((i) => i.accelerator === "CmdOrCtrl+,")
     expect(settings?.label).toBe("Settings…")
     ;(settings?.click as () => void)()
@@ -20,6 +20,17 @@ describe("menuTemplate", () => {
   })
 
   it.each([true, false])("keeps copy and paste working (mac: %s)", (isMac) => {
-    expect(menuTemplate(isMac, () => {}).some((i) => i.role === "editMenu")).toBe(true)
+    expect(menuTemplate(isMac, false, () => {}).some((i) => i.role === "editMenu")).toBe(true)
+  })
+
+  it.each([true, false])("only offers reload and dev tools while developing (mac: %s)", (isMac) => {
+    const roles = (dev: boolean) => flatten(menuTemplate(isMac, dev, () => {})).map((i) => i.role)
+    expect(roles(false)).not.toContain("reload")
+    expect(roles(false)).not.toContain("forceReload")
+    expect(roles(false)).not.toContain("toggleDevTools")
+    expect(roles(false)).not.toContain("viewMenu")
+    expect(roles(false)).toContain("togglefullscreen")
+    expect(roles(true)).toContain("reload")
+    expect(roles(true)).toContain("toggleDevTools")
   })
 })

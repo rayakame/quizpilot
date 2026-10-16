@@ -2,6 +2,7 @@ import type { MenuItemConstructorOptions } from "electron"
 
 export function menuTemplate(
   isMac: boolean,
+  dev: boolean,
   openSettings: () => void,
 ): MenuItemConstructorOptions[] {
   const settings: MenuItemConstructorOptions = {
@@ -9,9 +10,23 @@ export function menuTemplate(
     accelerator: "CmdOrCtrl+,",
     click: () => openSettings(),
   }
+  // A reload mid-game would hide the running bots from the window.
+  const devTools: MenuItemConstructorOptions[] = dev
+    ? [{ role: "reload" }, { role: "toggleDevTools" }, { type: "separator" }]
+    : []
   const common: MenuItemConstructorOptions[] = [
     { role: "editMenu" },
-    { role: "viewMenu" },
+    {
+      label: "View",
+      submenu: [
+        ...devTools,
+        { role: "resetZoom" },
+        { role: "zoomIn" },
+        { role: "zoomOut" },
+        { type: "separator" },
+        { role: "togglefullscreen" },
+      ],
+    },
     { role: "windowMenu" },
   ]
   if (!isMac) {
