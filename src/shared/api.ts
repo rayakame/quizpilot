@@ -74,6 +74,12 @@ export interface NewGame {
 export type ExportResult = "saved" | "cancelled" | "missing"
 export type SaveResult = "saved" | "cancelled"
 
+export type UpdateState =
+  | { kind: "off" }
+  | { kind: "none" }
+  | { kind: "available"; version: string; url: string }
+  | { kind: "ready"; version: string }
+
 export type KeyCheck = "ok" | "invalid" | "offline" | "error"
 export type Theme = "system" | "light" | "dark"
 
@@ -164,11 +170,18 @@ export interface QuizPilotApi {
   clearHistory(): Promise<boolean>
   exportHistory(id: number | null): Promise<ExportResult>
   saveDiagnostics(): Promise<SaveResult>
+  getUpdate(): Promise<UpdateState>
+  checkForUpdates(): Promise<UpdateState>
+  installUpdate(): Promise<void>
   onGameEvent(listener: (event: GameEvent) => void): () => void
   onOpenSettings(listener: () => void): () => void
+  onUpdate(listener: (state: UpdateState) => void): () => void
 }
 
-export type Invokable = Exclude<keyof QuizPilotApi, "platform" | "onGameEvent" | "onOpenSettings">
+export type Invokable = Exclude<
+  keyof QuizPilotApi,
+  "platform" | "onGameEvent" | "onOpenSettings" | "onUpdate"
+>
 
 export const CHANNELS = {
   getSettings: "settings:get",
@@ -191,7 +204,11 @@ export const CHANNELS = {
   clearHistory: "history:clear",
   exportHistory: "history:export",
   saveDiagnostics: "app:diagnostics",
+  getUpdate: "update:get",
+  checkForUpdates: "update:check",
+  installUpdate: "update:install",
 } as const satisfies Record<Invokable, string>
 
 export const GAME_EVENT_CHANNEL = "game:event"
 export const OPEN_SETTINGS_CHANNEL = "app:open-settings"
+export const UPDATE_CHANNEL = "update:state"

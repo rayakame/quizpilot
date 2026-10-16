@@ -3,8 +3,10 @@ import {
   CHANNELS,
   GAME_EVENT_CHANNEL,
   OPEN_SETTINGS_CHANNEL,
+  UPDATE_CHANNEL,
   type GameEvent,
   type QuizPilotApi,
+  type UpdateState,
 } from "../shared/api.js"
 
 const api: QuizPilotApi = {
@@ -29,6 +31,9 @@ const api: QuizPilotApi = {
   clearHistory: () => ipcRenderer.invoke(CHANNELS.clearHistory),
   exportHistory: (id) => ipcRenderer.invoke(CHANNELS.exportHistory, id),
   saveDiagnostics: () => ipcRenderer.invoke(CHANNELS.saveDiagnostics),
+  getUpdate: () => ipcRenderer.invoke(CHANNELS.getUpdate),
+  checkForUpdates: () => ipcRenderer.invoke(CHANNELS.checkForUpdates),
+  installUpdate: () => ipcRenderer.invoke(CHANNELS.installUpdate),
   onGameEvent: (listener) => {
     const handler = (_event: unknown, payload: GameEvent) => listener(payload)
     ipcRenderer.on(GAME_EVENT_CHANNEL, handler)
@@ -38,6 +43,11 @@ const api: QuizPilotApi = {
     const handler = () => listener()
     ipcRenderer.on(OPEN_SETTINGS_CHANNEL, handler)
     return () => ipcRenderer.off(OPEN_SETTINGS_CHANNEL, handler)
+  },
+  onUpdate: (listener) => {
+    const handler = (_event: unknown, state: UpdateState) => listener(state)
+    ipcRenderer.on(UPDATE_CHANNEL, handler)
+    return () => ipcRenderer.off(UPDATE_CHANNEL, handler)
   },
 }
 

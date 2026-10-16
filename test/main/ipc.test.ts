@@ -24,6 +24,9 @@ function handlers(): Handlers {
     endGame: vi.fn(),
     openExternal: vi.fn(),
     saveDiagnostics: vi.fn(),
+    getUpdate: vi.fn(),
+    checkForUpdates: vi.fn(),
+    installUpdate: vi.fn(),
   }
 }
 

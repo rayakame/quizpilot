@@ -14,9 +14,15 @@ import {
   shell,
   type FileFilter,
 } from "electron"
+import updater from "electron-updater"
 import { createImageLoader } from "../core/media/image-loader.js"
 import { withTimeout } from "../core/util/async.js"
-import { GAME_EVENT_CHANNEL, OPEN_SETTINGS_CHANNEL, type GameEvent } from "../shared/api.js"
+import {
+  GAME_EVENT_CHANNEL,
+  OPEN_SETTINGS_CHANNEL,
+  UPDATE_CHANNEL,
+  type GameEvent,
+} from "../shared/api.js"
 import { messagesFor, pickLanguage, type Language } from "../shared/i18n/index.js"
 import { diagnosticsName, diagnosticsReport } from "./diagnostics.js"
 import { removeFallback, saveFallback } from "./fallback.js"
@@ -33,7 +39,17 @@ import { QuizCache } from "./quiz.js"
 import { createSession } from "./session-factory.js"
 import { applyPatch, freshConfig, loadConfig, SettingsStore, toPublic } from "./settings.js"
 import { checkTypesafeKey } from "./typesafe.js"
+import {
+  CHECK_EVERY_MS,
+  FIRST_CHECK_MS,
+  latestRelease,
+  updateMode,
+  Updates,
+  type Downloader,
+} from "./updates.js"
 import { frameOptions } from "./window.js"
+
+const REPO = "rayakame/quizpilot"
 
 let win: BrowserWindow | null = null
 const icon = () => join(app.getAppPath(), "resources/icon.png")
@@ -200,6 +216,35 @@ async function start(): Promise<void> {
     log: writeEntry,
   })
 
+  const mode = updateMode(process.platform, app.isPackaged, Boolean(process.env["APPIMAGE"]))
+  let downloader: Downloader | null = null
+  if (mode === "download") {
+    const { autoUpdater } = updater
+    autoUpdater.logger = null
+    autoUpdater.autoInstallOnAppQuit = true
+    autoUpdater.on("update-downloaded", (info) => updates.downloaded(info.version))
+    autoUpdater.on("error", (err) => log.warn("Update failed", err))
+    downloader = {
+      check: async () => void (await autoUpdater.checkForUpdates()),
+      install: () => autoUpdater.quitAndInstall(),
+    }
+  }
+  const updates = new Updates({
+    mode,
+    current: app.getVersion(),
+    latest: () => latestRelease(REPO, fetch),
+    downloader,
+    beforeInstall: () => withTimeout(controller.end(), 2000, undefined),
+    log: (message, err) => log.warn(message, err),
+  })
+  updates.onChange((state) => {
+    if (win && !win.isDestroyed()) win.webContents.send(UPDATE_CHANNEL, state)
+  })
+  if (mode !== "off") {
+    setTimeout(() => void updates.check(), FIRST_CHECK_MS)
+    setInterval(() => void updates.check(), CHECK_EVERY_MS)
+  }
+
   registerIpc(ipcMain, {
     getSettings: async () => toPublic(settings.get()),
     saveSettings: async (patch) => {
@@ -229,6 +274,9 @@ async function start(): Promise<void> {
     pause: async (bot, paused) => controller.pause(bot, paused),
     leave: (bot) => controller.leave(bot),
     endGame: () => controller.end(),
+    getUpdate: async () => updates.state,
+    checkForUpdates: () => updates.check(),
+    installUpdate: () => updates.install(),
     saveDiagnostics: async () => {
       const report = diagnosticsReport(
         {
