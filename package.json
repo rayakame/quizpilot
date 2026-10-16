@@ -8,9 +8,9 @@
   "license": "MIT",
   "packageManager": "pnpm@12.11.2",
   "scripts": {
-    "dev": "electron-vite dev",
+    "dev": "tsx scripts/electron-vite.ts dev",
     "build": "electron-vite build",
-    "start": "electron-vite preview",
+    "start": "tsx scripts/electron-vite.ts preview",
     "lint": "eslint .",
     "typecheck": "tsc && svelte-check --tsconfig ./tsconfig.web.json --fail-on-warnings",
     "test": "vitest run",
