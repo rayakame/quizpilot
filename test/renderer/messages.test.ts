@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest"
 import type { Decision } from "../../src/core/types.js"
 import {
   costText,
+  dayText,
   keyText,
   mistakesText,
   percent,
@@ -128,5 +129,16 @@ describe("mistakesText", () => {
     setLanguage("de")
     expect(mistakesText(0)).toBe("Aus")
     expect(mistakesText(0.2)).toBe("Etwa 20\u00a0%")
+  })
+})
+
+describe("dayText", () => {
+  afterEach(() => setLanguage("en"))
+
+  it("names the day without the year", () => {
+    const day = new Date(2026, 9, 16, 18, 30).getTime()
+    expect(dayText(day)).toBe("Oct 16")
+    setLanguage("de")
+    expect(dayText(day)).toBe("16. Okt.")
   })
 })

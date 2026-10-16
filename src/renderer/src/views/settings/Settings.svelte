@@ -2,6 +2,7 @@
   import ArrowLeft from "@lucide/svelte/icons/arrow-left"
   import { toast } from "svelte-sonner"
   import { Button } from "$lib/components/ui/button/index.js"
+  import { SETTINGS_SECTIONS, type SettingsSection } from "$lib/home.js"
   import { t } from "$lib/i18n.js"
   import type { PublicSettings, SettingsPatch } from "../../../../shared/api.js"
   import FallbackForm from "../forms/FallbackForm.svelte"
@@ -14,17 +15,17 @@
 
   let {
     settings,
+    section: initial = "keys",
     onChange,
     onClose,
   }: {
     settings: PublicSettings
+    section?: SettingsSection
     onChange: (settings: PublicSettings) => void
     onClose: () => void
   } = $props()
 
-  const SECTIONS = ["keys", "backup", "behavior", "history", "appearance", "about"] as const
-
-  let section = $state<(typeof SECTIONS)[number]>("keys")
+  let section = $derived<SettingsSection>(initial)
   let saves = $state(0)
 
   async function patch(p: SettingsPatch) {
@@ -48,7 +49,7 @@
       <ArrowLeft />
       {t.common.back}
     </Button>
-    {#each SECTIONS as id (id)}
+    {#each SETTINGS_SECTIONS as id (id)}
       <Button
         variant={section === id ? "secondary" : "ghost"}
         class="justify-start"

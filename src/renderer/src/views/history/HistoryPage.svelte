@@ -1,5 +1,6 @@
 <script lang="ts">
   import ArrowLeft from "@lucide/svelte/icons/arrow-left"
+  import { onMount } from "svelte"
   import { toast } from "svelte-sonner"
   import { Button } from "$lib/components/ui/button/index.js"
   import {
@@ -14,7 +15,11 @@
   import type { HistoryGame, HistoryRecord, PublicSettings } from "../../../../shared/api.js"
   import QuestionRow from "./QuestionRow.svelte"
 
-  let { settings, onClose }: { settings: PublicSettings; onClose: () => void } = $props()
+  let {
+    settings,
+    game,
+    onClose,
+  }: { settings: PublicSettings; game?: number; onClose: () => void } = $props()
 
   let games = $state<HistoryGame[] | null>(null)
   let selected = $state<number | null>(null)
@@ -52,7 +57,7 @@
     if (result === "saved") toast.success(t.game.exported)
   }
 
-  void load()
+  onMount(() => void load(game))
 </script>
 
 <div class="grid h-full grid-cols-[18rem_1fr]">

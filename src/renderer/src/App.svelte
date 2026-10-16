@@ -5,20 +5,23 @@
   import { Button } from "$lib/components/ui/button/index.js"
   import { Toaster } from "$lib/components/ui/sonner/index.js"
   import { game } from "$lib/game.svelte.js"
+  import type { SettingsSection } from "$lib/home.js"
   import { setLanguage, t } from "$lib/i18n.js"
   import Logo from "$lib/Logo.svelte"
   import type { PublicSettings } from "../../shared/api.js"
   import Dashboard from "./views/Dashboard.svelte"
   import FallbackSetup from "./views/FallbackSetup.svelte"
   import HistoryPage from "./views/history/HistoryPage.svelte"
+  import Home from "./views/Home.svelte"
   import KeySetup from "./views/KeySetup.svelte"
   import SettingsPage from "./views/settings/Settings.svelte"
-  import StartWizard from "./views/StartWizard.svelte"
   import TwoStepDialog from "./views/TwoStepDialog.svelte"
   import UpdateBar from "./views/UpdateBar.svelte"
 
   let settings = $state<PublicSettings | null>(null)
   let view = $state<"fallback-setup" | "settings" | "history" | null>(null)
+  let settingsSection = $state<SettingsSection | undefined>()
+  let historyGame = $state<number | undefined>()
 
   const canOpenSettings = $derived(settings?.hasTypesafeKey === true && !game.started)
 
@@ -39,8 +42,18 @@
     await refresh()
   }
 
+  function openSettings(section?: SettingsSection) {
+    settingsSection = section
+    view = "settings"
+  }
+
+  function openHistory(game?: number) {
+    historyGame = game
+    view = "history"
+  }
+
   window.quizpilot.onOpenSettings(() => {
-    if (canOpenSettings) view = "settings"
+    if (canOpenSettings) openSettings()
   })
 
   void refresh()
@@ -61,21 +74,13 @@
     </div>
     {#if canOpenSettings && view === null}
       <div class="flex items-center gap-1 [-webkit-app-region:no-drag]">
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          aria-label={t.app.history}
-          onclick={() => (view = "history")}
-        >
+        <Button variant="ghost" size="sm" onclick={() => openHistory()}>
           <History />
+          {t.app.history}
         </Button>
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          aria-label={t.app.settings}
-          onclick={() => (view = "settings")}
-        >
+        <Button variant="ghost" size="sm" onclick={() => openSettings()}>
           <Settings />
+          {t.app.settings}
         </Button>
       </div>
     {/if}
@@ -101,20 +106,16 @@
     {:else if view === "settings"}
       <SettingsPage
         {settings}
+        section={settingsSection}
         onChange={(next) => (settings = next)}
         onClose={() => (view = null)}
       />
     {:else if view === "history"}
-      <HistoryPage {settings} onClose={() => (view = null)} />
+      <HistoryPage {settings} game={historyGame} onClose={() => (view = null)} />
     {:else if game.started}
-      <Dashboard
-        onNewGame={newGame}
-        onReview={settings.saveHistory ? () => (view = "history") : null}
-      />
+      <Dashboard onNewGame={newGame} onReview={settings.saveHistory ? () => openHistory() : null} />
     {:else}
-      {#key settings}
-        <StartWizard {settings} />
-      {/key}
+      <Home {settings} onSettings={openSettings} onHistory={openHistory} />
     {/if}
   </main>
 </div>

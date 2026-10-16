@@ -14,7 +14,7 @@
     {#each MISTAKE_STEPS as rate (rate)}
       <Button
         size="sm"
-        variant={value === rate ? "secondary" : "outline"}
+        variant={value === rate ? "default" : "outline"}
         role="radio"
         aria-checked={value === rate}
         onclick={() => onChange(rate)}

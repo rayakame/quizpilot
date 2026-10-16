@@ -106,163 +106,161 @@
   }
 </script>
 
-<div class="flex h-full items-center justify-center p-6">
-  <Card.Root class="w-full max-w-lg">
-    <Card.Header>
-      <Card.Title>{t.start.title}</Card.Title>
-      <Card.Description>
-        {#each STEPS as id, i (id)}
-          <span class={i === step ? "text-foreground font-medium" : ""}
-            >{i + 1}. {t.start.steps[id]}</span
-          >
-          {#if i < STEPS.length - 1}<span class="px-1">›</span>{/if}
-        {/each}
-      </Card.Description>
-    </Card.Header>
-    <form class="contents" onsubmit={next}>
-      <Card.Content class="grid gap-4">
-        {#if step === 0}
-          <div class="grid gap-2">
-            <Label for="pin">{t.start.pin}</Label>
-            <Input id="pin" bind:value={form.pin} placeholder={t.start.pinPlaceholder} autofocus />
-          </div>
-        {:else if step === 1}
-          <div class="grid gap-2">
-            <Label>{t.start.bots}</Label>
-            {#each form.bots as bot, i (i)}
-              <div class="flex gap-2">
-                <Input bind:value={bot.value} placeholder={bot.placeholder} maxlength={15} />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  aria-label={t.start.randomName}
-                  onclick={() => randomName(i)}
-                >
-                  <Dices />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  aria-label={t.start.removeBot}
-                  disabled={form.bots.length === 1}
-                  onclick={() => form.bots.splice(i, 1)}
-                >
-                  <X />
-                </Button>
-              </div>
-            {/each}
-            {#if form.bots.length < MAX_BOTS}
+<Card.Root>
+  <Card.Header>
+    <Card.Title>{t.start.title}</Card.Title>
+    <Card.Description>
+      {#each STEPS as id, i (id)}
+        <span class={i === step ? "text-foreground font-medium" : ""}
+          >{i + 1}. {t.start.steps[id]}</span
+        >
+        {#if i < STEPS.length - 1}<span class="px-1">›</span>{/if}
+      {/each}
+    </Card.Description>
+  </Card.Header>
+  <form class="contents" onsubmit={next}>
+    <Card.Content class="grid gap-4">
+      {#if step === 0}
+        <div class="grid gap-2">
+          <Label for="pin">{t.start.pin}</Label>
+          <Input id="pin" bind:value={form.pin} placeholder={t.start.pinPlaceholder} autofocus />
+        </div>
+      {:else if step === 1}
+        <div class="grid gap-2">
+          <Label>{t.start.bots}</Label>
+          {#each form.bots as bot, i (i)}
+            <div class="flex gap-2">
+              <Input bind:value={bot.value} placeholder={bot.placeholder} maxlength={15} />
               <Button
-                variant="outline"
-                class="w-fit"
-                onclick={() => (form.bots = addField(form.bots))}
+                variant="ghost"
+                size="icon"
+                aria-label={t.start.randomName}
+                onclick={() => randomName(i)}
               >
-                <Plus />
-                {t.start.addBot}
+                <Dices />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label={t.start.removeBot}
+                disabled={form.bots.length === 1}
+                onclick={() => form.bots.splice(i, 1)}
+              >
+                <X />
+              </Button>
+            </div>
+          {/each}
+          {#if form.bots.length < MAX_BOTS}
+            <Button
+              variant="outline"
+              class="w-fit"
+              onclick={() => (form.bots = addField(form.bots))}
+            >
+              <Plus />
+              {t.start.addBot}
+            </Button>
+          {/if}
+        </div>
+      {:else}
+        <div class="grid gap-2">
+          <Label>{t.start.whenToAnswer}</Label>
+          <RadioGroup.Root
+            value={form.human ? "human" : "instant"}
+            onValueChange={(v) => (form.human = v === "human")}
+          >
+            <div class="flex items-center gap-2">
+              <RadioGroup.Item value="instant" id="instant" />
+              <Label for="instant" class="font-normal">{t.start.instant}</Label>
+            </div>
+            <div class="flex items-center gap-2">
+              <RadioGroup.Item value="human" id="human" />
+              <Label for="human" class="font-normal">{t.start.human}</Label>
+            </div>
+          </RadioGroup.Root>
+          {#if form.human}
+            <div class="flex items-center gap-2 pl-6 text-sm">
+              <Input
+                type="number"
+                min="0"
+                max="30"
+                step="0.5"
+                class="w-20"
+                bind:value={form.minSeconds}
+              />
+              {t.common.to}
+              <Input
+                type="number"
+                min="0"
+                max="30"
+                step="0.5"
+                class="w-20"
+                bind:value={form.maxSeconds}
+              />
+              {t.common.seconds}
+            </div>
+          {/if}
+        </div>
+        <MistakesPicker value={form.mistakes} onChange={(rate) => (form.mistakes = rate)} />
+        <div class="grid gap-2">
+          <Label for="quiz-link">{t.start.quizLink}</Label>
+          <Input
+            id="quiz-link"
+            bind:value={form.quizLink}
+            placeholder="create.kahoot.it/details/…"
+            onblur={() => void checkLink()}
+          />
+          {#if shownCheck}
+            <p
+              class={[
+                "text-sm",
+                shownCheck.result?.ok === false ? "text-destructive" : "text-muted-foreground",
+              ]}
+            >
+              {quizLinkText(shownCheck)}
+            </p>
+          {:else}
+            <p class="text-muted-foreground text-sm">{t.start.quizLinkHint}</p>
+          {/if}
+        </div>
+        <div class="grid gap-2">
+          <Label for="context">{t.start.context}</Label>
+          <Textarea
+            id="context"
+            bind:value={form.context}
+            placeholder={t.start.contextPlaceholder}
+          />
+        </div>
+        <div class="flex items-center gap-2">
+          <Switch id="previous" bind:checked={form.includePrevious} />
+          <Label for="previous" class="font-normal">{t.start.previous}</Label>
+        </div>
+      {/if}
+      {#if error}
+        <Alert.Root variant="destructive">
+          <Alert.Description>
+            <p>{error()}</p>
+            {#if unknownJoin}
+              <p>{t.start.unknownHint}</p>
+              <Button
+                size="sm"
+                variant="outline"
+                class="mt-2"
+                onclick={() => void saveDiagnostics()}
+              >
+                {t.about.saveDiagnostics}
               </Button>
             {/if}
-          </div>
-        {:else}
-          <div class="grid gap-2">
-            <Label>{t.start.whenToAnswer}</Label>
-            <RadioGroup.Root
-              value={form.human ? "human" : "instant"}
-              onValueChange={(v) => (form.human = v === "human")}
-            >
-              <div class="flex items-center gap-2">
-                <RadioGroup.Item value="instant" id="instant" />
-                <Label for="instant" class="font-normal">{t.start.instant}</Label>
-              </div>
-              <div class="flex items-center gap-2">
-                <RadioGroup.Item value="human" id="human" />
-                <Label for="human" class="font-normal">{t.start.human}</Label>
-              </div>
-            </RadioGroup.Root>
-            {#if form.human}
-              <div class="flex items-center gap-2 pl-6 text-sm">
-                <Input
-                  type="number"
-                  min="0"
-                  max="30"
-                  step="0.5"
-                  class="w-20"
-                  bind:value={form.minSeconds}
-                />
-                {t.common.to}
-                <Input
-                  type="number"
-                  min="0"
-                  max="30"
-                  step="0.5"
-                  class="w-20"
-                  bind:value={form.maxSeconds}
-                />
-                {t.common.seconds}
-              </div>
-            {/if}
-          </div>
-          <MistakesPicker value={form.mistakes} onChange={(rate) => (form.mistakes = rate)} />
-          <div class="grid gap-2">
-            <Label for="quiz-link">{t.start.quizLink}</Label>
-            <Input
-              id="quiz-link"
-              bind:value={form.quizLink}
-              placeholder="create.kahoot.it/details/…"
-              onblur={() => void checkLink()}
-            />
-            {#if shownCheck}
-              <p
-                class={[
-                  "text-sm",
-                  shownCheck.result?.ok === false ? "text-destructive" : "text-muted-foreground",
-                ]}
-              >
-                {quizLinkText(shownCheck)}
-              </p>
-            {:else}
-              <p class="text-muted-foreground text-sm">{t.start.quizLinkHint}</p>
-            {/if}
-          </div>
-          <div class="grid gap-2">
-            <Label for="context">{t.start.context}</Label>
-            <Textarea
-              id="context"
-              bind:value={form.context}
-              placeholder={t.start.contextPlaceholder}
-            />
-          </div>
-          <div class="flex items-center gap-2">
-            <Switch id="previous" bind:checked={form.includePrevious} />
-            <Label for="previous" class="font-normal">{t.start.previous}</Label>
-          </div>
-        {/if}
-        {#if error}
-          <Alert.Root variant="destructive">
-            <Alert.Description>
-              <p>{error()}</p>
-              {#if unknownJoin}
-                <p>{t.start.unknownHint}</p>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  class="mt-2"
-                  onclick={() => void saveDiagnostics()}
-                >
-                  {t.about.saveDiagnostics}
-                </Button>
-              {/if}
-            </Alert.Description>
-          </Alert.Root>
-        {/if}
-      </Card.Content>
-      <Card.Footer class="justify-between">
-        <Button variant="ghost" disabled={step === 0 || starting} onclick={() => (step -= 1)}>
-          {t.common.back}
-        </Button>
-        <Button type="submit" disabled={starting}>
-          {step < STEPS.length - 1 ? t.common.next : starting ? t.start.joining : t.start.join}
-        </Button>
-      </Card.Footer>
-    </form>
-  </Card.Root>
-</div>
+          </Alert.Description>
+        </Alert.Root>
+      {/if}
+    </Card.Content>
+    <Card.Footer class="justify-between">
+      <Button variant="ghost" disabled={step === 0 || starting} onclick={() => (step -= 1)}>
+        {t.common.back}
+      </Button>
+      <Button type="submit" disabled={starting}>
+        {step < STEPS.length - 1 ? t.common.next : starting ? t.start.joining : t.start.join}
+      </Button>
+    </Card.Footer>
+  </form>
+</Card.Root>

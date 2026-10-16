@@ -40,6 +40,10 @@ export function dateText(ms: number): string {
   return new Intl.DateTimeFormat(t.locale, { dateStyle: "medium", timeStyle: "short" }).format(ms)
 }
 
+export function dayText(ms: number): string {
+  return new Intl.DateTimeFormat(t.locale, { day: "numeric", month: "short" }).format(ms)
+}
+
 export function sourceText(decision: Decision): string {
   switch (decision.source) {
     case "jev":
