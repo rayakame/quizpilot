@@ -3,12 +3,70 @@ import type { QuizLoadProblem } from "../core/quiz-source/link.js"
 import type { FallbackProviderId } from "../core/providers/fallback/ids.js"
 import type { Effort, ModelChoice } from "../core/providers/fallback/models.js"
 import type { JoinOutcome, SessionEvent, SessionSettings } from "../core/session/game-session.js"
-import type { Question } from "../core/types.js"
+import type { Decision, Question } from "../core/types.js"
 
 export type Timing = SessionSettings["timing"]
 export type QuestionView = Omit<Question, "raw">
 export type GameEvent =
   Exclude<SessionEvent, { type: "question" }> | { type: "question"; question: QuestionView }
+export interface HistoryGame {
+  id: number
+  pin: string
+  quizTitle: string | null
+  startedAt: number
+  endedAt: number | null
+  questions: number
+  graded: number
+  correct: number
+  costUsd: number
+  costComplete: boolean
+}
+
+export interface HistoryBot {
+  name: string
+  status: string | null
+  totalScore: number | null
+  rank: number | null
+}
+
+export interface HistoryResult {
+  bot: string
+  answeredMs: number | null
+  correct: boolean | null
+  points: number | null
+}
+
+export interface HistoryQuestion {
+  question: QuestionView
+  imagePath: string | null
+  correctChoices: number[] | null
+  decision: Decision | null
+  costUsd: number | null
+  results: HistoryResult[]
+}
+
+export interface HistoryRecord {
+  game: HistoryGame & {
+    context: string | null
+    quizLink: string | null
+    timing: Timing
+    includePrevious: boolean
+  }
+  bots: HistoryBot[]
+  questions: HistoryQuestion[]
+}
+
+export interface NewGame {
+  pin: string
+  quizTitle: string | null
+  quizId: string | null
+  context: string | null
+  quizLink: string | null
+  timing: Timing
+  includePrevious: boolean
+  startedAt: number
+}
+
 export type KeyCheck = "ok" | "invalid" | "offline" | "error"
 export type Theme = "system" | "light" | "dark"
 
