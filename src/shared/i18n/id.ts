@@ -1,12 +1,13 @@
 import type { Messages } from "./en.js"
 
-const names = (list: string[]) => new Intl.ListFormat("id", { type: "conjunction" }).format(list)
+const locale = "id"
+const names = (list: string[]) => new Intl.ListFormat(locale, { type: "conjunction" }).format(list)
 
 export const id: Messages = {
-  locale: "id",
+  locale,
   menu: {
-    file: "Berkas",
-    edit: "Sunting",
+    file: "File",
+    edit: "Edit",
     view: "Tampilan",
     window: "Jendela",
     about: "Tentang QuizPilot",
@@ -58,7 +59,9 @@ export const id: Messages = {
     apiKey: "Kunci API",
     to: "sampai",
     seconds: "detik",
-    inSeconds: (value) => `${value} s`,
+    inSeconds: (value) => `${value}\u00a0s`,
+    rank: (n) => `#${n}`,
+    range: (from, to) => `${from}–${to}`,
     noText: "(tanpa teks)",
     points: (n) => `${n} poin`,
   },
@@ -113,15 +116,15 @@ export const id: Messages = {
     efforts: { minimal: "Minimal", low: "Rendah", medium: "Sedang", high: "Tinggi" },
     below: (share) => `Tanya AI cadangan jika keyakinan Jev di bawah ${share}`,
     instantAt: (share) =>
-      `Pada pertanyaan bergambar, jangan tunggu jika keyakinan Jev minimal ${share}`,
+      `Pada pertanyaan bergambar, jangan tunggu AI cadangan jika keyakinan Jev minimal ${share}`,
   },
   status: {
-    joining: "Bergabung",
+    joining: "Sedang bergabung",
     twoStep: "Menunggu kode",
     lobby: "Di lobi",
     playing: "Bermain",
     paused: "Dijeda",
-    left: "Keluar",
+    left: "Sudah keluar",
     kicked: "Dikeluarkan host",
     disconnected: "Terputus",
     finished: "Selesai",
@@ -209,7 +212,7 @@ export const id: Messages = {
     text: "Ketuk empat simbol sesuai urutan di layar host.",
     wrong:
       "Itu belum benar. Kodenya berganti setiap beberapa detik, jadi lihat layarnya dan coba lagi.",
-    clear: "Hapus",
+    clear: "Bersihkan",
     send: "Kirim kode",
   },
   game: {
@@ -265,7 +268,7 @@ export const id: Messages = {
     backupText: "Dipakai saat Jev ragu, pada pertanyaan bergambar, jawaban ketik, dan awan kata.",
     backupSaved: "AI cadangan disimpan",
     behaviorText:
-      "Bawaan untuk permainan baru. Panduan awal bisa mengubahnya untuk setiap permainan.",
+      "Bawaan untuk permainan baru. Kamu bisa mengubahnya untuk tiap permainan saat memulainya.",
     reconnect: "Sambungkan ulang bot jika koneksi terputus",
     notify: "Beri tahu saya saat QuizPilot berjalan di latar belakang",
     theme: "Tema",
@@ -304,7 +307,7 @@ export const id: Messages = {
     twoStepTitle: "Bergabung dua langkah",
     twoStepBody: "Masukkan simbol dari layar host.",
     overTitle: "Permainan selesai",
-    overBody: (bot, rank) => `${bot} finis di peringkat ${rank}.`,
+    overBody: (bot, rank) => `${bot} meraih peringkat ${rank}.`,
     hostEnded: "Host mengakhiri permainan.",
     lostTitle: "Koneksi terputus",
     lostBody: (bots) => `${names(bots)} kehilangan koneksi.`,

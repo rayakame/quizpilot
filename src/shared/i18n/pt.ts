@@ -1,9 +1,10 @@
 import type { Messages } from "./en.js"
 
-const names = (list: string[]) => new Intl.ListFormat("pt-BR", { type: "conjunction" }).format(list)
+const locale = "pt-BR"
+const names = (list: string[]) => new Intl.ListFormat(locale, { type: "conjunction" }).format(list)
 
 export const pt: Messages = {
-  locale: "pt-BR",
+  locale,
   menu: {
     file: "Arquivo",
     edit: "Editar",
@@ -21,7 +22,7 @@ export const pt: Messages = {
     cut: "Recortar",
     copy: "Copiar",
     paste: "Colar",
-    pasteAndMatchStyle: "Colar e manter estilo",
+    pasteAndMatchStyle: "Colar e igualar estilo",
     delete: "Apagar",
     selectAll: "Selecionar tudo",
     reload: "Recarregar",
@@ -57,7 +58,9 @@ export const pt: Messages = {
     apiKey: "Chave de API",
     to: "a",
     seconds: "segundos",
-    inSeconds: (value) => `${value} s`,
+    inSeconds: (value) => `${value}\u00a0s`,
+    rank: (n) => `#${n}`,
+    range: (from, to) => `${from}–${to}`,
     noText: "(sem texto)",
     points: (n) => (n === 1 ? "1 ponto" : `${n} pontos`),
   },
@@ -85,7 +88,7 @@ export const pt: Messages = {
     jevWith: (model) => `Jev + ${model}`,
     instant: "Na hora",
     human: (range) => `Como uma pessoa, ${range}`,
-    saved: "Salvo",
+    saved: "Ativado",
     off: "Desativado",
   },
   setup: {
@@ -140,7 +143,7 @@ export const pt: Messages = {
     timing: "Escolha uma espera de 0 a 30 segundos, com o número menor primeiro.",
     quiz_link: "Não foi possível usar este link do quiz.",
     not_found: "Não existe partida com este PIN.",
-    locked: "O anfitrião trancou esta partida.",
+    locked: "O anfitrião bloqueou esta partida.",
     duplicate_name: "Alguém na partida já está usando este nome.",
     unknown: "Não foi possível entrar na partida.",
   },
@@ -243,7 +246,7 @@ export const pt: Messages = {
     causes: {
       network: "A conexão caiu.",
       ended: "O anfitrião encerrou a partida.",
-      locked: "O anfitrião trancou a partida.",
+      locked: "O anfitrião bloqueou a partida.",
       other: "O Kahoot fechou a conexão.",
     },
     jevKey:
@@ -259,7 +262,7 @@ export const pt: Messages = {
       about: "Sobre",
     },
     saveFailed: "Não foi possível salvar as configurações.",
-    keyText: "O Jev responde todas as perguntas. A chave fica neste computador.",
+    keyText: "O Jev responde a todas as perguntas. A chave fica neste computador.",
     keySaved: "Chave da TypeSafe salva",
     backupText:
       "Usada quando o Jev não tem certeza, em perguntas com imagem, para respostas digitadas e nuvens de palavras.",
@@ -280,7 +283,7 @@ export const pt: Messages = {
   about: {
     diagnostics: "Diagnóstico",
     diagnosticsText:
-      "Se algo der errado, salve um arquivo de diagnóstico e anexe a um relato de erro. Ele contém o log e suas configurações, mas nenhuma chave de API.",
+      "Se algo der errado, salve um arquivo de diagnóstico e anexe-o a um relatório de erro. Ele contém o log e suas configurações, mas nenhuma chave de API.",
     saveDiagnostics: "Salvar arquivo de diagnóstico",
     diagnosticsSaved: "Diagnóstico salvo",
     diagnosticsFailed: "Não foi possível salvar o arquivo de diagnóstico.",
@@ -307,7 +310,7 @@ export const pt: Messages = {
     hostEnded: "O anfitrião encerrou a partida.",
     lostTitle: "Conexão perdida",
     lostBody: (bots) => `${names(bots)} ${bots.length === 1 ? "perdeu" : "perderam"} a conexão.`,
-    kickedTitle: "Removido da partida",
+    kickedTitle: "Fora da partida",
     kickedBody: (bots) => `O anfitrião removeu ${names(bots)}.`,
     jevKeyTitle: "Chave da TypeSafe recusada",
     jevKeyBody: "Os bots estão chutando. Troque a chave nas configurações.",

@@ -1,9 +1,10 @@
 import type { Messages } from "./en.js"
 
-const names = (list: string[]) => new Intl.ListFormat("de", { type: "conjunction" }).format(list)
+const locale = "de"
+const names = (list: string[]) => new Intl.ListFormat(locale, { type: "conjunction" }).format(list)
 
 export const de: Messages = {
-  locale: "de",
+  locale,
   menu: {
     file: "Datei",
     edit: "Bearbeiten",
@@ -58,7 +59,9 @@ export const de: Messages = {
     apiKey: "API-Key",
     to: "bis",
     seconds: "Sekunden",
-    inSeconds: (value) => `${value} s`,
+    inSeconds: (value) => `${value}\u00a0s`,
+    rank: (n) => `#${n}`,
+    range: (from, to) => `${from}–${to}`,
     noText: "(kein Text)",
     points: (n) => (n === 1 ? "1 Punkt" : `${n} Punkte`),
   },

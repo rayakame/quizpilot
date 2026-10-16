@@ -52,7 +52,7 @@ describe("setupRows", () => {
     )
     expect(rows.map((r) => r.value)).toEqual([
       "Jev + Claude Sonnet 5.5",
-      "Like a human, 1.5–4 s",
+      "Like a human, 1.5–4\u00a0s",
       "About 20%",
       "Off",
       "English",
@@ -66,7 +66,7 @@ describe("setupRows", () => {
     )
     expect(rows.map((r) => r.value)).toEqual([
       "Nur Jev",
-      "Wie ein Mensch, 1,5–4 s",
+      "Wie ein Mensch, 1,5–4\u00a0s",
       "Aus",
       "Wird gespeichert",
       "Deutsch",
@@ -76,7 +76,7 @@ describe("setupRows", () => {
   it("puts the seconds unit the Japanese way", () => {
     setLanguage("ja")
     const rows = setupRows(settings({ timing: { mode: "human", minMs: 1500, maxMs: 4000 } }))
-    expect(rows.find((r) => r.id === "timing")?.value).toBe("人間らしく、1.5–4秒")
+    expect(rows.find((r) => r.id === "timing")?.value).toBe("人間らしく、1.5〜4秒")
   })
 })
 

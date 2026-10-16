@@ -3,10 +3,11 @@ import type { BotStatus } from "../../core/session/game-session.js"
 import type { QuestionType } from "../../core/types.js"
 import type { QuizLinkProblem, StartProblem, Theme } from "../api.js"
 
-const names = (list: string[]) => new Intl.ListFormat("en", { type: "conjunction" }).format(list)
+const locale = "en"
+const names = (list: string[]) => new Intl.ListFormat(locale, { type: "conjunction" }).format(list)
 
 export const en = {
-  locale: "en",
+  locale,
   menu: {
     file: "File",
     edit: "Edit",
@@ -61,7 +62,9 @@ export const en = {
     apiKey: "API key",
     to: "to",
     seconds: "seconds",
-    inSeconds: (value: string) => `${value} s`,
+    inSeconds: (value: string) => `${value}\u00a0s`,
+    rank: (n: number) => `#${n}`,
+    range: (from: string, to: string) => `${from}–${to}`,
     noText: "(no text)",
     points: (n: number) => (n === 1 ? "1 point" : `${n} points`),
   },

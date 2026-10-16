@@ -1,9 +1,10 @@
 import type { Messages } from "./en.js"
 
-const names = (list: string[]) => new Intl.ListFormat("nl", { type: "conjunction" }).format(list)
+const locale = "nl"
+const names = (list: string[]) => new Intl.ListFormat(locale, { type: "conjunction" }).format(list)
 
 export const nl: Messages = {
-  locale: "nl",
+  locale,
   menu: {
     file: "Bestand",
     edit: "Bewerken",
@@ -32,8 +33,8 @@ export const nl: Messages = {
     fullScreen: "Schermvullende weergave",
     minimize: "Minimaliseer",
     zoom: "Zoom",
-    front: "Alles naar voorgrond",
-    close: "Sluit venster",
+    front: "Breng alles naar voren",
+    close: "Venster sluiten",
   },
   dialogs: {
     settingsBroken: "QuizPilot kon de instellingen niet lezen.",
@@ -58,7 +59,9 @@ export const nl: Messages = {
     apiKey: "API-sleutel",
     to: "tot",
     seconds: "seconden",
-    inSeconds: (value) => `${value} s`,
+    inSeconds: (value) => `${value}\u00a0s`,
+    rank: (n) => `#${n}`,
+    range: (from, to) => `${from}–${to}`,
     noText: "(geen tekst)",
     points: (n) => (n === 1 ? "1 punt" : `${n} punten`),
   },
@@ -97,12 +100,12 @@ export const nl: Messages = {
     backupText:
       "Als Jev twijfelt, kan QuizPilot een tweede AI vragen. Die heeft een eigen API-sleutel nodig en kost een beetje per vraag. Je kunt dit later in de instellingen regelen.",
     keySaved: "Opgeslagen, plak een nieuwe sleutel om hem te vervangen",
-    getKey: "Haal een sleutel op typesafe.ai",
+    getKey: "Vraag een sleutel aan op typesafe.ai",
     checkAndSave: "Controleren en opslaan",
   },
   backup: {
     keySaved: "Opgeslagen, laat leeg om hem te houden",
-    getKey: (company) => `Haal een sleutel bij ${company}`,
+    getKey: (company) => `Vraag een sleutel aan bij ${company}`,
     model: "Model",
     effort: "Denkwerk",
     noEffort: (model) => `${model} heeft geen instelling voor denkwerk.`,
@@ -116,7 +119,7 @@ export const nl: Messages = {
       `Bij vragen met een afbeelding niet wachten als Jev minstens ${share} zeker is`,
   },
   status: {
-    joining: "Neemt deel",
+    joining: "Bezig met deelnemen",
     twoStep: "Wacht op code",
     lobby: "In de lobby",
     playing: "Speelt",
@@ -125,7 +128,7 @@ export const nl: Messages = {
     kicked: "Verwijderd door host",
     disconnected: "Verbinding verbroken",
     finished: "Klaar",
-    reconnecting: "Opnieuw verbinden",
+    reconnecting: "Verbindt opnieuw",
   },
   themes: {
     system: "Zoals het systeem",
@@ -134,7 +137,7 @@ export const nl: Messages = {
   },
   errors: {
     pin: "Voer de game-pin in of plak de kahoot.it-link.",
-    bots: "Gebruik 1 tot 5 bots.",
+    bots: "Gebruik 1 tot en met 5 bots.",
     name_empty: "Elke bot heeft een naam nodig.",
     name_long: "Namen mogen hoogstens 15 tekens hebben.",
     name_taken: "Elke bot heeft een andere naam nodig.",
@@ -206,7 +209,7 @@ export const nl: Messages = {
   },
   twoStep: {
     title: "Deelnemen in twee stappen",
-    text: "Tik de vier symbolen aan in de volgorde van het scherm van de host.",
+    text: "Tik de vier symbolen aan in de volgorde waarin ze op het scherm van de host staan.",
     wrong:
       "Dat klopte niet. De code verandert om de paar seconden, dus kijk naar het scherm en probeer het opnieuw.",
     clear: "Wissen",
@@ -287,7 +290,7 @@ export const nl: Messages = {
     diagnosticsFailed: "Kon het diagnosebestand niet opslaan.",
     version: (version) => `Versie ${version}`,
     license:
-      "Open source onder de MIT-licentie. Niet verbonden aan Kahoot!, TypeSafe, Anthropic, OpenAI of Google.",
+      "Open source onder de MIT-licentie. Niet gelieerd aan Kahoot!, TypeSafe, Anthropic, OpenAI of Google.",
   },
   history: {
     filters: { all: "Alle", wrong: "Fout", unsure: "Twijfel", image: "Afbeeldingen" },
@@ -320,7 +323,7 @@ export const nl: Messages = {
     about: (share) => `Ongeveer ${share}`,
   },
   updates: {
-    available: (version) => `QuizPilot ${version} is uit.`,
+    available: (version) => `QuizPilot ${version} is beschikbaar.`,
     ready: (version) => `QuizPilot ${version} is klaar om te installeren.`,
     download: "Downloaden",
     restart: "Nu herstarten",

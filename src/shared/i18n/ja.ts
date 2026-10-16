@@ -1,9 +1,10 @@
 import type { Messages } from "./en.js"
 
-const names = (list: string[]) => new Intl.ListFormat("ja", { type: "conjunction" }).format(list)
+const locale = "ja"
+const names = (list: string[]) => new Intl.ListFormat(locale, { type: "conjunction" }).format(list)
 
 export const ja: Messages = {
-  locale: "ja",
+  locale,
   menu: {
     file: "ファイル",
     edit: "編集",
@@ -31,7 +32,7 @@ export const ja: Messages = {
     zoomOut: "縮小",
     fullScreen: "フルスクリーン",
     minimize: "最小化",
-    zoom: "ズーム",
+    zoom: "拡大/縮小",
     front: "すべてを手前に移動",
     close: "ウインドウを閉じる",
   },
@@ -59,6 +60,8 @@ export const ja: Messages = {
     to: "〜",
     seconds: "秒",
     inSeconds: (value) => `${value}秒`,
+    rank: (n) => `${n}位`,
+    range: (from, to) => `${from}〜${to}`,
     noText: "（テキストなし）",
     points: (n) => `${n}ポイント`,
   },
@@ -115,13 +118,13 @@ export const ja: Messages = {
     instantAt: (share) => `画像の問題では、Jevの確信度が${share}以上なら予備のAIを待たない`,
   },
   status: {
-    joining: "参加中",
+    joining: "接続中",
     twoStep: "コード待ち",
     lobby: "ロビー",
     playing: "プレイ中",
     paused: "一時停止中",
     left: "退出",
-    kicked: "ホストが削除",
+    kicked: "ホストにより削除",
     disconnected: "切断",
     finished: "終了",
     reconnecting: "再接続中",
@@ -185,7 +188,7 @@ export const ja: Messages = {
     title: "新しいゲーム",
     steps: { game: "ゲーム", bots: "ボット", options: "オプション" },
     pin: "ゲームPIN",
-    pinPlaceholder: "123456 または kahoot.it のリンク",
+    pinPlaceholder: "123456またはkahoot.itのリンク",
     bots: "ボット",
     randomName: "ランダムな名前",
     removeBot: "ボットを削除",
@@ -222,9 +225,9 @@ export const ja: Messages = {
     earlier: "これまでの問題",
     nothingYet: "まだありません。",
     waiting: "最初の問題を待っています…",
-    question: (n, type) => `第${n}問 · ${type}`,
+    question: (n, type) => `第${n}問・${type}`,
     hidden: "ホストは端末に問題を表示していません。",
-    answer: "回答：",
+    answer: "回答:",
     thinking: "考え中…",
     answeredAfter: (time) => `${time}で回答`,
     onPurpose: "わざと不正解",
@@ -293,7 +296,7 @@ export const ja: Messages = {
     noGames: "まだゲームがありません。",
     loadFailed: "履歴を読み込めませんでした。",
     noQuestions: "問題がありません。",
-    rightAnswer: "正解：",
+    rightAnswer: "正解:",
     result: { right: "正解", wrong: "不正解" },
   },
   notify: {

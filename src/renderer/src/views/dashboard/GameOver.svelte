@@ -34,7 +34,7 @@
       <ol class="space-y-1 text-sm">
         {#each standings as bot (bot.name)}
           <li>
-            <span class="font-medium">{bot.rank ? `#${bot.rank}` : "–"} {bot.name}</span>
+            <span class="font-medium">{bot.rank ? t.common.rank(bot.rank) : "–"} {bot.name}</span>
             <span class="text-muted-foreground">· {t.common.points(bot.totalScore)}</span>
           </li>
         {/each}

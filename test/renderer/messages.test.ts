@@ -26,10 +26,10 @@ describe("sourceText", () => {
   it("names the backup AI and how sure it was", () => {
     const fallback = { provider: "anthropic", model: "claude-opus-5-5", latencyMs: 2100 }
     expect(sourceText(decision({ source: "fallback", confidence: 0.72, fallback }))).toBe(
-      "Claude · 72% · 2.1 s",
+      "Claude · 72% · 2.1\u00a0s",
     )
     expect(sourceText(decision({ source: "fallback", confidence: null, fallback }))).toBe(
-      "Claude · 2.1 s",
+      "Claude · 2.1\u00a0s",
     )
     expect(sourceText(decision({ source: "jev", confidence: 0.9 }))).toBe("Jev · 90%")
   })
@@ -93,10 +93,16 @@ describe("game over texts", () => {
   })
 
   it("shows seconds with one decimal", () => {
-    expect(secondsText(1234)).toBe("1.2 s")
-    setLanguage("ja")
+    expect(secondsText(1234)).toBe("1.2\u00a0s")
+  })
+})
+
+describe("Japanese", () => {
+  beforeEach(() => setLanguage("ja"))
+  afterEach(() => setLanguage("en"))
+
+  it("puts the seconds unit right after the number", () => {
     expect(secondsText(1234)).toBe("1.2秒")
-    setLanguage("en")
   })
 })
 
@@ -105,7 +111,7 @@ describe("German", () => {
   afterEach(() => setLanguage("en"))
 
   it("writes numbers the German way", () => {
-    expect(secondsText(2100)).toBe("2,1 s")
+    expect(secondsText(2100)).toBe("2,1\u00a0s")
     expect(percent(0.72)).toBe("72\u00a0%")
     expect(costText({ usd: 0.0042, complete: true })).toBe("≈\u00a00,0042\u00a0$")
     expect(costText({ usd: 0.0000126, complete: false })).toBe("<\u00a00,001\u00a0$ oder mehr")

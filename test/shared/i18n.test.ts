@@ -26,7 +26,7 @@ const SAME = new Set([
 // Words that only read the same in one language.
 const ALSO_SAME: Partial<Record<Language, string[]>> = {
   fr: ["Services", "Options"],
-  id: ["Model", "Slide"],
+  id: ["File", "Edit", "Model", "Slide"],
   it: ["File"],
   nl: ["Model"],
   pl: ["Model"],
@@ -34,16 +34,36 @@ const ALSO_SAME: Partial<Record<Language, string[]>> = {
   tr: ["Model"],
 }
 
+type Fn = (...args: unknown[]) => string
+
+// Functions that give the same text as in English.
+const SAME_FUNCTIONS = new Set([
+  "home.jevWith",
+  "history.pin",
+  "common.inSeconds",
+  "common.range",
+  "common.rank",
+])
+const ALSO_SAME_FUNCTIONS: Partial<Record<Language, string[]>> = {
+  de: ["about.version"],
+  fr: ["common.points", "start.questions", "game.question", "about.version"],
+}
+
 // Lists for the functions that take bot names, numbers for everything else.
 const LISTS = new Set(["notify.lostBody", "notify.kickedBody"])
+
+function samples(path: string, fn: Fn): unknown[][] {
+  if (LISTS.has(path)) return [[["Ada"]], [["Ada", "Bo", "Cy"]]]
+  expect(fn.length, path).toBeGreaterThan(0)
+  // 1, 2, 5 and 22 hit the one, few and many forms of every language here.
+  return [1, 2, 5, 22].map((n) => [n, n + 100].slice(0, fn.length))
+}
 
 function strings(value: unknown, path = ""): [string, string][] {
   if (typeof value === "string") return [[path, value]]
   if (value === null || typeof value !== "object") return []
   return Object.entries(value).flatMap(([k, v]) => strings(v, path ? `${path}.${k}` : k))
 }
-
-type Fn = (...args: unknown[]) => string
 
 function functions(value: unknown, path = ""): [string, Fn][] {
   if (typeof value === "function") return [[path, value as Fn]]
@@ -102,12 +122,12 @@ describe("dictionaries", () => {
 
   it("counts in Polish", () => {
     const pl = messagesFor("pl")
-    expect([1, 2, 5, 12, 22].map((n) => pl.settings.gamesSaved(n))).toEqual([
-      "Zapisano 1 grę",
-      "Zapisano 2 gry",
-      "Zapisano 5 gier",
-      "Zapisano 12 gier",
-      "Zapisano 22 gry",
+    expect([1, 2, 5, 12, 22].map((n) => pl.start.questions(n))).toEqual([
+      "1 pytanie",
+      "2 pytania",
+      "5 pytań",
+      "12 pytań",
+      "22 pytania",
     ])
     expect([1, 2, 5].map((n) => pl.common.points(n))).toEqual(["1 punkt", "2 punkty", "5 punktów"])
   })
@@ -125,6 +145,18 @@ describe("dictionaries", () => {
     expect(messagesFor("ja").start.questions(3)).toBe("3問")
     expect(messagesFor("ja").start.questions(1)).toBe("1問")
   })
+
+  it("writes ranks and ranges the local way", () => {
+    expect(en.common.rank(1)).toBe("#1")
+    expect(messagesFor("tr").common.rank(1)).toBe("1.")
+    expect(messagesFor("ja").common.rank(1)).toBe("1位")
+    expect(en.common.range("1.5", "4")).toBe("1.5–4")
+    expect(messagesFor("ja").common.range("1.5", "4")).toBe("1.5〜4")
+  })
+
+  it("offers every language it has a name for", () => {
+    expect([...LANGUAGES].sort()).toEqual(Object.keys(LANGUAGE_NAMES).sort())
+  })
 })
 
 describe.each(LANGUAGES.filter((l) => l !== "en"))("%s", (language) => {
@@ -141,16 +173,30 @@ describe.each(LANGUAGES.filter((l) => l !== "en"))("%s", (language) => {
     expect(untranslated).toEqual([])
   })
 
+  it("translates every English function", () => {
+    const same = new Set([...SAME_FUNCTIONS, ...(ALSO_SAME_FUNCTIONS[language] ?? [])])
+    const own = new Map(functions(messages))
+    const untranslated = functions(en)
+      .filter(([path, fn]) => {
+        const [args = []] = samples(path, fn)
+        return !same.has(path) && own.get(path)?.(...args) === fn(...args)
+      })
+      .map(([path]) => path)
+    expect(untranslated).toEqual([])
+  })
+
   it("keeps every value it is given", () => {
     const own = new Map(functions(messages))
-    const lost = functions(en).flatMap(([path, fn]) => {
-      const args = LISTS.has(path) ? [["Ada", "Bo"]] : [7, 8].slice(0, fn.length)
-      const text = own.get(path)?.(...args) ?? ""
-      return args
-        .flat()
-        .filter((value) => !text.includes(String(value)))
-        .map(() => path)
-    })
+    const lost = functions(en).flatMap(([path, fn]) =>
+      samples(path, fn).flatMap((args) => {
+        const english = fn(...args)
+        const text = own.get(path)?.(...args) ?? ""
+        return args
+          .flat()
+          .filter((value) => english.includes(String(value)) && !text.includes(String(value)))
+          .map((value) => `${path}(${value})`)
+      }),
+    )
     expect(lost).toEqual([])
   })
 

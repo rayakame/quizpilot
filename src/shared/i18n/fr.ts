@@ -1,14 +1,15 @@
 import type { Messages } from "./en.js"
 
-const names = (list: string[]) => new Intl.ListFormat("fr", { type: "conjunction" }).format(list)
+const locale = "fr"
+const names = (list: string[]) => new Intl.ListFormat(locale, { type: "conjunction" }).format(list)
 // French counts 0 and 1 as singular.
-const plural = new Intl.PluralRules("fr")
+const plural = new Intl.PluralRules(locale)
 const one = (n: number) => plural.select(n) === "one"
 // French puts a no-break space before ? and :.
 const nbsp = "\u00a0"
 
 export const fr: Messages = {
-  locale: "fr",
+  locale,
   menu: {
     file: "Fichier",
     edit: "Édition",
@@ -65,7 +66,9 @@ export const fr: Messages = {
     apiKey: "Clé d’API",
     to: "à",
     seconds: "secondes",
-    inSeconds: (value) => `${value} s`,
+    inSeconds: (value) => `${value}\u00a0s`,
+    rank: (n) => `#${n}`,
+    range: (from, to) => `${from}–${to}`,
     noText: "(sans texte)",
     points: (n) => (one(n) ? `${n} point` : `${n} points`),
   },
@@ -93,14 +96,14 @@ export const fr: Messages = {
     jevWith: (model) => `Jev + ${model}`,
     instant: "Tout de suite",
     human: (range) => `Comme un humain, ${range}`,
-    saved: "Enregistré",
+    saved: "Activé",
     off: "Désactivé",
   },
   setup: {
     welcome: "Bienvenue dans QuizPilot",
     welcomeText:
       "QuizPilot répond avec Jev de TypeSafe. Collez votre clé d’API, elle reste sur cet ordinateur.",
-    backupTitle: "IA de secours (facultatif)",
+    backupTitle: "IA de secours (facultative)",
     backupText:
       "Quand Jev hésite, QuizPilot peut demander à une deuxième IA. Elle a besoin de sa propre clé d’API et coûte un peu par question. Vous pourrez la configurer plus tard dans les paramètres.",
     keySaved: "Enregistrée, collez une nouvelle clé pour la remplacer",
@@ -118,9 +121,10 @@ export const fr: Messages = {
     turnOff: "Désactiver",
     tiers: { best: "le plus précis", balanced: "équilibré", fast: "le plus rapide" },
     efforts: { minimal: "Minimale", low: "Faible", medium: "Moyenne", high: "Élevée" },
-    below: (share) => `Demander à l’IA de secours quand Jev est sûr à moins de ${share}`,
+    below: (share) =>
+      `Demander à l’IA de secours quand la confiance de Jev est inférieure à ${share}`,
     instantAt: (share) =>
-      `Pour les questions en image, ne pas l’attendre quand Jev est sûr à au moins ${share}`,
+      `Pour les questions en image, ne pas l’attendre quand la confiance de Jev atteint au moins ${share}`,
   },
   status: {
     joining: "Connexion",
@@ -234,7 +238,7 @@ export const fr: Messages = {
     hidden: "L’hôte n’affiche pas les questions sur les appareils.",
     answer: `Réponse${nbsp}:`,
     thinking: "Réflexion…",
-    answeredAfter: (time) => `a répondu après ${time}`,
+    answeredAfter: (time) => `a répondu en ${time}`,
     onPurpose: "erreur volontaire",
     over: "Partie terminée",
     right: "Bonnes réponses",
@@ -315,7 +319,7 @@ export const fr: Messages = {
     hostEnded: "L’hôte a terminé la partie.",
     lostTitle: "Connexion perdue",
     lostBody: (bots) => `${names(bots)} ${bots.length === 1 ? "a" : "ont"} perdu la connexion.`,
-    kickedTitle: "Retiré de la partie",
+    kickedTitle: "Exclusion de la partie",
     kickedBody: (bots) => `L’hôte a retiré ${names(bots)}.`,
     jevKeyTitle: "Clé TypeSafe refusée",
     jevKeyBody: "Les bots répondent au hasard. Changez la clé dans les paramètres.",

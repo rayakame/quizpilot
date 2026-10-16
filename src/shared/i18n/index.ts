@@ -11,22 +11,9 @@ import { pt } from "./pt.js"
 import { tr } from "./tr.js"
 
 export type { Messages }
-export type Language = "en" | "de" | "es" | "fr" | "id" | "it" | "ja" | "nl" | "pl" | "pt" | "tr"
-
 // In the order of their names, the way the menu lists them.
-export const LANGUAGES: Language[] = [
-  "id",
-  "de",
-  "en",
-  "es",
-  "fr",
-  "it",
-  "nl",
-  "pl",
-  "pt",
-  "tr",
-  "ja",
-]
+export const LANGUAGES = ["id", "de", "en", "es", "fr", "it", "nl", "pl", "pt", "tr", "ja"] as const
+export type Language = (typeof LANGUAGES)[number]
 export const LANGUAGE_NAMES: Record<Language, string> = {
   id: "Bahasa Indonesia",
   de: "Deutsch",

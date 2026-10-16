@@ -33,7 +33,7 @@ function timingText({ mode, minMs, maxMs }: Timing): string {
   if (mode === "instant") return t.home.instant
   const seconds = new Intl.NumberFormat(t.locale, { maximumFractionDigits: 1 })
   return t.home.human(
-    t.common.inSeconds(`${seconds.format(minMs / 1000)}–${seconds.format(maxMs / 1000)}`),
+    t.common.inSeconds(t.common.range(seconds.format(minMs / 1000), seconds.format(maxMs / 1000))),
   )
 }
 

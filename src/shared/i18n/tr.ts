@@ -1,9 +1,10 @@
 import type { Messages } from "./en.js"
 
-const names = (list: string[]) => new Intl.ListFormat("tr", { type: "conjunction" }).format(list)
+const locale = "tr"
+const names = (list: string[]) => new Intl.ListFormat(locale, { type: "conjunction" }).format(list)
 
 export const tr: Messages = {
-  locale: "tr",
+  locale,
   menu: {
     file: "Dosya",
     edit: "Düzen",
@@ -58,7 +59,9 @@ export const tr: Messages = {
     apiKey: "API anahtarı",
     to: "ile",
     seconds: "saniye",
-    inSeconds: (value) => `${value} s`,
+    inSeconds: (value) => `${value}\u00a0sn`,
+    rank: (n) => `${n}.`,
+    range: (from, to) => `${from}–${to}`,
     noText: "(metin yok)",
     points: (n) => `${n} puan`,
   },
@@ -170,7 +173,7 @@ export const tr: Messages = {
   },
   sources: {
     backupAi: "Yedek yapay zekâ",
-    known: "Biliniyor",
+    known: "Bilinen",
     knownAnswer: "Bilinen cevap",
     guessed: "Tahmin",
     skipped: "Atlandı",
@@ -212,7 +215,7 @@ export const tr: Messages = {
   },
   game: {
     joinAs: (name) => `${name} olarak katıl`,
-    resume: "Devam et",
+    resume: "Sürdür",
     pause: "Duraklat",
     leave: "Ayrıl",
     enterCode: "İki adımlı kodu gir",
@@ -286,7 +289,7 @@ export const tr: Messages = {
     diagnosticsFailed: "Tanılama dosyası kaydedilemedi.",
     version: (version) => `Sürüm ${version}`,
     license:
-      "MIT lisanslı açık kaynak. Kahoot!, TypeSafe, Anthropic, OpenAI veya Google ile bağlantısı yoktur.",
+      "MIT lisanslı açık kaynak. Kahoot!, TypeSafe, Anthropic, OpenAI veya Google ile bir ilişkisi yoktur.",
   },
   history: {
     filters: { all: "Tümü", wrong: "Yanlış", unsure: "Emin değil", image: "Resimli" },
@@ -315,8 +318,8 @@ export const tr: Messages = {
   },
   mistakes: {
     title: "Bilerek yanlış cevaplar",
-    hint: "Botlar arada bir yanlış cevap seçer, böylece insan gibi görünürler. Her bot kendi karar verir.",
-    off: "Hiç",
+    hint: "Botlar arada bir yanlış cevap seçer, böylece insan gibi görünürler. Her bot kendi kararını verir.",
+    off: "Kapalı",
     about: (share) => `Yaklaşık ${share}`,
   },
   updates: {
@@ -324,10 +327,10 @@ export const tr: Messages = {
     ready: (version) => `QuizPilot ${version} kurulmaya hazır.`,
     download: "İndir",
     restart: "Şimdi yeniden başlat",
-    check: "Güncellemeleri denetle",
+    check: "Güncellemeleri kontrol et",
     checking: "Kontrol ediliyor…",
     upToDate: "En yeni sürümü kullanıyorsun.",
-    failed: "Güncellemeler denetlenemedi.",
+    failed: "Güncellemeler kontrol edilemedi.",
     downloading: (version) => `QuizPilot ${version} indiriliyor…`,
   },
   colors: {

@@ -1,7 +1,8 @@
 import type { Messages } from "./en.js"
 
-const names = (list: string[]) => new Intl.ListFormat("pl", { type: "conjunction" }).format(list)
-const plural = new Intl.PluralRules("pl")
+const locale = "pl"
+const names = (list: string[]) => new Intl.ListFormat(locale, { type: "conjunction" }).format(list)
+const plural = new Intl.PluralRules(locale)
 // Polish has a form for 1, one for 2–4 (but not 12–14) and one for the rest.
 const count = (n: number, one: string, few: string, many: string) => {
   const form = plural.select(n)
@@ -9,7 +10,7 @@ const count = (n: number, one: string, few: string, many: string) => {
 }
 
 export const pl: Messages = {
-  locale: "pl",
+  locale,
   menu: {
     file: "Plik",
     edit: "Edycja",
@@ -64,7 +65,9 @@ export const pl: Messages = {
     apiKey: "Klucz API",
     to: "do",
     seconds: "sekund",
-    inSeconds: (value) => `${value} s`,
+    inSeconds: (value) => `${value}\u00a0s`,
+    rank: (n) => `#${n}`,
+    range: (from, to) => `${from}–${to}`,
     noText: "(brak tekstu)",
     points: (n) => count(n, "punkt", "punkty", "punktów"),
   },
@@ -119,7 +122,7 @@ export const pl: Messages = {
     efforts: { minimal: "Minimalny", low: "Niski", medium: "Średni", high: "Wysoki" },
     below: (share) => `Pytaj zapasowe AI, gdy pewność Jev jest poniżej ${share}`,
     instantAt: (share) =>
-      `Przy pytaniach z obrazkiem nie czekaj na nie, gdy pewność Jev wynosi co najmniej ${share}`,
+      `Przy pytaniach z obrazkiem nie czekaj na zapasowe AI, gdy pewność Jev wynosi co najmniej ${share}`,
   },
   status: {
     joining: "Dołącza",
@@ -147,7 +150,7 @@ export const pl: Messages = {
     timing: "Wybierz przerwę od 0 do 30 sekund, mniejszą liczbę najpierw.",
     quiz_link: "Nie można użyć tego linku do quizu.",
     not_found: "Nie ma gry z tym PIN-em.",
-    locked: "Prowadzący zablokował tę grę.",
+    locked: "Ta gra jest zablokowana.",
     duplicate_name: "Ktoś w grze ma już tę nazwę.",
     unknown: "Nie udało się dołączyć do gry.",
   },
@@ -204,7 +207,7 @@ export const pl: Messages = {
     quizLinkHint: "Tylko publiczne quizy. QuizPilot zna wtedy poprawne odpowiedzi.",
     context: "O czym jest quiz? (opcjonalnie)",
     contextPlaceholder: "np. quiz dla pierwszego roku UW o życiu na kampusie",
-    previous: "Mów AI o wcześniejszych pytaniach",
+    previous: "Przekazuj AI wcześniejsze pytania",
     unknownHint:
       "Kahoot mógł coś zmienić. Poszukaj nowszej wersji QuizPilot albo zapisz plik diagnostyczny do zgłoszenia błędu.",
     joining: "Dołączanie…",
@@ -212,7 +215,7 @@ export const pl: Messages = {
   },
   twoStep: {
     title: "Dołączanie dwuetapowe",
-    text: "Dotknij czterech symboli w kolejności z ekranu prowadzącego.",
+    text: "Dotknij czterech symboli w kolejności, w jakiej widać je na ekranie prowadzącego.",
     wrong:
       "To nie było to. Kod zmienia się co kilka sekund, więc spójrz na ekran i spróbuj jeszcze raz.",
     clear: "Wyczyść",
@@ -229,11 +232,11 @@ export const pl: Messages = {
     startOver: "Wyjdź i zacznij od nowa",
     earlier: "Wcześniejsze pytania",
     nothingYet: "Jeszcze nic.",
-    waiting: "Czekam na pierwsze pytanie…",
+    waiting: "Oczekiwanie na pierwsze pytanie…",
     question: (n, type) => `Pytanie ${n} · ${type}`,
     hidden: "Prowadzący nie pokazuje pytań na urządzeniach.",
     answer: "Odpowiedź:",
-    thinking: "Myślę…",
+    thinking: "Myśli…",
     answeredAfter: (time) => `odpowiedź po ${time}`,
     onPurpose: "celowy błąd",
     over: "Koniec gry",
@@ -249,8 +252,8 @@ export const pl: Messages = {
     exportFailed: "Nie udało się wyeksportować gry.",
     causes: {
       network: "Połączenie zostało przerwane.",
-      ended: "Prowadzący zakończył grę.",
-      locked: "Prowadzący zablokował grę.",
+      ended: "Gra została zakończona.",
+      locked: "Gra została zablokowana.",
       other: "Kahoot zamknął połączenie.",
     },
     jevKey:
@@ -271,7 +274,8 @@ export const pl: Messages = {
     backupText:
       "Pytane, gdy Jev nie jest pewny, przy pytaniach z obrazkiem, wpisywanych odpowiedziach i chmurach słów.",
     backupSaved: "Zapasowe AI zapisane",
-    behaviorText: "Domyślne dla nowych gier. Kreator startu może je zmienić dla każdej gry.",
+    behaviorText:
+      "Ustawienia domyślne dla nowych gier. Kreator startu może je zmienić dla każdej gry.",
     reconnect: "Łącz boty ponownie, gdy połączenie zostanie przerwane",
     notify: "Powiadamiaj mnie, gdy QuizPilot działa w tle",
     theme: "Motyw",
@@ -279,7 +283,7 @@ export const pl: Messages = {
     historyText: "Rozegrane gry zostają na tym komputerze, z pytaniami, odpowiedziami i kosztami.",
     saveGames: "Zapisuj rozegrane gry",
     deleteAll: "Usuń wszystkie gry",
-    gamesSaved: (n) => `Zapisano ${count(n, "grę", "gry", "gier")}`,
+    gamesSaved: (n) => `Zapisane gry: ${n}`,
     historyDeleted: "Historia usunięta",
     deleteFailed: "Nie udało się usunąć historii.",
   },
@@ -310,11 +314,11 @@ export const pl: Messages = {
     twoStepBody: "Wpisz symbole z ekranu prowadzącego.",
     overTitle: "Koniec gry",
     overBody: (bot, rank) => `${bot} zajmuje ${rank}. miejsce.`,
-    hostEnded: "Prowadzący zakończył grę.",
+    hostEnded: "Gra została zakończona.",
     lostTitle: "Utracono połączenie",
     lostBody: (bots) => `Połączenie utracone: ${names(bots)}.`,
     kickedTitle: "Usunięto z gry",
-    kickedBody: (bots) => `Prowadzący usunął z gry: ${names(bots)}.`,
+    kickedBody: (bots) => `Usunięto z gry: ${names(bots)}.`,
     jevKeyTitle: "Klucz TypeSafe odrzucony",
     jevKeyBody: "Boty zgadują. Zmień klucz w ustawieniach.",
   },

@@ -1,9 +1,10 @@
 import type { Messages } from "./en.js"
 
-const names = (list: string[]) => new Intl.ListFormat("es", { type: "conjunction" }).format(list)
+const locale = "es"
+const names = (list: string[]) => new Intl.ListFormat(locale, { type: "conjunction" }).format(list)
 
 export const es: Messages = {
-  locale: "es",
+  locale,
   menu: {
     file: "Archivo",
     edit: "Edición",
@@ -58,7 +59,9 @@ export const es: Messages = {
     apiKey: "Clave de API",
     to: "a",
     seconds: "segundos",
-    inSeconds: (value) => `${value} s`,
+    inSeconds: (value) => `${value}\u00a0s`,
+    rank: (n) => `#${n}`,
+    range: (from, to) => `${from}–${to}`,
     noText: "(sin texto)",
     points: (n) => (n === 1 ? "1 punto" : `${n} puntos`),
   },
@@ -111,7 +114,8 @@ export const es: Messages = {
     turnOff: "Desactivar",
     tiers: { best: "más preciso", balanced: "equilibrado", fast: "más rápido" },
     efforts: { minimal: "Mínimo", low: "Bajo", medium: "Medio", high: "Alto" },
-    below: (share) => `Preguntar a la IA de respaldo si la confianza de Jev es menor del ${share}`,
+    below: (share) =>
+      `Preguntar a la IA de respaldo si la confianza de Jev es inferior al ${share}`,
     instantAt: (share) =>
       `En preguntas con imagen, no esperarla si la confianza de Jev es de al menos el ${share}`,
   },
@@ -309,7 +313,7 @@ export const es: Messages = {
     hostEnded: "El anfitrión terminó la partida.",
     lostTitle: "Conexión perdida",
     lostBody: (bots) => `${names(bots)} ${bots.length === 1 ? "perdió" : "perdieron"} la conexión.`,
-    kickedTitle: "Expulsado de la partida",
+    kickedTitle: "Fuera de la partida",
     kickedBody: (bots) => `El anfitrión expulsó a ${names(bots)}.`,
     jevKeyTitle: "Clave de TypeSafe rechazada",
     jevKeyBody: "Los bots están adivinando. Cambia la clave en la configuración.",

@@ -45,7 +45,7 @@
           </Badge>
         </div>
         <div class="text-muted-foreground text-sm">
-          {t.common.points(bot.totalScore)}{bot.rank ? ` · #${bot.rank}` : ""}
+          {t.common.points(bot.totalScore)}{bot.rank ? ` · ${t.common.rank(bot.rank)}` : ""}
         </div>
         {#if bot.joinError}
           <p class="text-destructive text-sm">{t.errors[bot.joinError]}</p>
