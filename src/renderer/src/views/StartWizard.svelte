@@ -106,7 +106,8 @@
   }
 </script>
 
-<Card.Root>
+<!-- On short windows the footer sticks to the bottom; overflow-hidden would stop that. -->
+<Card.Root class="overflow-clip">
   <Card.Header>
     <Card.Title>{t.start.title}</Card.Title>
     <Card.Description>
@@ -254,7 +255,9 @@
         </Alert.Root>
       {/if}
     </Card.Content>
-    <Card.Footer class="justify-between">
+    <Card.Footer
+      class="sticky bottom-0 justify-between bg-[color-mix(in_oklab,var(--color-muted)_50%,var(--color-card))]"
+    >
       <Button variant="ghost" disabled={step === 0 || starting} onclick={() => (step -= 1)}>
         {t.common.back}
       </Button>
