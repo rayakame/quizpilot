@@ -1,5 +1,6 @@
 import { mkdirSync } from "node:fs"
 import { mkdir, rename, rm, writeFile } from "node:fs/promises"
+import { release } from "node:os"
 import { join } from "node:path"
 import {
   app,
@@ -21,6 +22,7 @@ import { historyHandlers } from "./history/handlers.js"
 import { HistoryRecorder } from "./history/recorder.js"
 import { HistoryStore } from "./history/store.js"
 import { registerIpc } from "./ipc.js"
+import { Logger } from "./log.js"
 import { menuTemplate } from "./menu.js"
 import { QuizCache } from "./quiz.js"
 import { createSession } from "./session-factory.js"
@@ -31,7 +33,7 @@ import { frameOptions } from "./window.js"
 let win: BrowserWindow | null = null
 const icon = () => join(app.getAppPath(), "resources/icon.png")
 
-function createWindow(): BrowserWindow {
+function createWindow(log: Logger): BrowserWindow {
   const w = new BrowserWindow({
     width: 1280,
     height: 800,
@@ -46,15 +48,25 @@ function createWindow(): BrowserWindow {
   w.once("ready-to-show", () => w.show())
   w.webContents.setWindowOpenHandler(() => ({ action: "deny" }))
   w.webContents.on("will-navigate", (event) => event.preventDefault())
+  w.webContents.on("console-message", (e) => {
+    if (e.level === "error") log.error("Window", e.message)
+  })
+  w.webContents.on("render-process-gone", (_e, details) => log.error("Window gone", details.reason))
   const devUrl = process.env["ELECTRON_RENDERER_URL"]
   if (devUrl) void w.loadURL(devUrl)
   else void w.loadFile(join(import.meta.dirname, "../renderer/index.html"))
   return w
 }
 
-async function openSettings(file: string, language: Language): Promise<SettingsStore | null> {
+async function openSettings(
+  file: string,
+  language: Language,
+  log: Logger,
+): Promise<SettingsStore | null> {
   const loaded = await loadConfig(file, () => freshConfig(language))
   if (loaded.ok) return new SettingsStore(file, loaded.config)
+  // The parse error quotes the file, keys included, and they aren't known yet to hide them.
+  log.warn("Settings unreadable")
   const text = messagesFor(language).dialogs
   const { response } = await dialog.showMessageBox({
     type: "warning",
@@ -69,12 +81,12 @@ async function openSettings(file: string, language: Language): Promise<SettingsS
   return new SettingsStore(file, freshConfig(language))
 }
 
-function openHistory(dir: string): HistoryStore | null {
+function openHistory(dir: string, log: Logger): HistoryStore | null {
   try {
     mkdirSync(dir, { recursive: true })
     return HistoryStore.open(join(dir, "history.db"))
   } catch (err) {
-    console.error("Couldn't open the game history", err)
+    log.error("Couldn't open the game history", err)
     return null
   }
 }
@@ -94,14 +106,28 @@ async function confirm(message: string, button: string, cancel: string): Promise
 }
 
 async function start(): Promise<void> {
+  let secrets = (): readonly string[] => []
+  const log = new Logger({
+    file: join(app.getPath("logs"), "main.log"),
+    secrets: () => secrets(),
+    echo: app.isPackaged ? undefined : (line) => process.stdout.write(line),
+  })
+  process.on("uncaughtExceptionMonitor", (err) => log.error("Uncaught", err))
+  process.on("unhandledRejection", (reason) => log.error("Unhandled rejection", reason))
+  log.info(
+    `QuizPilot ${app.getVersion()} on ${process.platform} ${release()} ${process.arch}, Electron ${process.versions.electron}`,
+  )
+
   const systemLanguage = pickLanguage(app.getPreferredSystemLanguages())
-  const settings = await openSettings(join(app.getPath("userData"), "config.json"), systemLanguage)
+  const file = join(app.getPath("userData"), "config.json")
+  const settings = await openSettings(file, systemLanguage, log)
   if (!settings) return app.quit()
+  secrets = () => Object.values(settings.get().keys)
   const text = () => messagesFor(settings.get().ui.language)
   nativeTheme.themeSource = settings.get().ui.theme
 
   const historyDir = join(app.getPath("userData"), "history")
-  const history = openHistory(historyDir)
+  const history = openHistory(historyDir, log)
   const download = createImageLoader()
   const recorder = history
     ? new HistoryRecorder({
@@ -117,7 +143,7 @@ async function start(): Promise<void> {
           return file
         },
         now: Date.now,
-        log: (message, err) => console.error(message, err),
+        log: (message, err) => log.error(message, err),
       })
     : undefined
 
@@ -207,7 +233,7 @@ async function start(): Promise<void> {
   }
   buildMenu()
 
-  win = createWindow()
+  win = createWindow(log)
 }
 
 if (!app.requestSingleInstanceLock()) {
