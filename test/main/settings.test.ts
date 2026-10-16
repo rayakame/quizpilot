@@ -32,6 +32,7 @@ describe("parseConfig", () => {
       context: { includePrevious: false },
       behavior: { timing: { mode: "human", minMs: 500, maxMs: 2000 }, reconnect: false },
       ui: { language: "de", theme: "dark" },
+      history: { enabled: false },
     }
     expect(parseConfig(config)).toEqual(config)
   })
@@ -103,6 +104,7 @@ describe("toPublic", () => {
       includePrevious: true,
       reconnect: true,
       theme: "system",
+      saveHistory: true,
       fallback: {
         provider: "anthropic",
         webSearch: true,
@@ -152,5 +154,20 @@ describe("applyPatch", () => {
       theme: "pink" as never,
     })
     expect(next).toEqual(DEFAULT_CONFIG)
+  })
+})
+
+describe("history setting", () => {
+  it("keeps the history on by default and reads it back", () => {
+    expect(parseConfig({ version: 1 }).history).toEqual({ enabled: true })
+    expect(parseConfig({ version: 1, history: { enabled: false } }).history).toEqual({
+      enabled: false,
+    })
+    expect(toPublic(DEFAULT_CONFIG).saveHistory).toBe(true)
+  })
+
+  it("turns the history off", () => {
+    expect(applyPatch(DEFAULT_CONFIG, { saveHistory: false }).history.enabled).toBe(false)
+    expect(applyPatch(DEFAULT_CONFIG, { saveHistory: "no" as never }).history.enabled).toBe(true)
   })
 })

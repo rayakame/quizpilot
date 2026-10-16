@@ -1,4 +1,5 @@
-import { rename } from "node:fs/promises"
+import { mkdirSync } from "node:fs"
+import { mkdir, rename, rm, writeFile } from "node:fs/promises"
 import { join } from "node:path"
 import {
   app,
@@ -10,10 +11,14 @@ import {
   nativeTheme,
   shell,
 } from "electron"
+import { createImageLoader } from "../core/media/image-loader.js"
 import { withTimeout } from "../core/util/async.js"
 import { GAME_EVENT_CHANNEL, OPEN_SETTINGS_CHANNEL } from "../shared/api.js"
 import { removeFallback, saveFallback } from "./fallback.js"
 import { GameController } from "./game-controller.js"
+import { exportName, toCsv, toJson } from "./history/export.js"
+import { HistoryRecorder } from "./history/recorder.js"
+import { HistoryStore } from "./history/store.js"
 import { registerIpc } from "./ipc.js"
 import { menuTemplate } from "./menu.js"
 import { QuizCache } from "./quiz.js"
@@ -62,10 +67,57 @@ async function openSettings(file: string): Promise<SettingsStore | null> {
   return new SettingsStore(file, structuredClone(DEFAULT_CONFIG))
 }
 
+function openHistory(dir: string): HistoryStore | null {
+  try {
+    mkdirSync(dir, { recursive: true })
+    return HistoryStore.open(join(dir, "history.db"))
+  } catch (err) {
+    console.error("Couldn't open the game history", err)
+    return null
+  }
+}
+
+async function confirm(message: string, button: string): Promise<boolean> {
+  const options = {
+    type: "warning" as const,
+    message,
+    buttons: [button, "Cancel"],
+    defaultId: 1,
+    cancelId: 1,
+  }
+  const { response } = win
+    ? await dialog.showMessageBox(win, options)
+    : await dialog.showMessageBox(options)
+  return response === 0
+}
+
 async function start(): Promise<void> {
   const settings = await openSettings(join(app.getPath("userData"), "config.json"))
   if (!settings) return app.quit()
   nativeTheme.themeSource = settings.get().ui.theme
+
+  const historyDir = join(app.getPath("userData"), "history")
+  const history = openHistory(historyDir)
+  const download = createImageLoader()
+  const recorder = history
+    ? new HistoryRecorder({
+        store: history,
+        enabled: () => settings.get().history.enabled,
+        saveImage: async (gameId, index, url) => {
+          const bytes = await download({ url })
+          if (!bytes) return null
+          const dir = join(historyDir, String(gameId))
+          await mkdir(dir, { recursive: true })
+          const file = join(dir, `${index}.jpg`)
+          await writeFile(file, bytes)
+          return file
+        },
+        now: Date.now,
+        log: (message, err) => console.error(message, err),
+      })
+    : undefined
+  const removeImages = (id: number) =>
+    rm(join(historyDir, String(id)), { recursive: true, force: true })
 
   const quizzes = new QuizCache()
   const controller = new GameController({
@@ -74,6 +126,7 @@ async function start(): Promise<void> {
     send: (event) => {
       if (win && !win.isDestroyed()) win.webContents.send(GAME_EVENT_CHANNEL, event)
     },
+    recorder,
   })
 
   registerIpc(ipcMain, {
@@ -103,6 +156,43 @@ async function start(): Promise<void> {
     openExternal: async (url) => {
       if (url.startsWith("https://")) await shell.openExternal(url)
     },
+    listHistory: async () => history?.listGames() ?? [],
+    getHistory: async (id) => history?.getGame(id) ?? null,
+    deleteHistory: async (id) => {
+      if (!history || !(await confirm("Delete this game from the history?", "Delete"))) {
+        return false
+      }
+      history.deleteGame(id)
+      await removeImages(id)
+      return true
+    },
+    clearHistory: async () => {
+      const count = history?.listGames().length ?? 0
+      if (!history || count === 0) return false
+      const games = count === 1 ? "the saved game" : `all ${count} saved games`
+      if (!(await confirm(`Delete ${games}?`, "Delete"))) return false
+      for (const id of history.deleteAll()) await removeImages(id)
+      return true
+    },
+    exportHistory: async (id) => {
+      const gameId = id ?? history?.latestGameId() ?? null
+      const record = gameId === null ? null : (history?.getGame(gameId) ?? null)
+      if (!record) return "missing"
+      const options = {
+        defaultPath: `${exportName(record)}.json`,
+        filters: [
+          { name: "JSON", extensions: ["json"] },
+          { name: "CSV", extensions: ["csv"] },
+        ],
+      }
+      const { canceled, filePath } = win
+        ? await dialog.showSaveDialog(win, options)
+        : await dialog.showSaveDialog(options)
+      if (canceled || !filePath) return "cancelled"
+      const csv = filePath.toLowerCase().endsWith(".csv")
+      await writeFile(filePath, csv ? toCsv(record) : toJson(record))
+      return "saved"
+    },
   })
 
   let quitting = false
@@ -114,6 +204,7 @@ async function start(): Promise<void> {
     void withTimeout(controller.end(), 2000, undefined).finally(() => app.quit())
   })
   app.on("window-all-closed", () => app.quit())
+  app.on("will-quit", () => history?.close())
 
   const isMac = process.platform === "darwin"
   // Packaged builds take the dock icon from the bundle.

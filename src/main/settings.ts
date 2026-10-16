@@ -25,6 +25,7 @@ export interface Config {
   context: { includePrevious: boolean }
   behavior: { timing: Timing; reconnect: boolean }
   ui: { language: "en" | "de"; theme: Theme }
+  history: { enabled: boolean }
 }
 
 export const DEFAULT_CONFIG: Config = {
@@ -41,6 +42,7 @@ export const DEFAULT_CONFIG: Config = {
   context: { includePrevious: true },
   behavior: { timing: { mode: "instant", minMs: 1000, maxMs: 5000 }, reconnect: true },
   ui: { language: "en", theme: "system" },
+  history: { enabled: true },
 }
 
 export type LoadResult = { ok: true; config: Config } | { ok: false; error: string }
@@ -79,6 +81,7 @@ export function parseConfig(raw: unknown): Config {
   const context = obj(raw.context)
   const behavior = obj(raw.behavior)
   const ui = obj(raw.ui)
+  const history = obj(raw.history)
   return {
     version: 1,
     keys: {
@@ -104,6 +107,7 @@ export function parseConfig(raw: unknown): Config {
       language: oneOf(ui.language, ["en", "de"], d.ui.language),
       theme: oneOf(ui.theme, THEMES, d.ui.theme),
     },
+    history: { enabled: bool(history.enabled, d.history.enabled) },
   }
 }
 
@@ -114,6 +118,7 @@ export function toPublic(config: Config): PublicSettings {
     includePrevious: config.context.includePrevious,
     reconnect: config.behavior.reconnect,
     theme: config.ui.theme,
+    saveHistory: config.history.enabled,
     fallback: {
       provider: config.fallback.provider,
       webSearch: config.fallback.webSearch,
@@ -143,6 +148,7 @@ export function applyPatch(config: Config, patch: SettingsPatch): Config {
   if (theme && THEMES.includes(theme)) next.ui.theme = theme
   if (isShare(fallbackBelow)) next.fallback.below = fallbackBelow
   if (isShare(imageInstantAt)) next.fallback.imageInstantAt = imageInstantAt
+  if (typeof patch.saveHistory === "boolean") next.history.enabled = patch.saveHistory
   return next
 }
 

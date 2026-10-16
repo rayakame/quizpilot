@@ -67,6 +67,8 @@ export interface NewGame {
   startedAt: number
 }
 
+export type ExportResult = "saved" | "cancelled" | "missing"
+
 export type KeyCheck = "ok" | "invalid" | "offline" | "error"
 export type Theme = "system" | "light" | "dark"
 
@@ -78,6 +80,7 @@ export interface PublicSettings {
   includePrevious: boolean
   reconnect: boolean
   theme: Theme
+  saveHistory: boolean
   fallback: {
     provider: FallbackProviderId
     webSearch: boolean
@@ -103,6 +106,7 @@ export interface SettingsPatch {
   theme?: Theme
   fallbackBelow?: number
   imageInstantAt?: number
+  saveHistory?: boolean
 }
 
 export interface AppInfo {
@@ -145,6 +149,11 @@ export interface QuizPilotApi {
   leave(bot: string | null): Promise<void>
   endGame(): Promise<void>
   openExternal(url: string): Promise<void>
+  listHistory(): Promise<HistoryGame[]>
+  getHistory(id: number): Promise<HistoryRecord | null>
+  deleteHistory(id: number): Promise<boolean>
+  clearHistory(): Promise<boolean>
+  exportHistory(id: number | null): Promise<ExportResult>
   onGameEvent(listener: (event: GameEvent) => void): () => void
   onOpenSettings(listener: () => void): () => void
 }
@@ -166,6 +175,11 @@ export const CHANNELS = {
   leave: "game:leave",
   endGame: "game:end",
   openExternal: "app:open-external",
+  listHistory: "history:list",
+  getHistory: "history:get",
+  deleteHistory: "history:delete",
+  clearHistory: "history:clear",
+  exportHistory: "history:export",
 } as const satisfies Record<Invokable, string>
 
 export const GAME_EVENT_CHANNEL = "game:event"

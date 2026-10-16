@@ -23,6 +23,11 @@ const api: QuizPilotApi = {
   leave: (bot) => ipcRenderer.invoke(CHANNELS.leave, bot),
   endGame: () => ipcRenderer.invoke(CHANNELS.endGame),
   openExternal: (url) => ipcRenderer.invoke(CHANNELS.openExternal, url),
+  listHistory: () => ipcRenderer.invoke(CHANNELS.listHistory),
+  getHistory: (id) => ipcRenderer.invoke(CHANNELS.getHistory, id),
+  deleteHistory: (id) => ipcRenderer.invoke(CHANNELS.deleteHistory, id),
+  clearHistory: () => ipcRenderer.invoke(CHANNELS.clearHistory),
+  exportHistory: (id) => ipcRenderer.invoke(CHANNELS.exportHistory, id),
   onGameEvent: (listener) => {
     const handler = (_event: unknown, payload: GameEvent) => listener(payload)
     ipcRenderer.on(GAME_EVENT_CHANNEL, handler)
