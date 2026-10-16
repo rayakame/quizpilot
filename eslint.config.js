@@ -7,7 +7,15 @@ import svelteConfig from "./svelte.config.js"
 
 export default defineConfig(
   {
-    ignores: ["node_modules", "out", "dist", "test/fixtures", "src/renderer/src/lib/components/ui"],
+    ignores: [
+      "node_modules",
+      "out",
+      "dist",
+      "test/fixtures",
+      "src/renderer/src/lib/components/ui",
+      "site/dist",
+      "site/.astro",
+    ],
   },
   js.configs.recommended,
   tseslint.configs.recommended,
@@ -15,6 +23,10 @@ export default defineConfig(
   {
     files: ["src/renderer/**/*.{ts,svelte}"],
     languageOptions: { globals: globals.browser },
+  },
+  {
+    files: ["site/scripts/**/*.mjs"],
+    languageOptions: { globals: globals.node },
   },
   {
     files: ["**/*.svelte", "**/*.svelte.ts"],

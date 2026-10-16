@@ -1,0 +1,14 @@
+@import "tailwindcss";
+@import "@fontsource-variable/bricolage-grotesque";
+@import "@fontsource-variable/geist";
+
+@theme {
+  --color-ink: #050506;
+  --color-panel: #0c0d10;
+  --color-line: #ffffff14;
+  --color-emerald: #10b981;
+  --color-lime: #a3e635;
+  --color-sun: #facc15;
+  --font-display: "Bricolage Grotesque Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+}
