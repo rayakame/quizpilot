@@ -17,6 +17,7 @@ const settings: PublicSettings = {
   includePrevious: false,
   reconnect: true,
   theme: "system",
+  language: "en",
   saveHistory: true,
   fallback: {
     provider: "anthropic",

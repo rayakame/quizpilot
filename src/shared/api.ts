@@ -4,6 +4,7 @@ import type { FallbackProviderId } from "../core/providers/fallback/ids.js"
 import type { Effort, ModelChoice } from "../core/providers/fallback/models.js"
 import type { JoinOutcome, SessionEvent, SessionSettings } from "../core/session/game-session.js"
 import type { Decision, Question } from "../core/types.js"
+import type { Language } from "./i18n/index.js"
 
 export type Timing = SessionSettings["timing"]
 export type QuestionView = Omit<Question, "raw">
@@ -80,6 +81,7 @@ export interface PublicSettings {
   includePrevious: boolean
   reconnect: boolean
   theme: Theme
+  language: Language
   saveHistory: boolean
   fallback: {
     provider: FallbackProviderId
@@ -104,6 +106,7 @@ export interface SettingsPatch {
   includePrevious?: boolean
   reconnect?: boolean
   theme?: Theme
+  language?: Language
   fallbackBelow?: number
   imageInstantAt?: number
   saveHistory?: boolean

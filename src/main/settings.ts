@@ -9,6 +9,7 @@ import {
   type Theme,
   type Timing,
 } from "../shared/api.js"
+import { LANGUAGES, type Language } from "../shared/i18n/index.js"
 import { MAX_DELAY_MS, timingProblem } from "../shared/start.js"
 
 export interface Config {
@@ -24,7 +25,7 @@ export interface Config {
   }
   context: { includePrevious: boolean }
   behavior: { timing: Timing; reconnect: boolean }
-  ui: { language: "en" | "de"; theme: Theme }
+  ui: { language: Language; theme: Theme }
   history: { enabled: boolean }
 }
 
@@ -47,13 +48,22 @@ export const DEFAULT_CONFIG: Config = {
 
 export type LoadResult = { ok: true; config: Config } | { ok: false; error: string }
 
-export async function loadConfig(file: string): Promise<LoadResult> {
+export function freshConfig(language: Language): Config {
+  const config = structuredClone(DEFAULT_CONFIG)
+  config.ui.language = language
+  return config
+}
+
+export async function loadConfig(
+  file: string,
+  fresh: () => Config = () => structuredClone(DEFAULT_CONFIG),
+): Promise<LoadResult> {
   let text: string
   try {
     text = await readFile(file, "utf8")
   } catch (err) {
     if ((err as NodeJS.ErrnoException).code === "ENOENT") {
-      return { ok: true, config: structuredClone(DEFAULT_CONFIG) }
+      return { ok: true, config: fresh() }
     }
     return { ok: false, error: String(err) }
   }
@@ -104,7 +114,7 @@ export function parseConfig(raw: unknown): Config {
       reconnect: bool(behavior.reconnect, d.behavior.reconnect),
     },
     ui: {
-      language: oneOf(ui.language, ["en", "de"], d.ui.language),
+      language: oneOf(ui.language, LANGUAGES, d.ui.language),
       theme: oneOf(ui.theme, THEMES, d.ui.theme),
     },
     history: { enabled: bool(history.enabled, d.history.enabled) },
@@ -118,6 +128,7 @@ export function toPublic(config: Config): PublicSettings {
     includePrevious: config.context.includePrevious,
     reconnect: config.behavior.reconnect,
     theme: config.ui.theme,
+    language: config.ui.language,
     saveHistory: config.history.enabled,
     fallback: {
       provider: config.fallback.provider,
@@ -148,6 +159,7 @@ export function applyPatch(config: Config, patch: SettingsPatch): Config {
   if (theme && THEMES.includes(theme)) next.ui.theme = theme
   if (isShare(fallbackBelow)) next.fallback.below = fallbackBelow
   if (isShare(imageInstantAt)) next.fallback.imageInstantAt = imageInstantAt
+  if (patch.language && LANGUAGES.includes(patch.language)) next.ui.language = patch.language
   if (typeof patch.saveHistory === "boolean") next.history.enabled = patch.saveHistory
   return next
 }

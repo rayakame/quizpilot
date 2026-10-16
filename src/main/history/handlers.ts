@@ -1,4 +1,5 @@
 import type { ExportResult, HistoryGame, HistoryRecord } from "../../shared/api.js"
+import type { Messages } from "../../shared/i18n/index.js"
 import { exportName, toCsv, toJson } from "./export.js"
 import type { HistoryStore } from "./store.js"
 
@@ -9,6 +10,7 @@ export interface HistoryHandlerDeps {
   removeImages(id: number): Promise<void>
   chooseFile(defaultName: string): Promise<string | null>
   writeFile(path: string, text: string): Promise<void>
+  text(): Messages["dialogs"]
 }
 
 export function historyHandlers(deps: HistoryHandlerDeps) {
@@ -19,7 +21,8 @@ export function historyHandlers(deps: HistoryHandlerDeps) {
       store && isGameId(id) ? store.getGame(id) : null,
     deleteHistory: async (id: unknown): Promise<boolean> => {
       if (!store || !isGameId(id) || !store.getGame(id)) return false
-      if (!(await deps.confirm("Delete this game from the history?", "Delete"))) return false
+      const text = deps.text()
+      if (!(await deps.confirm(text.deleteGame, text.delete))) return false
       if (!store.deleteGame(id)) return false
       await deps.removeImages(id)
       return true
@@ -27,8 +30,8 @@ export function historyHandlers(deps: HistoryHandlerDeps) {
     clearHistory: async (): Promise<boolean> => {
       const count = store?.listGames().length ?? 0
       if (!store || count === 0) return false
-      const games = count === 1 ? "the saved game" : `all ${count} saved games`
-      if (!(await deps.confirm(`Delete ${games}?`, "Delete"))) return false
+      const text = deps.text()
+      if (!(await deps.confirm(text.deleteGames(count), text.delete))) return false
       for (const id of store.deleteAll()) await deps.removeImages(id)
       return true
     },

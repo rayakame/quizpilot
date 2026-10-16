@@ -2,6 +2,8 @@ import { describe, expect, it, vi } from "vitest"
 import { historyHandlers, type HistoryHandlerDeps } from "../../src/main/history/handlers.js"
 import { HistoryStore } from "../../src/main/history/store.js"
 import type { NewGame } from "../../src/shared/api.js"
+import { de } from "../../src/shared/i18n/de.js"
+import { en } from "../../src/shared/i18n/en.js"
 
 const game = (quizTitle: string, startedAt: number): NewGame => ({
   pin: "916240",
@@ -25,6 +27,7 @@ function setup(over: Partial<HistoryHandlerDeps> = {}) {
     removeImages: vi.fn(async () => {}),
     chooseFile: vi.fn(async (name: string) => `/out/${name}.json`),
     writeFile: vi.fn(async () => {}),
+    text: () => en.dialogs,
     ...over,
   }
   return { store, older, newer, deps, handlers: historyHandlers(deps) }
@@ -72,5 +75,11 @@ describe("historyHandlers", () => {
     expect(await handlers.deleteHistory(newer)).toBe(false)
     expect(await handlers.exportHistory(newer)).toBe("cancelled")
     expect(deps.writeFile).not.toHaveBeenCalled()
+  })
+
+  it("asks in the user's language", async () => {
+    const { deps, handlers, older } = setup({ text: () => de.dialogs })
+    await handlers.deleteHistory(older)
+    expect(deps.confirm).toHaveBeenCalledWith("Dieses Spiel aus dem Verlauf löschen?", "Löschen")
   })
 })

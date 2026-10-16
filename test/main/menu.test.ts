@@ -1,6 +1,8 @@
 import type { MenuItemConstructorOptions } from "electron"
 import { describe, expect, it, vi } from "vitest"
 import { menuTemplate } from "../../src/main/menu.js"
+import { de } from "../../src/shared/i18n/de.js"
+import { en } from "../../src/shared/i18n/en.js"
 
 function flatten(items: MenuItemConstructorOptions[]): MenuItemConstructorOptions[] {
   return items.flatMap((item) => [
@@ -12,7 +14,7 @@ function flatten(items: MenuItemConstructorOptions[]): MenuItemConstructorOption
 describe("menuTemplate", () => {
   it.each([true, false])("opens the settings with Cmd/Ctrl+, (mac: %s)", (isMac) => {
     const openSettings = vi.fn()
-    const items = flatten(menuTemplate(isMac, false, openSettings))
+    const items = flatten(menuTemplate(isMac, false, openSettings, en.menu))
     const settings = items.find((i) => i.accelerator === "CmdOrCtrl+,")
     expect(settings?.label).toBe("Settings…")
     ;(settings?.click as () => void)()
@@ -20,11 +22,14 @@ describe("menuTemplate", () => {
   })
 
   it.each([true, false])("keeps copy and paste working (mac: %s)", (isMac) => {
-    expect(menuTemplate(isMac, false, () => {}).some((i) => i.role === "editMenu")).toBe(true)
+    expect(menuTemplate(isMac, false, () => {}, en.menu).some((i) => i.role === "editMenu")).toBe(
+      true,
+    )
   })
 
   it.each([true, false])("only offers reload and dev tools while developing (mac: %s)", (isMac) => {
-    const roles = (dev: boolean) => flatten(menuTemplate(isMac, dev, () => {})).map((i) => i.role)
+    const roles = (dev: boolean) =>
+      flatten(menuTemplate(isMac, dev, () => {}, en.menu)).map((i) => i.role)
     expect(roles(false)).not.toContain("reload")
     expect(roles(false)).not.toContain("forceReload")
     expect(roles(false)).not.toContain("toggleDevTools")
@@ -32,5 +37,14 @@ describe("menuTemplate", () => {
     expect(roles(false)).toContain("togglefullscreen")
     expect(roles(true)).toContain("reload")
     expect(roles(true)).toContain("toggleDevTools")
+  })
+
+  it.each([true, false])("labels every item in the chosen language (mac: %s)", (isMac) => {
+    const items = flatten(menuTemplate(isMac, true, () => {}, de.menu)).filter(
+      (i) => i.type !== "separator",
+    )
+    expect(items.every((i) => typeof i.label === "string" && i.label !== "")).toBe(true)
+    expect(items.find((i) => i.accelerator === "CmdOrCtrl+,")?.label).toBe("Einstellungen…")
+    expect(items.find((i) => i.role === "copy")?.label).toBe("Kopieren")
   })
 })

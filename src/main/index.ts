@@ -14,6 +14,7 @@ import {
 import { createImageLoader } from "../core/media/image-loader.js"
 import { withTimeout } from "../core/util/async.js"
 import { GAME_EVENT_CHANNEL, OPEN_SETTINGS_CHANNEL } from "../shared/api.js"
+import { messagesFor, pickLanguage, type Language } from "../shared/i18n/index.js"
 import { removeFallback, saveFallback } from "./fallback.js"
 import { GameController } from "./game-controller.js"
 import { historyHandlers } from "./history/handlers.js"
@@ -23,7 +24,7 @@ import { registerIpc } from "./ipc.js"
 import { menuTemplate } from "./menu.js"
 import { QuizCache } from "./quiz.js"
 import { createSession } from "./session-factory.js"
-import { applyPatch, DEFAULT_CONFIG, loadConfig, SettingsStore, toPublic } from "./settings.js"
+import { applyPatch, freshConfig, loadConfig, SettingsStore, toPublic } from "./settings.js"
 import { checkTypesafeKey } from "./typesafe.js"
 import { frameOptions } from "./window.js"
 
@@ -51,20 +52,21 @@ function createWindow(): BrowserWindow {
   return w
 }
 
-async function openSettings(file: string): Promise<SettingsStore | null> {
-  const loaded = await loadConfig(file)
+async function openSettings(file: string, language: Language): Promise<SettingsStore | null> {
+  const loaded = await loadConfig(file, () => freshConfig(language))
   if (loaded.ok) return new SettingsStore(file, loaded.config)
+  const text = messagesFor(language).dialogs
   const { response } = await dialog.showMessageBox({
     type: "warning",
-    message: "QuizPilot couldn't read its settings.",
+    message: text.settingsBroken,
     detail: `${file}\n\n${loaded.error}`,
-    buttons: ["Reset settings", "Quit"],
+    buttons: [text.resetSettings, text.quit],
     defaultId: 0,
     cancelId: 1,
   })
   if (response !== 0) return null
   await rename(file, `${file}.broken`).catch(() => {})
-  return new SettingsStore(file, structuredClone(DEFAULT_CONFIG))
+  return new SettingsStore(file, freshConfig(language))
 }
 
 function openHistory(dir: string): HistoryStore | null {
@@ -77,11 +79,11 @@ function openHistory(dir: string): HistoryStore | null {
   }
 }
 
-async function confirm(message: string, button: string): Promise<boolean> {
+async function confirm(message: string, button: string, cancel: string): Promise<boolean> {
   const options = {
     type: "warning" as const,
     message,
-    buttons: [button, "Cancel"],
+    buttons: [button, cancel],
     defaultId: 1,
     cancelId: 1,
   }
@@ -92,8 +94,10 @@ async function confirm(message: string, button: string): Promise<boolean> {
 }
 
 async function start(): Promise<void> {
-  const settings = await openSettings(join(app.getPath("userData"), "config.json"))
+  const systemLanguage = pickLanguage(app.getPreferredSystemLanguages())
+  const settings = await openSettings(join(app.getPath("userData"), "config.json"), systemLanguage)
   if (!settings) return app.quit()
+  const text = () => messagesFor(settings.get().ui.language)
   nativeTheme.themeSource = settings.get().ui.theme
 
   const historyDir = join(app.getPath("userData"), "history")
@@ -130,8 +134,10 @@ async function start(): Promise<void> {
   registerIpc(ipcMain, {
     getSettings: async () => toPublic(settings.get()),
     saveSettings: async (patch) => {
+      const language = settings.get().ui.language
       await settings.update((c) => applyPatch(c, patch))
       nativeTheme.themeSource = settings.get().ui.theme
+      if (settings.get().ui.language !== language) buildMenu()
       return toPublic(settings.get())
     },
     getAppInfo: async () => ({ version: app.getVersion() }),
@@ -157,7 +163,8 @@ async function start(): Promise<void> {
     ...historyHandlers({
       store: history,
       currentGameId: () => recorder?.gameId ?? null,
-      confirm,
+      confirm: (message, button) => confirm(message, button, text().dialogs.cancel),
+      text: () => text().dialogs,
       removeImages: (id) => rm(join(historyDir, String(id)), { recursive: true, force: true }),
       chooseFile: async (name) => {
         const options = {
@@ -191,13 +198,14 @@ async function start(): Promise<void> {
   // Packaged builds take the dock icon from the bundle.
   const dockIcon = nativeImage.createFromPath(icon())
   if (isMac && !app.isPackaged && !dockIcon.isEmpty()) app.dock?.setIcon(dockIcon)
-  Menu.setApplicationMenu(
-    Menu.buildFromTemplate(
-      menuTemplate(isMac, !app.isPackaged, () => {
-        if (win && !win.isDestroyed()) win.webContents.send(OPEN_SETTINGS_CHANNEL)
-      }),
-    ),
-  )
+  function buildMenu() {
+    const openSettings = () => {
+      if (win && !win.isDestroyed()) win.webContents.send(OPEN_SETTINGS_CHANNEL)
+    }
+    const template = menuTemplate(isMac, !app.isPackaged, openSettings, text().menu)
+    Menu.setApplicationMenu(Menu.buildFromTemplate(template))
+  }
+  buildMenu()
 
   win = createWindow()
 }
@@ -215,7 +223,7 @@ if (!app.requestSingleInstanceLock()) {
     .then(start)
     .catch((err: unknown) => {
       dialog.showErrorBox(
-        "QuizPilot couldn't start",
+        messagesFor(pickLanguage(app.getPreferredSystemLanguages())).dialogs.startFailed,
         err instanceof Error ? err.message : String(err),
       )
       app.quit()

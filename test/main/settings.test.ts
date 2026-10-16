@@ -4,6 +4,7 @@ import { join } from "node:path"
 import { describe, expect, it } from "vitest"
 import {
   DEFAULT_CONFIG,
+  freshConfig,
   loadConfig,
   parseConfig,
   saveConfig,
@@ -104,6 +105,7 @@ describe("toPublic", () => {
       includePrevious: true,
       reconnect: true,
       theme: "system",
+      language: "en",
       saveHistory: true,
       fallback: {
         provider: "anthropic",
@@ -169,5 +171,25 @@ describe("history setting", () => {
   it("turns the history off", () => {
     expect(applyPatch(DEFAULT_CONFIG, { saveHistory: false }).history.enabled).toBe(false)
     expect(applyPatch(DEFAULT_CONFIG, { saveHistory: "no" as never }).history.enabled).toBe(true)
+  })
+})
+
+describe("language", () => {
+  it("starts a fresh install in the given language", async () => {
+    const loaded = await loadConfig(await tempFile(), () => freshConfig("de"))
+    expect(loaded.ok && loaded.config.ui.language).toBe("de")
+  })
+
+  it("keeps the language of existing settings", async () => {
+    const file = await tempFile()
+    await saveConfig(file, DEFAULT_CONFIG)
+    const loaded = await loadConfig(file, () => freshConfig("de"))
+    expect(loaded.ok && loaded.config.ui.language).toBe("en")
+  })
+
+  it("shows and changes the language", () => {
+    expect(toPublic(freshConfig("de")).language).toBe("de")
+    expect(applyPatch(DEFAULT_CONFIG, { language: "de" }).ui.language).toBe("de")
+    expect(applyPatch(DEFAULT_CONFIG, { language: "fr" as never }).ui.language).toBe("en")
   })
 })
