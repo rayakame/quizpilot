@@ -3,7 +3,7 @@ import { JoinError, type JoinErrorCode } from "../../src/core/kahoot/adapter.js"
 import { QuizLoadError, type KnownQuiz } from "../../src/core/quiz-source/link.js"
 import { GameSession } from "../../src/core/session/game-session.js"
 import type { Question } from "../../src/core/types.js"
-import { GameController, toGameEvent } from "../../src/main/game-controller.js"
+import { GameController, toGameEvent, type GameRecorder } from "../../src/main/game-controller.js"
 import type { GameEvent, StartRequest } from "../../src/shared/api.js"
 import { FakeAdapter } from "../support/fake-adapter.js"
 
@@ -23,6 +23,7 @@ function setup(
   loadQuiz: (link: string) => Promise<KnownQuiz> = async () => {
     throw new QuizLoadError("unknown")
   },
+  recorder?: GameRecorder,
 ) {
   const adapters: FakeAdapter[] = []
   const sent: GameEvent[] = []
@@ -50,7 +51,12 @@ function setup(
         },
       ),
   )
-  const controller = new GameController({ createSession, loadQuiz, send: (e) => sent.push(e) })
+  const controller = new GameController({
+    createSession,
+    loadQuiz,
+    send: (e) => sent.push(e),
+    recorder,
+  })
   return { controller, createSession, adapters, sent }
 }
 
@@ -201,5 +207,29 @@ describe("toGameEvent", () => {
       },
     })
     expect(() => structuredClone(event)).not.toThrow()
+  })
+})
+
+describe("recording", () => {
+  function recorder() {
+    return { begin: vi.fn(), event: vi.fn(), finish: vi.fn() }
+  }
+
+  it("records a game once the first bot is in", async () => {
+    const r = recorder()
+    const { controller } = setup(undefined, undefined, r)
+    await controller.start(request)
+    await flush()
+    expect(r.begin).toHaveBeenCalledWith(request, null)
+    expect(r.event).toHaveBeenCalledWith(expect.objectContaining({ type: "status", bot: "Anna" }))
+    await controller.end()
+    expect(r.finish).toHaveBeenCalledTimes(1)
+  })
+
+  it("records nothing when the first bot cannot join", async () => {
+    const r = recorder()
+    const { controller } = setup("not_found", undefined, r)
+    await controller.start(request)
+    expect(r.begin).not.toHaveBeenCalled()
   })
 })

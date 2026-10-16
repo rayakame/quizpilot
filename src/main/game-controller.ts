@@ -4,10 +4,17 @@ import type { GameSession, JoinOutcome, SessionEvent } from "../core/session/gam
 import type { GameEvent, QuestionView, StartRequest, StartResult } from "../shared/api.js"
 import { startProblem } from "../shared/start.js"
 
+export interface GameRecorder {
+  begin(request: StartRequest, quiz: KnownQuiz | null): void
+  event(event: GameEvent): void
+  finish(): void
+}
+
 export interface ControllerDeps {
   createSession(request: StartRequest, quiz: KnownQuiz | null): GameSession
   loadQuiz(link: string): Promise<KnownQuiz>
   send(event: GameEvent): void
+  recorder?: GameRecorder
 }
 
 export class GameController {
@@ -41,13 +48,18 @@ export class GameController {
     }
     this.session = session
     this.pin = request.pin
-    this.unsubscribe = session.on((event) => this.deps.send(toGameEvent(event)))
+    this.unsubscribe = session.on((event) => {
+      const e = toGameEvent(event)
+      this.deps.send(e)
+      this.deps.recorder?.event(e)
+    })
     const [first, ...rest] = request.names
     const [outcome] = await session.join(request.pin, [first!])
     if (outcome && !outcome.ok && outcome.code !== "duplicate_name") {
       await this.end()
       return { ok: false, error: outcome.code, message: outcome.message }
     }
+    this.deps.recorder?.begin(request, quiz)
     if (rest.length > 0) void session.join(request.pin, rest).catch(() => {})
     return { ok: true }
   }
@@ -80,6 +92,7 @@ export class GameController {
     if (!session) return
     this.session = null
     this.unsubscribe()
+    this.deps.recorder?.finish()
     await session.leave()
   }
 }
