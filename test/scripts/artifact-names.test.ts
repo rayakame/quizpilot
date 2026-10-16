@@ -16,7 +16,7 @@ describe("installer names", () => {
 
   // Git on Windows checks files out with CRLF line endings.
   it("reads the config with Windows line endings too", () => {
-    const crlf = readFileSync("electron-builder.yml", "utf8").replace(/\n/g, "\r\n")
+    const crlf = readFileSync("electron-builder.yml", "utf8").replace(/\r?\n/g, "\r\n")
     expect(installerNames(crlf)).toEqual(installerNames())
   })
 })
