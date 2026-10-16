@@ -1,15 +1,16 @@
-import { describe, expect, it } from "vitest"
+import { afterEach, beforeEach, describe, expect, it } from "vitest"
 import type { Decision } from "../../src/core/types.js"
 import {
   costText,
   keyText,
-  QUIZ_LINK_TEXT,
+  percent,
   quizLinkText,
   secondsText,
   sourceCounts,
   sourceText,
   statusText,
 } from "../../src/renderer/src/lib/messages.js"
+import { setLanguage } from "../../src/renderer/src/lib/i18n.js"
 
 const decision = (over: Partial<Decision>): Decision => ({
   answer: { kind: "choice", index: 0 },
@@ -57,7 +58,7 @@ describe("quizLinkText", () => {
       "Geo · 1 question",
     )
     expect(quizLinkText({ link: "x", result: { ok: false, error: "private" } })).toBe(
-      QUIZ_LINK_TEXT.private,
+      "This quiz is private. Only public quizzes work.",
     )
   })
 
@@ -90,5 +91,29 @@ describe("game over texts", () => {
 
   it("shows seconds with one decimal", () => {
     expect(secondsText(1234)).toBe("1.2 s")
+  })
+})
+
+describe("German", () => {
+  beforeEach(() => setLanguage("de"))
+  afterEach(() => setLanguage("en"))
+
+  it("writes numbers the German way", () => {
+    expect(secondsText(2100)).toBe("2,1 s")
+    expect(percent(0.72)).toBe("72\u00a0%")
+    expect(costText({ usd: 0.0042, complete: true })).toBe("≈ 0,0042\u00a0$")
+    expect(costText({ usd: 0.0000126, complete: false })).toBe("< 0,001\u00a0$ oder mehr")
+  })
+
+  it("names statuses and sources", () => {
+    expect(statusText("kicked", null)).toBe("Vom Host entfernt")
+    expect(statusText("joining", "reconnecting")).toBe("Verbindet neu")
+    expect(sourceText(decision({ source: "random" }))).toBe("Geraten")
+    expect(keyText("invalid", "Gemini")).toBe("Gemini akzeptiert diesen Key nicht.")
+  })
+
+  it("counts questions", () => {
+    const result = { ok: true as const, title: "Campus", questions: 1 }
+    expect(quizLinkText({ link: "x", result })).toBe("Campus · 1 Frage")
   })
 })

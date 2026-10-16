@@ -1,5 +1,11 @@
-import { describe, expect, it } from "vitest"
-import { gameLine, gameTitle, matches } from "../../src/renderer/src/lib/history-view.js"
+import { afterEach, describe, expect, it } from "vitest"
+import {
+  gameLine,
+  gameTitle,
+  HISTORY_FILTERS,
+  matches,
+} from "../../src/renderer/src/lib/history-view.js"
+import { setLanguage } from "../../src/renderer/src/lib/i18n.js"
 import type { HistoryGame, HistoryQuestion } from "../../src/shared/api.js"
 
 const q = (over: Partial<HistoryQuestion> = {}): HistoryQuestion => ({
@@ -81,5 +87,19 @@ describe("game labels", () => {
 
   it("sums up a game in one line", () => {
     expect(gameLine(game)).toBe("7 of 9 right · ≈ $0.012")
+  })
+})
+
+describe("German labels", () => {
+  afterEach(() => setLanguage("en"))
+
+  it("names and sums up games in German", () => {
+    setLanguage("de")
+    expect(gameTitle(game)).toBe("Spiel 916240")
+    expect(gameLine(game)).toBe("7 von 9 richtig · ≈ 0,012\u00a0$")
+  })
+
+  it("offers the filters in a fixed order", () => {
+    expect(HISTORY_FILTERS).toEqual(["all", "wrong", "unsure", "image"])
   })
 })

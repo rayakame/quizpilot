@@ -1,15 +1,11 @@
 import type { HistoryGame, HistoryQuestion } from "../../../shared/api.js"
 import { questionOutcome } from "../../../shared/history.js"
+import { t } from "./i18n.js"
 import { costText } from "./messages.js"
 
 export type HistoryFilter = "all" | "wrong" | "unsure" | "image"
 
-export const FILTERS: { id: HistoryFilter; label: string }[] = [
-  { id: "all", label: "All" },
-  { id: "wrong", label: "Wrong" },
-  { id: "unsure", label: "Unsure" },
-  { id: "image", label: "Pictures" },
-]
+export const HISTORY_FILTERS: HistoryFilter[] = ["all", "wrong", "unsure", "image"]
 
 export function matches(q: HistoryQuestion, filter: HistoryFilter, below: number): boolean {
   switch (filter) {
@@ -30,9 +26,10 @@ export function matches(q: HistoryQuestion, filter: HistoryFilter, below: number
 }
 
 export function gameTitle(g: HistoryGame): string {
-  return g.quizTitle ?? `Game ${g.pin}`
+  return g.quizTitle ?? t.history.game(g.pin)
 }
 
 export function gameLine(g: HistoryGame): string {
-  return `${g.correct} of ${g.graded} right · ${costText({ usd: g.costUsd, complete: g.costComplete })}`
+  const cost = costText({ usd: g.costUsd, complete: g.costComplete })
+  return `${t.history.right(g.correct, g.graded)} · ${cost}`
 }

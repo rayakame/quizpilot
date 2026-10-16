@@ -7,7 +7,8 @@
   import { Button } from "$lib/components/ui/button/index.js"
   import { game } from "$lib/game.svelte.js"
   import { canLeave, canPause, type BotView } from "$lib/game-state.js"
-  import { ERROR_TEXT, statusText } from "$lib/messages.js"
+  import { t } from "$lib/i18n.js"
+  import { statusText } from "$lib/messages.js"
   import { suggestName } from "../../../../core/names/names.js"
 
   let { onNewGame }: { onNewGame: () => void } = $props()
@@ -47,7 +48,7 @@
           {bot.totalScore} points{bot.rank ? ` · #${bot.rank}` : ""}
         </div>
         {#if bot.joinError}
-          <p class="text-destructive text-sm">{ERROR_TEXT[bot.joinError]}</p>
+          <p class="text-destructive text-sm">{t.errors[bot.joinError]}</p>
           {#if bot.joinError === "duplicate_name" || bot.joinError === "unknown"}
             <Button size="sm" variant="outline" onclick={() => retry(bot)}>
               Join as {retryName(bot)}

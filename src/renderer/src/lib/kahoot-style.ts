@@ -1,16 +1,18 @@
 import type { QuestionType } from "../../../core/types.js"
 
+export type ColorName = "red" | "blue" | "yellow" | "green" | "gray"
+
 export interface ChoiceStyle {
   shape: string
   color: string
-  name: string
+  name: ColorName
 }
 
 export const COLORS: ChoiceStyle[] = [
-  { shape: "▲", color: "bg-[#e21b3c]", name: "red triangle" },
-  { shape: "◆", color: "bg-[#1368ce]", name: "blue diamond" },
-  { shape: "●", color: "bg-[#d89e00]", name: "yellow circle" },
-  { shape: "■", color: "bg-[#26890c]", name: "green square" },
+  { shape: "▲", color: "bg-[#e21b3c]", name: "red" },
+  { shape: "◆", color: "bg-[#1368ce]", name: "blue" },
+  { shape: "●", color: "bg-[#d89e00]", name: "yellow" },
+  { shape: "■", color: "bg-[#26890c]", name: "green" },
 ]
 
 export function choiceStyle(type: QuestionType, index: number): ChoiceStyle {

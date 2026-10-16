@@ -2,6 +2,7 @@
   import { Button } from "$lib/components/ui/button/index.js"
   import * as Dialog from "$lib/components/ui/dialog/index.js"
   import { game } from "$lib/game.svelte.js"
+  import { t } from "$lib/i18n.js"
   import { COLORS } from "$lib/kahoot-style.js"
 
   let picked = $state<number[]>([])
@@ -33,7 +34,7 @@
         <button
           type="button"
           class="{color.color} h-16 rounded-lg text-3xl text-white transition-opacity disabled:opacity-30"
-          aria-label={color.name}
+          aria-label={t.colors[color.name]}
           disabled={picked.includes(i) || sending}
           onclick={() => (picked = [...picked, i])}
         >

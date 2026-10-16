@@ -5,7 +5,8 @@
   import { Progress } from "$lib/components/ui/progress/index.js"
   import { answerSummary, choiceRows, type RoundView } from "$lib/game-state.js"
   import { choiceStyle } from "$lib/kahoot-style.js"
-  import { percent, sourceText, TYPE_TEXT } from "$lib/messages.js"
+  import { t } from "$lib/i18n.js"
+  import { percent, sourceText } from "$lib/messages.js"
 
   let { round }: { round: RoundView | null } = $props()
 
@@ -20,7 +21,7 @@
 {:else}
   <section class="space-y-4 p-6">
     <div class="text-muted-foreground text-sm">
-      Question {round.question.index + 1} · {TYPE_TEXT[round.question.type]}
+      Question {round.question.index + 1} · {t.types[round.question.type]}
     </div>
     <h2 class="text-xl font-semibold">
       {round.question.title ?? "The host doesn't show questions on devices."}

@@ -3,7 +3,7 @@
   import { Label } from "$lib/components/ui/label/index.js"
   import * as RadioGroup from "$lib/components/ui/radio-group/index.js"
   import { Switch } from "$lib/components/ui/switch/index.js"
-  import { ERROR_TEXT } from "$lib/messages.js"
+  import { t } from "$lib/i18n.js"
   import { toTiming } from "$lib/start-form.js"
   import type { PublicSettings, SettingsPatch } from "../../../../shared/api.js"
   import { timingProblem } from "../../../../shared/start.js"
@@ -74,7 +74,7 @@
       seconds
     </div>
     {#if invalid}
-      <p class="text-destructive text-sm">{ERROR_TEXT.timing}</p>
+      <p class="text-destructive text-sm">{t.errors.timing}</p>
     {/if}
   </div>
   <div class="flex items-center gap-2">

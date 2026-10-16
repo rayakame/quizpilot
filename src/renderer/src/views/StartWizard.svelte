@@ -11,7 +11,8 @@
   import { Switch } from "$lib/components/ui/switch/index.js"
   import { Textarea } from "$lib/components/ui/textarea/index.js"
   import { game } from "$lib/game.svelte.js"
-  import { ERROR_TEXT, QUIZ_LINK_TEXT, quizLinkText } from "$lib/messages.js"
+  import { t } from "$lib/i18n.js"
+  import { quizLinkText } from "$lib/messages.js"
   import {
     addField,
     botName,
@@ -42,7 +43,7 @@
   function next(event: SubmitEvent) {
     event.preventDefault()
     const problem = stepProblem(form, step)
-    error = problem ? ERROR_TEXT[problem] : null
+    error = problem ? t.errors[problem] : null
     if (problem) return
     if (step < STEPS.length - 1) step += 1
     else void start()
@@ -66,7 +67,7 @@
     const check = await checkLink()
     if (check && !check.ok) {
       starting = false
-      error = QUIZ_LINK_TEXT[check.error]
+      error = t.quizLink[check.error]
       return
     }
     game.reset()
@@ -84,7 +85,7 @@
     }
     if (result.ok) return game.begin()
     game.reset()
-    error = ERROR_TEXT[result.error]
+    error = t.errors[result.error]
     if (result.error === "unknown") error += ` (${result.message})`
     if (BACK_TO_PIN.includes(result.error)) step = 0
   }

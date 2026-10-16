@@ -2,7 +2,14 @@
   import ArrowLeft from "@lucide/svelte/icons/arrow-left"
   import { toast } from "svelte-sonner"
   import { Button } from "$lib/components/ui/button/index.js"
-  import { FILTERS, gameLine, gameTitle, matches, type HistoryFilter } from "$lib/history-view.js"
+  import {
+    gameLine,
+    gameTitle,
+    HISTORY_FILTERS,
+    matches,
+    type HistoryFilter,
+  } from "$lib/history-view.js"
+  import { t } from "$lib/i18n.js"
   import type { HistoryGame, HistoryRecord, PublicSettings } from "../../../../shared/api.js"
   import QuestionRow from "./QuestionRow.svelte"
 
@@ -89,13 +96,13 @@
           </div>
         </div>
         <div class="flex gap-1">
-          {#each FILTERS as f (f.id)}
+          {#each HISTORY_FILTERS as f (f)}
             <Button
               size="sm"
-              variant={filter === f.id ? "secondary" : "ghost"}
-              onclick={() => (filter = f.id)}
+              variant={filter === f ? "secondary" : "ghost"}
+              onclick={() => (filter = f)}
             >
-              {f.label}
+              {t.history.filters[f]}
             </Button>
           {/each}
         </div>

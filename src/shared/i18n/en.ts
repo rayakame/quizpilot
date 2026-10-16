@@ -1,3 +1,8 @@
+import type { JoinErrorCode } from "../../core/kahoot/adapter.js"
+import type { BotStatus } from "../../core/session/game-session.js"
+import type { QuestionType } from "../../core/types.js"
+import type { QuizLinkProblem, StartProblem, Theme } from "../api.js"
+
 export const en = {
   locale: "en",
   menu: {
@@ -42,6 +47,87 @@ export const en = {
       n === 1 ? "Delete the saved game?" : `Delete all ${n} saved games?`,
     delete: "Delete",
     textFile: "Text",
+  },
+  status: {
+    joining: "Joining",
+    twoStep: "Waiting for code",
+    lobby: "In lobby",
+    playing: "Playing",
+    paused: "Paused",
+    left: "Left",
+    kicked: "Removed by host",
+    disconnected: "Disconnected",
+    finished: "Finished",
+    reconnecting: "Reconnecting",
+  } satisfies Record<BotStatus | "reconnecting", string>,
+  themes: {
+    system: "Like the system",
+    light: "Light",
+    dark: "Dark",
+  } satisfies Record<Theme, string>,
+  errors: {
+    pin: "Enter the game PIN or paste the kahoot.it link.",
+    bots: "Use between 1 and 5 bots.",
+    name_empty: "Every bot needs a name.",
+    name_long: "Names can have at most 15 characters.",
+    name_taken: "Every bot needs a different name.",
+    timing: "Pick a delay between 0 and 30 seconds, the smaller number first.",
+    quiz_link: "Couldn't use this quiz link.",
+    not_found: "There's no game with this PIN.",
+    locked: "The host has locked this game.",
+    duplicate_name: "Someone in the game already has this name.",
+    unknown: "Couldn't join the game.",
+  } satisfies Record<StartProblem | JoinErrorCode, string>,
+  quizLink: {
+    link: "This doesn't look like a Kahoot quiz link.",
+    not_found: "There's no quiz behind this link.",
+    private: "This quiz is private. Only public quizzes work.",
+    offline: "Couldn't reach Kahoot. Check your connection.",
+    unknown: "Couldn't load the quiz.",
+  } satisfies Record<QuizLinkProblem, string>,
+  keys: {
+    invalid: (service: string) => `${service} doesn't accept this key.`,
+    offline: (service: string) => `Couldn't reach ${service}. Check your connection.`,
+    error: (service: string) => `${service} had a problem. Try again in a moment.`,
+  },
+  types: {
+    quiz: "Quiz",
+    true_false: "True or false",
+    multiple_select_quiz: "Multiple choice",
+    jumble: "Puzzle",
+    slider: "Slider",
+    open_ended: "Type answer",
+    survey: "Poll",
+    word_cloud: "Word cloud",
+    content: "Slide",
+    unknown: "Unknown",
+  } satisfies Record<QuestionType, string>,
+  sources: {
+    backupAi: "Backup AI",
+    known: "Known",
+    knownAnswer: "Known answer",
+    guessed: "Guessed",
+    skipped: "Skipped",
+  },
+  cost: {
+    unknown: "unknown",
+    orMore: " or more",
+  },
+  start: {
+    checking: "Checking…",
+    questions: (n: number) => (n === 1 ? "1 question" : `${n} questions`),
+  },
+  history: {
+    filters: { all: "All", wrong: "Wrong", unsure: "Unsure", image: "Pictures" },
+    game: (pin: string) => `Game ${pin}`,
+    right: (correct: number, graded: number) => `${correct} of ${graded} right`,
+  },
+  colors: {
+    red: "red triangle",
+    blue: "blue diamond",
+    yellow: "yellow circle",
+    green: "green square",
+    gray: "gray",
   },
 }
 

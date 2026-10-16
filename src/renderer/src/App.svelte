@@ -5,6 +5,7 @@
   import { Button } from "$lib/components/ui/button/index.js"
   import { Toaster } from "$lib/components/ui/sonner/index.js"
   import { game } from "$lib/game.svelte.js"
+  import { setLanguage } from "$lib/i18n.js"
   import Logo from "$lib/Logo.svelte"
   import type { PublicSettings } from "../../shared/api.js"
   import Dashboard from "./views/Dashboard.svelte"
@@ -23,6 +24,7 @@
   async function refresh() {
     settings = await window.quizpilot.getSettings()
     setMode(settings.theme)
+    setLanguage(settings.language)
   }
 
   async function keySaved() {
