@@ -84,6 +84,7 @@ const cases: [string, Question][] = [
     "type answer",
     question({ type: "open_ended", title: "Wie heißt die Hauptstadt von Frankreich?" }),
   ],
+  ["word cloud", question({ type: "word_cloud", title: "Was fällt dir zu München ein?" })],
 ]
 
 async function ask(label: string, input: FallbackInput, webSearch: boolean) {
