@@ -6,7 +6,7 @@ const plural = new Intl.PluralRules(locale)
 // Polish has a form for 1, one for 2–4 (but not 12–14) and one for the rest.
 const count = (n: number, one: string, few: string, many: string) => {
   const form = plural.select(n)
-  return `${n} ${form === "one" ? one : form === "few" ? few : many}`
+  return `${n}\u00a0${form === "one" ? one : form === "few" ? few : many}`
 }
 
 export const pl: Messages = {
@@ -44,7 +44,7 @@ export const pl: Messages = {
   },
   dialogs: {
     settingsBroken: "QuizPilot nie może odczytać ustawień.",
-    resetSettings: "Przywróć ustawienia",
+    resetSettings: "Przywróć domyślne",
     quit: "Zakończ",
     cancel: "Anuluj",
     startFailed: "Nie udało się uruchomić QuizPilot",
@@ -68,6 +68,8 @@ export const pl: Messages = {
     inSeconds: (value) => `${value}\u00a0s`,
     rank: (n) => `#${n}`,
     range: (from, to) => `${from}–${to}`,
+    pair: (label, value) => `${label}: ${value}`,
+    list: (items) => items.join(", "),
     noText: "(brak tekstu)",
     points: (n) => count(n, "punkt", "punkty", "punktów"),
   },

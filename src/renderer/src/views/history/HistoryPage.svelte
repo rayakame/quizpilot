@@ -92,9 +92,11 @@
             <h2 class="text-lg font-semibold">{gameTitle(record.game)}</h2>
             <p class="text-muted-foreground text-sm">
               {t.history.pin(record.game.pin)} · {dateText(record.game.startedAt)} ·
-              {record.bots
-                .map((b) => (b.rank ? `${t.common.rank(b.rank)} ${b.name}` : b.name))
-                .join(", ")}
+              {t.common.list(
+                record.bots.map((b) =>
+                  b.rank ? `${t.common.rank(b.rank)}\u00a0${b.name}` : b.name,
+                ),
+              )}
             </p>
           </div>
           <div class="flex gap-2">

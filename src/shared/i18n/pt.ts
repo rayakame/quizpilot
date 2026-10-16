@@ -61,8 +61,10 @@ export const pt: Messages = {
     inSeconds: (value) => `${value}\u00a0s`,
     rank: (n) => `#${n}`,
     range: (from, to) => `${from}–${to}`,
+    pair: (label, value) => `${label}: ${value}`,
+    list: (items) => items.join(", "),
     noText: "(sem texto)",
-    points: (n) => (n === 1 ? "1 ponto" : `${n} pontos`),
+    points: (n) => (n === 1 ? "1\u00a0ponto" : `${n}\u00a0pontos`),
   },
   app: {
     history: "Histórico",
@@ -104,7 +106,7 @@ export const pt: Messages = {
   },
   backup: {
     keySaved: "Salva, deixe vazio para manter",
-    getKey: (company) => `Pegue uma chave de API (${company})`,
+    getKey: (company) => `Pegue uma chave ${company === "Google" ? "do" : "da"} ${company}`,
     model: "Modelo",
     effort: "Esforço",
     noEffort: (model) => `${model} não tem ajuste de esforço.`,

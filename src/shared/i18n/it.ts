@@ -62,8 +62,10 @@ export const it: Messages = {
     inSeconds: (value) => `${value}\u00a0s`,
     rank: (n) => `#${n}`,
     range: (from, to) => `${from}–${to}`,
+    pair: (label, value) => `${label}: ${value}`,
+    list: (items) => items.join(", "),
     noText: "(nessun testo)",
-    points: (n) => (n === 1 ? "1 punto" : `${n} punti`),
+    points: (n) => (n === 1 ? "1\u00a0punto" : `${n}\u00a0punti`),
   },
   app: {
     history: "Cronologia",
@@ -269,7 +271,7 @@ export const it: Messages = {
       "Interviene quando Jev non è sicuro, nelle domande con immagine, per le risposte scritte e le nuvole di parole.",
     backupSaved: "IA di riserva salvata",
     behaviorText:
-      "Valori predefiniti per le nuove partite. La procedura iniziale può cambiarli per ogni partita.",
+      "Valori predefiniti per le nuove partite. La procedura guidata di avvio può cambiarli per ogni partita.",
     reconnect: "Riconnetti i bot se cade la connessione",
     notify: "Avvisami quando QuizPilot è in background",
     theme: "Tema",
@@ -295,7 +297,7 @@ export const it: Messages = {
   history: {
     filters: { all: "Tutte", wrong: "Sbagliate", unsure: "Incerte", image: "Immagini" },
     game: (pin) => `Partita ${pin}`,
-    right: (correct, graded) => `${correct} giuste su ${graded}`,
+    right: (correct, graded) => `Giuste: ${correct} su ${graded}`,
     pin: (pin) => `PIN ${pin}`,
     noGames: "Ancora nessuna partita.",
     loadFailed: "Impossibile caricare la cronologia.",

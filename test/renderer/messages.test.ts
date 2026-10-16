@@ -102,7 +102,7 @@ describe("Japanese", () => {
   afterEach(() => setLanguage("en"))
 
   it("puts the seconds unit right after the number", () => {
-    expect(secondsText(1234)).toBe("1.2秒")
+    expect(secondsText(1234)).toBe("1.2\u2060秒")
   })
 })
 

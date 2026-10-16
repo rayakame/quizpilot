@@ -62,8 +62,10 @@ export const id: Messages = {
     inSeconds: (value) => `${value}\u00a0s`,
     rank: (n) => `#${n}`,
     range: (from, to) => `${from}–${to}`,
+    pair: (label, value) => `${label}: ${value}`,
+    list: (items) => items.join(", "),
     noText: "(tanpa teks)",
-    points: (n) => `${n} poin`,
+    points: (n) => `${n}\u00a0poin`,
   },
   app: {
     history: "Riwayat",

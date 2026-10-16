@@ -38,7 +38,7 @@ export const nl: Messages = {
   },
   dialogs: {
     settingsBroken: "QuizPilot kon de instellingen niet lezen.",
-    resetSettings: "Instellingen herstellen",
+    resetSettings: "Instellingen resetten",
     quit: "Stoppen",
     cancel: "Annuleren",
     startFailed: "QuizPilot kon niet starten",
@@ -62,8 +62,10 @@ export const nl: Messages = {
     inSeconds: (value) => `${value}\u00a0s`,
     rank: (n) => `#${n}`,
     range: (from, to) => `${from}–${to}`,
+    pair: (label, value) => `${label}: ${value}`,
+    list: (items) => items.join(", "),
     noText: "(geen tekst)",
-    points: (n) => (n === 1 ? "1 punt" : `${n} punten`),
+    points: (n) => (n === 1 ? "1\u00a0punt" : `${n}\u00a0punten`),
   },
   app: {
     history: "Geschiedenis",
@@ -116,7 +118,7 @@ export const nl: Messages = {
     efforts: { minimal: "Minimaal", low: "Laag", medium: "Gemiddeld", high: "Hoog" },
     below: (share) => `De reserve-AI vragen als Jev minder dan ${share} zeker is`,
     instantAt: (share) =>
-      `Bij vragen met een afbeelding niet wachten als Jev minstens ${share} zeker is`,
+      `Bij vragen met een afbeelding niet op de reserve-AI wachten als Jev minstens ${share} zeker is`,
   },
   status: {
     joining: "Bezig met deelnemen",
@@ -268,7 +270,8 @@ export const nl: Messages = {
     backupText:
       "Wordt gevraagd als Jev twijfelt, bij vragen met afbeeldingen, getypte antwoorden en woordwolken.",
     backupSaved: "Reserve-AI opgeslagen",
-    behaviorText: "Standaard voor nieuwe spellen. De startwizard kan ze per spel aanpassen.",
+    behaviorText:
+      "Standaardinstellingen voor nieuwe spellen. De startwizard kan ze per spel aanpassen.",
     reconnect: "Bots opnieuw verbinden als de verbinding wegvalt",
     notify: "Melding geven als QuizPilot op de achtergrond draait",
     theme: "Thema",

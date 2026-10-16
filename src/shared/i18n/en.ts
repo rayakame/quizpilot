@@ -65,8 +65,10 @@ export const en = {
     inSeconds: (value: string) => `${value}\u00a0s`,
     rank: (n: number) => `#${n}`,
     range: (from: string, to: string) => `${from}–${to}`,
+    pair: (label: string, value: string) => `${label}: ${value}`,
+    list: (items: string[]) => items.join(", "),
     noText: "(no text)",
-    points: (n: number) => (n === 1 ? "1 point" : `${n} points`),
+    points: (n: number) => (n === 1 ? "1\u00a0point" : `${n}\u00a0points`),
   },
   app: {
     history: "History",

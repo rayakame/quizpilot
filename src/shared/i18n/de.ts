@@ -62,8 +62,10 @@ export const de: Messages = {
     inSeconds: (value) => `${value}\u00a0s`,
     rank: (n) => `#${n}`,
     range: (from, to) => `${from}–${to}`,
+    pair: (label, value) => `${label}: ${value}`,
+    list: (items) => items.join(", "),
     noText: "(kein Text)",
-    points: (n) => (n === 1 ? "1 Punkt" : `${n} Punkte`),
+    points: (n) => (n === 1 ? "1\u00a0Punkt" : `${n}\u00a0Punkte`),
   },
   app: {
     history: "Verlauf",

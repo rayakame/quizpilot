@@ -71,11 +71,14 @@
         <ul class="text-muted-foreground grid gap-1">
           {#each item.results as r (r.bot)}
             <li>
-              {r.bot}: {r.correct === null
-                ? "–"
-                : r.correct
-                  ? t.history.result.right
-                  : t.history.result.wrong}
+              {t.common.pair(
+                r.bot,
+                r.correct === null
+                  ? "–"
+                  : r.correct
+                    ? t.history.result.right
+                    : t.history.result.wrong,
+              )}
               {#if r.points !== null}· {t.common.points(r.points)}{/if}
               {#if r.answeredMs !== null}· {secondsText(r.answeredMs)}{/if}
               {#if r.onPurpose}· {t.game.onPurpose}{/if}

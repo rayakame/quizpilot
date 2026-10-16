@@ -1,6 +1,8 @@
 import type { Messages } from "./en.js"
 
 const locale = "ja"
+// Japanese may break between a number and its unit; a word joiner stops that.
+const join = "\u2060"
 const names = (list: string[]) => new Intl.ListFormat(locale, { type: "conjunction" }).format(list)
 
 export const ja: Messages = {
@@ -13,8 +15,8 @@ export const ja: Messages = {
     about: "QuizPilotについて",
     settings: "設定…",
     services: "サービス",
-    hide: "QuizPilotを隠す",
-    hideOthers: "ほかを隠す",
+    hide: "QuizPilotを非表示",
+    hideOthers: "ほかを非表示",
     showAll: "すべてを表示",
     quit: "QuizPilotを終了",
     undo: "取り消す",
@@ -59,11 +61,13 @@ export const ja: Messages = {
     apiKey: "APIキー",
     to: "〜",
     seconds: "秒",
-    inSeconds: (value) => `${value}秒`,
-    rank: (n) => `${n}位`,
+    inSeconds: (value) => `${value}${join}秒`,
+    rank: (n) => `${n}${join}位`,
     range: (from, to) => `${from}〜${to}`,
+    pair: (label, value) => `${label}: ${value}`,
+    list: (items) => items.join("、"),
     noText: "（テキストなし）",
-    points: (n) => `${n}ポイント`,
+    points: (n) => `${n}${join}ポイント`,
   },
   app: {
     history: "履歴",
@@ -98,7 +102,7 @@ export const ja: Messages = {
       "QuizPilotはTypeSafeのJevで回答します。APIキーを貼り付けてください。キーはこのコンピュータの中だけに保存されます。",
     backupTitle: "予備のAI（任意）",
     backupText:
-      "Jevが自信のないとき、QuizPilotは別のAIに聞くことができます。そのAI専用のAPIキーが必要で、質問ごとに少し料金がかかります。設定はあとからでもできます。",
+      "Jevに自信がないとき、QuizPilotは別のAIに聞くことができます。そのAI専用のAPIキーが必要で、質問ごとに少し料金がかかります。設定はあとからでもできます。",
     keySaved: "保存済み。新しいキーを貼り付けると置き換わります",
     getKey: "typesafe.aiでキーを取得",
     checkAndSave: "確認して保存",

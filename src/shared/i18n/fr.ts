@@ -69,8 +69,10 @@ export const fr: Messages = {
     inSeconds: (value) => `${value}\u00a0s`,
     rank: (n) => `#${n}`,
     range: (from, to) => `${from}–${to}`,
+    pair: (label, value) => `${label}${nbsp}: ${value}`,
+    list: (items) => items.join(", "),
     noText: "(sans texte)",
-    points: (n) => (one(n) ? `${n} point` : `${n} points`),
+    points: (n) => (one(n) ? `${n}${nbsp}point` : `${n}${nbsp}points`),
   },
   app: {
     history: "Historique",
@@ -227,7 +229,7 @@ export const fr: Messages = {
     resume: "Reprendre",
     pause: "Mettre en pause",
     leave: "Quitter",
-    enterCode: "Saisir le code en deux étapes",
+    enterCode: "Saisir le code de connexion",
     resumeAll: "Tout reprendre",
     pauseAll: "Tout mettre en pause",
     startOver: "Quitter et recommencer",
@@ -276,7 +278,7 @@ export const fr: Messages = {
       "Sollicitée quand Jev hésite, pour les questions en image, les réponses libres et les nuages de mots.",
     backupSaved: "IA de secours enregistrée",
     behaviorText:
-      "Valeurs par défaut des nouvelles parties. L’assistant de départ peut les changer pour chaque partie.",
+      "Valeurs par défaut des nouvelles parties. L’assistant de nouvelle partie peut les changer pour chaque partie.",
     reconnect: "Reconnecter les bots quand la connexion est coupée",
     notify: "Me prévenir quand QuizPilot est en arrière-plan",
     theme: "Thème",
@@ -301,7 +303,7 @@ export const fr: Messages = {
       "Open source sous licence MIT. Sans lien avec Kahoot!, TypeSafe, Anthropic, OpenAI ou Google.",
   },
   history: {
-    filters: { all: "Toutes", wrong: "Fausses", unsure: "Incertaines", image: "Images" },
+    filters: { all: "Toutes", wrong: "Ratées", unsure: "Incertaines", image: "Images" },
     game: (pin) => `Partie ${pin}`,
     right: (correct, graded) => `Justes${nbsp}: ${correct} sur ${graded}`,
     pin: (pin) => `PIN ${pin}`,

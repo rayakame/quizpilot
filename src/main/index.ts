@@ -96,6 +96,8 @@ async function openSettings(
     buttons: [text.resetSettings, text.quit],
     defaultId: 0,
     cancelId: 1,
+    // Windows only spots English button names, the rest become big command links.
+    noLink: true,
   })
   if (response !== 0) return null
   await rename(file, `${file}.broken`).catch(() => {})
@@ -119,6 +121,7 @@ async function confirm(message: string, button: string, cancel: string): Promise
     buttons: [button, cancel],
     defaultId: 1,
     cancelId: 1,
+    noLink: true,
   }
   const { response } = win
     ? await dialog.showMessageBox(win, options)

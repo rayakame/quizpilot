@@ -82,9 +82,9 @@
         {#each results as [bot, result] (bot)}
           <li class="flex items-center gap-2">
             {#if result.correct === true}
-              <Check class="size-4 text-green-600" />
+              <Check class="size-4 shrink-0 text-green-600" />
             {:else if result.correct === false}
-              <X class="text-destructive size-4" />
+              <X class="text-destructive size-4 shrink-0" />
             {/if}
             <span class="font-medium">{bot}</span>
             <span class="text-muted-foreground">

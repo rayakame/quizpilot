@@ -30,7 +30,7 @@
     const name = retryName(bot)
     game.forget(bot.name)
     const outcome = await window.quizpilot.addBot(name)
-    if (!outcome.ok) toast.error(`${name}: ${t.errors[outcome.code]}`)
+    if (!outcome.ok) toast.error(t.common.pair(name, t.errors[outcome.code]))
   }
 </script>
 

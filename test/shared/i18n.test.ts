@@ -43,6 +43,8 @@ const SAME_FUNCTIONS = new Set([
   "common.inSeconds",
   "common.range",
   "common.rank",
+  "common.pair",
+  "common.list",
 ])
 const ALSO_SAME_FUNCTIONS: Partial<Record<Language, string[]>> = {
   de: ["about.version"],
@@ -50,13 +52,20 @@ const ALSO_SAME_FUNCTIONS: Partial<Record<Language, string[]>> = {
 }
 
 // Lists for the functions that take bot names, numbers for everything else.
-const LISTS = new Set(["notify.lostBody", "notify.kickedBody"])
+const LISTS = new Set(["notify.lostBody", "notify.kickedBody", "common.list"])
 
 function samples(path: string, fn: Fn): unknown[][] {
   if (LISTS.has(path)) return [[["Ada"]], [["Ada", "Bo", "Cy"]]]
   expect(fn.length, path).toBeGreaterThan(0)
-  // 1, 2, 5 and 22 hit the one, few and many forms of every language here.
-  return [1, 2, 5, 22].map((n) => [n, n + 100].slice(0, fn.length))
+  // 1, 2, 5 and 22 hit every plural form here; no second value contains the first.
+  const pairs = [
+    [1, 30],
+    [2, 40],
+    [5, 70],
+    [22, 90],
+    [3, 1],
+  ]
+  return pairs.map((pair) => pair.slice(0, fn.length))
 }
 
 function strings(value: unknown, path = ""): [string, string][] {
@@ -123,13 +132,17 @@ describe("dictionaries", () => {
   it("counts in Polish", () => {
     const pl = messagesFor("pl")
     expect([1, 2, 5, 12, 22].map((n) => pl.start.questions(n))).toEqual([
-      "1 pytanie",
-      "2 pytania",
-      "5 pytań",
-      "12 pytań",
-      "22 pytania",
+      "1\u00a0pytanie",
+      "2\u00a0pytania",
+      "5\u00a0pytań",
+      "12\u00a0pytań",
+      "22\u00a0pytania",
     ])
-    expect([1, 2, 5].map((n) => pl.common.points(n))).toEqual(["1 punkt", "2 punkty", "5 punktów"])
+    expect([1, 2, 5].map((n) => pl.common.points(n))).toEqual([
+      "1\u00a0punkt",
+      "2\u00a0punkty",
+      "5\u00a0punktów",
+    ])
   })
 
   it("counts in Italian and Dutch", () => {
@@ -149,9 +162,18 @@ describe("dictionaries", () => {
   it("writes ranks and ranges the local way", () => {
     expect(en.common.rank(1)).toBe("#1")
     expect(messagesFor("tr").common.rank(1)).toBe("1.")
-    expect(messagesFor("ja").common.rank(1)).toBe("1位")
+    expect(messagesFor("ja").common.rank(1)).toBe("1\u2060位")
+    expect(messagesFor("ja").common.points(3)).toBe("3\u2060ポイント")
     expect(en.common.range("1.5", "4")).toBe("1.5–4")
     expect(messagesFor("ja").common.range("1.5", "4")).toBe("1.5〜4")
+  })
+
+  it("keeps numbers with their words and labels with their values", () => {
+    expect(en.common.points(950)).toBe("950\u00a0points")
+    expect(en.common.pair("Ada", "right")).toBe("Ada: right")
+    expect(messagesFor("fr").common.pair("Ada", "juste")).toBe("Ada\u00a0: juste")
+    expect(en.common.list(["Ada", "Bo"])).toBe("Ada, Bo")
+    expect(messagesFor("ja").common.list(["Ada", "Bo"])).toBe("Ada、Bo")
   })
 
   it("offers every language it has a name for", () => {

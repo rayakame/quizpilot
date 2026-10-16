@@ -62,8 +62,10 @@ export const es: Messages = {
     inSeconds: (value) => `${value}\u00a0s`,
     rank: (n) => `#${n}`,
     range: (from, to) => `${from}–${to}`,
+    pair: (label, value) => `${label}: ${value}`,
+    list: (items) => items.join(", "),
     noText: "(sin texto)",
-    points: (n) => (n === 1 ? "1 punto" : `${n} puntos`),
+    points: (n) => (n === 1 ? "1\u00a0punto" : `${n}\u00a0puntos`),
   },
   app: {
     history: "Historial",
@@ -89,7 +91,7 @@ export const es: Messages = {
     jevWith: (model) => `Jev + ${model}`,
     instant: "Al instante",
     human: (range) => `Como una persona, ${range}`,
-    saved: "Se guarda",
+    saved: "Activado",
     off: "Desactivado",
   },
   setup: {
@@ -201,7 +203,7 @@ export const es: Messages = {
     quizLink: "Enlace del quiz (opcional)",
     quizLinkHint: "Solo quizzes públicos. Así QuizPilot conoce las respuestas correctas.",
     context: "¿De qué trata el quiz? (opcional)",
-    contextPlaceholder: "p. ej. quiz de bienvenida de la UNAM sobre la vida en el campus",
+    contextPlaceholder: "p. ej. quiz de bienvenida de la Complutense sobre la vida en el campus",
     previous: "Contarle a la IA las preguntas anteriores",
     unknownHint:
       "Puede que Kahoot haya cambiado algo. Busca una versión más nueva de QuizPilot o guarda un archivo de diagnóstico para informar del error.",

@@ -24,6 +24,6 @@ export function currentLanguage(): Language {
 export function setLanguage(next: Language): void {
   if (next === language) return
   language = next
-  if (typeof document !== "undefined") document.documentElement.lang = next
+  if (typeof document !== "undefined") document.documentElement.lang = messagesFor(next).locale
   changed()
 }
