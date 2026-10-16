@@ -55,6 +55,22 @@ export function toQuestion(p: KahootPayload): Question {
   }
 }
 
+export interface QuizStartInfo {
+  randomQuestions: boolean | null
+  randomAnswers: boolean | null
+  first: KahootPayload | null
+}
+
+export function toQuizStart(p: KahootPayload): QuizStartInfo {
+  const options = obj(p.gameOptions)
+  const flag = (v: unknown) => (typeof v === "boolean" ? v : null)
+  return {
+    randomQuestions: flag(options?.randomQuestions),
+    randomAnswers: flag(options?.randomAnswers),
+    first: obj(p.firstGameBlockData),
+  }
+}
+
 export function toUpcoming(p: KahootPayload): { question: Question; startsInMs: number } {
   return { question: toQuestion(p), startsInMs: num(p.getReadyTimeRemaining) ?? 0 }
 }

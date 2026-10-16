@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest"
 import {
   questionType,
   toKahootAnswer,
+  toQuizStart,
   toQuestion,
   toQuizEnd,
   toResult,
@@ -189,5 +190,17 @@ describe("questionType", () => {
     expect(questionType("multiple_select_poll", undefined)).toBe("survey")
     expect(questionType("drop_pin", undefined)).toBe("unknown")
     expect(questionType(undefined, undefined)).toBe("unknown")
+  })
+})
+
+describe("toQuizStart", () => {
+  it("reads whether the host shuffles and the first question with its answer", () => {
+    const start = toQuizStart(load(B, "0022-event-QuizStart.json"))
+    expect(start).toMatchObject({ randomQuestions: false, randomAnswers: false })
+    expect(start.first).toMatchObject({ question: "Hauptstadt der Schweiz?", type: "quiz" })
+  })
+
+  it("leaves unknown options open", () => {
+    expect(toQuizStart({})).toEqual({ randomQuestions: null, randomAnswers: null, first: null })
   })
 })
