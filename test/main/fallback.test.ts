@@ -182,20 +182,39 @@ describe("retryWithoutSearch", () => {
     usage: { provider: "openai", model: "gpt-6.1-sol", inputTokens: 1, outputTokens: 1 },
   }
 
-  it("asks again without web search when the search request fails", async () => {
+  it("asks without web search when the provider rejects the request, from then on", async () => {
+    const rejected = new OpenAI.BadRequestError(
+      400,
+      undefined,
+      "web_search with json_schema",
+      new Headers(),
+    )
     const decide = vi.fn<FallbackProvider["decide"]>(async (_input, opts) => {
-      if (opts.webSearch) throw new Error("400 tools not supported with json_schema")
+      if (opts.webSearch) throw rejected
       return answer
     })
     const signal = new AbortController().signal
+    const provider = retryWithoutSearch({ decide })
+    await expect(provider.decide(input, { signal, webSearch: true })).resolves.toBe(answer)
+    await expect(provider.decide(input, { signal, webSearch: true })).resolves.toBe(answer)
+    expect(decide.mock.calls.map((c) => c[1].webSearch)).toEqual([true, false, false])
+  })
+
+  it("doesn't retry answers that failed for other reasons", async () => {
+    const decide = vi.fn<FallbackProvider["decide"]>(() =>
+      Promise.reject(new Error("Claude declined the question")),
+    )
+    const signal = new AbortController().signal
     await expect(
       retryWithoutSearch({ decide }).decide(input, { signal, webSearch: true }),
-    ).resolves.toBe(answer)
-    expect(decide.mock.calls.map((c) => c[1].webSearch)).toEqual([true, false])
+    ).rejects.toThrow()
+    expect(decide).toHaveBeenCalledTimes(1)
   })
 
   it("doesn't retry without search, or after the engine gave up", async () => {
-    const decide = vi.fn<FallbackProvider["decide"]>(() => Promise.reject(new Error("nope")))
+    const decide = vi.fn<FallbackProvider["decide"]>(() =>
+      Promise.reject(new ApiError({ message: "bad request", status: 400 })),
+    )
     const live = new AbortController().signal
     await expect(
       retryWithoutSearch({ decide }).decide(input, { signal: live, webSearch: false }),

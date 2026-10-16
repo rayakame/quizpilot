@@ -72,17 +72,6 @@ export function fallbackFor(config: Config): FallbackProvider | null {
   return retryWithoutSearch(logFailures(createFallback(provider, key, choiceFor(config, provider))))
 }
 
-// Not every provider is confirmed to take web search and a JSON schema together.
-export function retryWithoutSearch(provider: FallbackProvider): FallbackProvider {
-  return {
-    decide: (input, opts) =>
-      provider.decide(input, opts).catch((err: unknown) => {
-        if (!opts.webSearch || opts.signal.aborted) throw err
-        return provider.decide(input, { ...opts, webSearch: false })
-      }),
-  }
-}
-
 // The engine treats a failed backup answer like a missing one; keep the reason visible.
 export function logFailures(
   provider: FallbackProvider,
@@ -96,6 +85,31 @@ export function logFailures(
         throw err
       }),
   }
+}
+
+// Not every provider is confirmed to take web search and a JSON schema together.
+export function retryWithoutSearch(provider: FallbackProvider): FallbackProvider {
+  let searchRejected = false
+  return {
+    async decide(input, opts) {
+      const webSearch = opts.webSearch && !searchRejected
+      try {
+        return await provider.decide(input, { ...opts, webSearch })
+      } catch (err) {
+        if (!webSearch || opts.signal.aborted || !isRejection(err)) throw err
+        searchRejected = true
+        return provider.decide(input, { ...opts, webSearch: false })
+      }
+    },
+  }
+}
+
+function isRejection(err: unknown): boolean {
+  return (
+    err instanceof Anthropic.BadRequestError ||
+    err instanceof OpenAI.BadRequestError ||
+    (err instanceof ApiError && err.status === 400)
+  )
 }
 
 function classify(err: unknown): KeyCheck {
