@@ -6,7 +6,7 @@ import {
   type JoinErrorCode,
   type KahootAdapterLike,
 } from "../kahoot/adapter.js"
-import type { QuestionResult, QuizEnd } from "../kahoot/normalize.js"
+import type { QuestionResult, QuizEnd, QuizStartInfo } from "../kahoot/normalize.js"
 import type { Decision, Question } from "../types.js"
 import { sleep } from "../util/async.js"
 
@@ -34,13 +34,13 @@ export interface SessionSettings {
 export interface SessionDeps {
   createAdapter(): KahootAdapterLike
   decide(question: Question, startedAt: number, context: AskContext): Promise<Decision>
+  quizStarted?(info: QuizStartInfo): void
   now(): number
   random(): number
 }
 
 export type JoinOutcome =
-  | { name: string; ok: true }
-  | { name: string; ok: false; code: JoinErrorCode; message: string }
+  { name: string; ok: true } | { name: string; ok: false; code: JoinErrorCode; message: string }
 
 export type SessionEvent =
   | { type: "status"; bot: string; status: BotStatus; detail?: string }
@@ -177,6 +177,7 @@ export class GameSession {
       this.prepare(question, this.deps.now() + startsInMs)
     })
     a.on("questionStarted", ({ question }) => void this.play(bot, question))
+    a.on("quizStarted", (info) => this.deps.quizStarted?.(info))
     a.on("questionEnded", (result) => this.finish(bot, result))
     a.on("quizEnded", (end) => {
       this.setStatus(bot, "finished")

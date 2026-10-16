@@ -404,3 +404,21 @@ describe("reconnecting", () => {
     expect(statusOf(off.events, "Anna")?.status).toBe("disconnected")
   })
 })
+
+describe("quiz start", () => {
+  it("tells the answer key when a bot sees the quiz start", async () => {
+    const quizStarted = vi.fn()
+    const adapter = new FakeAdapter()
+    const session = new GameSession(defaults, {
+      createAdapter: () => adapter,
+      decide: () => new Promise(() => {}),
+      quizStarted,
+      now: () => Date.now(),
+      random: () => 0.5,
+    })
+    await session.join("123456", ["Anna"])
+    const info = { randomQuestions: false, randomAnswers: true, first: null }
+    adapter.emit("quizStarted", info)
+    expect(quizStarted).toHaveBeenCalledWith(info)
+  })
+})

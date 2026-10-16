@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest"
-import {
-  JoinError,
-  KahootAdapter,
-  type AdapterEvents,
-} from "../../../src/core/kahoot/adapter.js"
+import { JoinError, KahootAdapter, type AdapterEvents } from "../../../src/core/kahoot/adapter.js"
 import { FakeKahootClient } from "../../support/fake-kahoot.js"
 
 const A = "test/fixtures/kahoot/2026-10-15T20-44-39-567Z"
@@ -105,7 +101,11 @@ describe("two-step join", () => {
 describe("kahoot.js quirks", () => {
   it("tells kahoot.js which question is running when Ready was missed", () => {
     const { client } = setup()
-    client.fire("QuestionStart", { gameBlockIndex: 4, type: "multiple_select_quiz", timeAvailable: 5000 })
+    client.fire("QuestionStart", {
+      gameBlockIndex: 4,
+      type: "multiple_select_quiz",
+      timeAvailable: 5000,
+    })
     expect(client.quiz?.currentQuestion).toMatchObject({
       questionIndex: 4,
       gameBlockType: "multiple_select_quiz",
@@ -115,7 +115,10 @@ describe("kahoot.js quirks", () => {
   it("handles every message of a batched frame", () => {
     const { client, of } = setup()
     client._message(
-      JSON.stringify([{ channel: "/meta/connect" }, { channel: "/service/player", data: { id: 53 } }]),
+      JSON.stringify([
+        { channel: "/meta/connect" },
+        { channel: "/service/player", data: { id: 53 } },
+      ]),
     )
     expect(of("twoStepRequired")).toHaveLength(1)
   })
@@ -141,7 +144,10 @@ describe("join, answer and disconnect", () => {
 
   it("explains why a join failed", async () => {
     const cases: [unknown, string][] = [
-      [{ description: "Duplicate name", type: "loginResponse", error: "USER_INPUT" }, "duplicate_name"],
+      [
+        { description: "Duplicate name", type: "loginResponse", error: "USER_INPUT" },
+        "duplicate_name",
+      ],
       [{ status: "LOCKED", description: "Locked" }, "locked"],
       [
         { description: "Request failed or timed out.", error: { response: { statusCode: 404 } } },
@@ -179,5 +185,21 @@ describe("join, answer and disconnect", () => {
       { reason: "Lost Connection", kicked: false, retryable: true },
       { reason: "Session Ended", kicked: false, retryable: false },
     ])
+  })
+})
+
+describe("quiz start", () => {
+  it("reports the game options and the first question", () => {
+    const client = new FakeKahootClient()
+    const adapter = new KahootAdapter(client)
+    const starts: unknown[] = []
+    adapter.on("quizStarted", (info) => starts.push(info))
+    client.replay(A)
+    expect(starts).toHaveLength(1)
+    expect(starts[0]).toMatchObject({
+      randomQuestions: false,
+      randomAnswers: false,
+      first: { question: "Hauptstadt der Schweiz?" },
+    })
   })
 })

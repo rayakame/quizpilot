@@ -4,11 +4,13 @@ import {
   toKahootAnswer,
   toQuestion,
   toQuizEnd,
+  toQuizStart,
   toResult,
   toUpcoming,
   type KahootPayload,
   type QuestionResult,
   type QuizEnd,
+  type QuizStartInfo,
 } from "./normalize.js"
 import type { RawMessage } from "./raw.js"
 import { recoveryRequest, TwoStepGate, twoStepAnswer, twoStepEvent } from "./two-step.js"
@@ -30,6 +32,7 @@ export interface AdapterEvents {
   joined: Record<string, never>
   twoStepRequired: Record<string, never>
   twoStepResult: { ok: boolean }
+  quizStarted: QuizStartInfo
   questionReady: { question: Question; startsInMs: number }
   questionStarted: { question: Question }
   questionEnded: QuestionResult
@@ -76,6 +79,7 @@ export class KahootAdapter extends Emitter<AdapterEvents> implements KahootAdapt
       }
     }
     client.handlers.quizpilot = (message) => void this.onRaw(message as RawMessage)
+    client.on("QuizStart", (p: KahootPayload) => this.emit("quizStarted", toQuizStart(p)))
     client.on("QuestionReady", (p: KahootPayload) => this.emit("questionReady", toUpcoming(p)))
     client.on("QuestionStart", (p: KahootPayload) => {
       const question = toQuestion(p)
@@ -158,7 +162,8 @@ function toJoinError(err: unknown): JoinError {
     status?: unknown
     error?: { response?: { statusCode?: unknown } }
   }
-  if (e.description === "Duplicate name") return new JoinError("duplicate_name", "Name is already taken")
+  if (e.description === "Duplicate name")
+    return new JoinError("duplicate_name", "Name is already taken")
   if (e.status === "LOCKED") return new JoinError("locked", "Game is locked")
   // kahoot.js reports an unknown PIN as a failed request; only the HTTP status tells.
   const notFound = e.error?.response?.statusCode === 404
@@ -166,6 +171,10 @@ function toJoinError(err: unknown): JoinError {
     return new JoinError("not_found", "No game with this PIN")
   }
   const message =
-    typeof err === "string" ? err : typeof e.description === "string" ? e.description : "Join failed"
+    typeof err === "string"
+      ? err
+      : typeof e.description === "string"
+        ? e.description
+        : "Join failed"
   return new JoinError("unknown", message)
 }
