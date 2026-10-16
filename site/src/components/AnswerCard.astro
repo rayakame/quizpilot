@@ -1,0 +1,77 @@
+---
+import Icon from "./Icon.astro"
+
+const CHOICES = [
+  { letter: "A", text: "Isar", share: 62, picked: true },
+  { letter: "B", text: "Danube", share: 20, picked: false },
+  { letter: "C", text: "Inn", share: 10, picked: false },
+  { letter: "D", text: "Lech", share: 8, picked: false },
+]
+const BOTS = [
+  { name: "Anna", points: 950 },
+  { name: "Ben", points: 870 },
+  { name: "Cleo", points: 640 },
+]
+---
+
+<div data-reveal class="glass rounded-3xl p-5 shadow-2xl shadow-black/60">
+  <div class="flex items-center justify-between text-xs text-zinc-400">
+    <span>Question 2 · Quiz</span>
+    <span class="rounded-full bg-lime/15 px-2.5 py-1 font-medium text-lime">Jev · 62% sure</span>
+  </div>
+  <p class="mt-3 text-lg leading-snug font-semibold">Which river flows through Munich?</p>
+  <ul class="mt-4 grid gap-2">
+    {CHOICES.map((choice, i) => (
+      <li
+        class:list={[
+          "rounded-xl border p-3",
+          choice.picked ? "border-lime/50 bg-lime/[0.07]" : "border-white/10 bg-white/[0.03]",
+        ]}
+      >
+        <div class="flex items-center gap-3 text-sm">
+          <span class="flex size-6 items-center justify-center rounded-md bg-white/10 text-xs font-semibold">
+            {choice.letter}
+          </span>
+          <span class="flex-1">{choice.text}</span>
+          {choice.picked && <Icon name="check" class="size-4 text-lime" />}
+          <span class="w-9 text-right text-xs text-zinc-400">{choice.share}%</span>
+        </div>
+        <div class="mt-2 h-1 overflow-hidden rounded-full bg-white/10">
+          <div
+            class="bar h-full rounded-full bg-gradient-to-r from-emerald to-lime"
+            style={`--share: ${choice.share}%; --delay: ${300 + i * 120}ms`}
+          />
+        </div>
+      </li>
+    ))}
+  </ul>
+  <div class="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-sm text-zinc-400">
+    {BOTS.map((bot) => (
+      <span>
+        <span class="font-medium text-white">{bot.name}</span> +{bot.points}
+      </span>
+    ))}
+  </div>
+</div>
+
+<style>
+  .bar {
+    width: var(--share);
+  }
+
+  /* With JavaScript the bars fill up once the card scrolls into view. */
+  :global(.js) [data-reveal] .bar {
+    width: 0;
+    transition: width 1s cubic-bezier(0.2, 0.7, 0.2, 1) var(--delay);
+  }
+
+  :global(.js) [data-reveal].is-visible .bar {
+    width: var(--share);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js) [data-reveal] .bar {
+      width: var(--share);
+    }
+  }
+</style>
