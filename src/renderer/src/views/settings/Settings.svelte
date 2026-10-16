@@ -8,6 +8,7 @@
   import AboutSection from "./AboutSection.svelte"
   import AppearanceSection from "./AppearanceSection.svelte"
   import BehaviorSection from "./BehaviorSection.svelte"
+  import HistorySection from "./HistorySection.svelte"
   import ThresholdsSection from "./ThresholdsSection.svelte"
 
   let {
@@ -24,6 +25,7 @@
     { id: "keys", label: "TypeSafe key" },
     { id: "backup", label: "Backup AI" },
     { id: "behavior", label: "Behavior" },
+    { id: "history", label: "History" },
     { id: "appearance", label: "Appearance" },
     { id: "about", label: "About" },
   ] as const
@@ -88,6 +90,8 @@
         </section>
       {:else if section === "behavior"}
         <BehaviorSection {settings} {patch} />
+      {:else if section === "history"}
+        <HistorySection {settings} {patch} />
       {:else if section === "appearance"}
         <AppearanceSection theme={settings.theme} {patch} />
       {:else}
