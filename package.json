@@ -1,7 +1,7 @@
 {
   "name": "quizpilot",
   "productName": "QuizPilot",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Joins Kahoot games with a few bots that answer with AI",
   "author": "Christopher",
   "homepage": "https://github.com/rayakame/quizpilot",
