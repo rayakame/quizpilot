@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest"
 import type { StartRequest } from "../../src/shared/api.js"
-import { nameProblem, parsePin, startProblem, timingProblem } from "../../src/shared/start.js"
+import {
+  MAX_MISTAKES,
+  MISTAKE_STEPS,
+  nameProblem,
+  parsePin,
+  startProblem,
+  timingProblem,
+} from "../../src/shared/start.js"
 
 describe("parsePin", () => {
   it("reads a typed PIN, with or without spaces", () => {
@@ -72,5 +79,12 @@ describe("startProblem", () => {
         quizLink: "https://create.kahoot.it/details/fba5cd05-96af-4506-b8ce-388ff9b33fbb",
       }),
     ).toBeNull()
+  })
+})
+
+describe("MISTAKE_STEPS", () => {
+  it("goes from off to 30% in 5% steps", () => {
+    expect(MISTAKE_STEPS).toEqual([0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3])
+    expect(Math.max(...MISTAKE_STEPS)).toBeLessThanOrEqual(MAX_MISTAKES)
   })
 })
