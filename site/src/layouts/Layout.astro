@@ -8,6 +8,7 @@ interface Props {
 }
 
 const { title, description } = Astro.props
+const image = new URL(url("og.png"), Astro.site).href
 ---
 
 <!doctype html>
@@ -17,9 +18,24 @@ const { title, description } = Astro.props
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta name="theme-color" content="#050506" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={image} />
+    <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" type="image/svg+xml" href={url("favicon.svg")} />
+    <script is:inline>
+      document.documentElement.classList.add("js")
+    </script>
   </head>
-  <body class="bg-ink font-sans text-white antialiased">
+  <body class="relative min-h-screen overflow-x-hidden bg-ink font-sans text-white antialiased">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+      <div class="aurora top-[-18rem] left-[8%] size-[42rem] bg-emerald/50"></div>
+      <div class="aurora top-[-10rem] right-[2%] size-[36rem] bg-lime/35 [animation-delay:-8s]"></div>
+      <div class="aurora top-[20rem] left-[38%] size-[30rem] bg-sun/15 [animation-delay:-14s]"></div>
+      <div class="grid-lines absolute inset-0"></div>
+      <div class="noise absolute inset-0"></div>
+    </div>
     <slot />
   </body>
 </html>

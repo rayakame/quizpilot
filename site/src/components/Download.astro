@@ -1,0 +1,91 @@
+---
+import { assetUrl, RELEASES } from "../lib/download"
+import Icon from "./Icon.astro"
+import SectionHead from "./SectionHead.astro"
+
+const CARDS = [
+  {
+    id: "mac",
+    name: "macOS",
+    note: "Apple Silicon and Intel",
+    links: [
+      { label: "Apple Silicon", href: assetUrl("macArm"), primary: true },
+      { label: "Intel", href: assetUrl("macIntel"), primary: false },
+    ],
+    help: 'The app isn\'t signed, so macOS stops it the first time. Open System Settings → Privacy & Security and click "Open Anyway".',
+  },
+  {
+    id: "windows",
+    name: "Windows",
+    note: "Windows 10 or 11, 64-bit",
+    links: [{ label: "Download installer", href: assetUrl("windows"), primary: true }],
+    help: 'SmartScreen shows "Windows protected your PC". Click "More info", then "Run anyway". Updates install themselves.',
+  },
+  {
+    id: "linux",
+    name: "Linux",
+    note: "AppImage, 64-bit",
+    links: [{ label: "Download AppImage", href: assetUrl("linux"), primary: true }],
+    help: "Make it executable with chmod +x and start it. Some distros need libfuse2. If it closes right away on Ubuntu 24.04 or newer, start it with --no-sandbox.",
+  },
+]
+---
+
+<section id="download" class="scroll-mt-28 px-4 pt-36">
+  <SectionHead
+    eyebrow="Download"
+    title="Get QuizPilot."
+    text="Free and open source. Windows and Linux update themselves, on macOS the app tells you when a new version is out."
+  />
+  <div class="mx-auto mt-16 grid max-w-6xl gap-4 md:grid-cols-3">
+    {CARDS.map((card, i) => (
+      <article
+        data-reveal
+        data-card={card.id}
+        style={`--delay: ${i * 100}ms`}
+        class="spot group flex flex-col p-7 data-[current]:border-lime/40 data-[current]:shadow-[0_0_80px_-30px_#a3e635]"
+      >
+        <div class="flex items-center justify-between">
+          <Icon name="monitor" class="size-6 text-zinc-400 group-data-[current]:text-lime" />
+          <span class="hidden rounded-full bg-lime/15 px-2.5 py-1 text-xs font-medium text-lime group-data-[current]:inline">
+            Your system
+          </span>
+        </div>
+        <h3 class="mt-6 font-display text-3xl font-bold tracking-tight">{card.name}</h3>
+        <p class="mt-1 text-sm text-zinc-500">{card.note}</p>
+        <div class="mt-6 flex flex-wrap gap-2">
+          {card.links.map((link) => (
+            <a
+              href={link.href}
+              class:list={[
+                "inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition",
+                link.primary
+                  ? "bg-white text-black hover:bg-lime"
+                  : "border border-white/15 text-white hover:border-white/40",
+              ]}
+            >
+              <Icon name="download" class="size-4" />
+              {link.label}
+            </a>
+          ))}
+        </div>
+        <details class="mt-6 border-t border-white/[0.07] pt-4 text-sm text-zinc-400">
+          <summary class="cursor-pointer text-zinc-300 marker:text-zinc-600">
+            Opening it the first time
+          </summary>
+          <p class="mt-2">{card.help}</p>
+        </details>
+      </article>
+    ))}
+  </div>
+  <p class="mt-8 text-center text-sm text-zinc-500">
+    All files and older versions are on the{" "}
+    <a
+      href={RELEASES}
+      class="text-zinc-300 underline decoration-white/30 underline-offset-4 hover:text-white"
+    >
+      release page
+    </a>
+    .
+  </p>
+</section>

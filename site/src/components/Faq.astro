@@ -1,0 +1,45 @@
+---
+import SectionHead from "./SectionHead.astro"
+
+const QUESTIONS = [
+  {
+    q: "Is this allowed?",
+    a: "Bots in someone else's game can break Kahoot's terms of use and spoil the fun for everyone else. Use QuizPilot where the host is in on it.",
+  },
+  {
+    q: "What do I need?",
+    a: "A TypeSafe API key for Jev. A key from Anthropic, OpenAI or Google is optional and only used when Jev isn't sure.",
+  },
+  {
+    q: "What does it cost?",
+    a: "QuizPilot is free. The AI services bill you for what you use, and QuizPilot shows an estimate after every game.",
+  },
+  {
+    q: "Does it always get it right?",
+    a: "No. Jev is quick and usually right, but not always. With a link to a public quiz the answers are known in advance.",
+  },
+  {
+    q: "Does it send anything home?",
+    a: "No. There's no telemetry. QuizPilot only asks GitHub whether a new version is out.",
+  },
+]
+---
+
+<section id="faq" class="scroll-mt-28 px-4 pt-36">
+  <SectionHead eyebrow="FAQ" title="Good questions." />
+  <div class="mx-auto mt-14 grid max-w-3xl gap-3">
+    {QUESTIONS.map((item, i) => (
+      <details
+        data-reveal
+        style={`--delay: ${i * 60}ms`}
+        class="group rounded-2xl border border-white/[0.08] bg-white/[0.03] px-6 py-5 open:bg-white/[0.05]"
+      >
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-medium">
+          {item.q}
+          <span class="text-2xl leading-none text-lime transition group-open:rotate-45">+</span>
+        </summary>
+        <p class="mt-3 text-zinc-400">{item.a}</p>
+      </details>
+    ))}
+  </div>
+</section>

@@ -1,0 +1,40 @@
+---
+import Icon from "./Icon.astro"
+
+const POINTS = [
+  "Keys only go to the service they belong to.",
+  "Questions go to TypeSafe and, if you set one up, your backup AI.",
+  "Games are saved on your computer. Delete them any time.",
+  "No account, no tracking, no telemetry.",
+]
+---
+
+<section id="privacy" class="scroll-mt-28 px-4 pt-36">
+  <div
+    data-reveal
+    class="spot relative mx-auto grid max-w-6xl gap-10 overflow-hidden p-8 sm:p-14 md:grid-cols-[1fr_1.1fr] md:items-center"
+  >
+    <div class="pointer-events-none absolute -top-32 -left-24 size-96 rounded-full bg-emerald/20 blur-3xl"></div>
+    <div class="relative">
+      <div class="flex size-14 items-center justify-center rounded-2xl border border-lime/30 bg-lime/10 text-lime">
+        <Icon name="lock" class="size-7" />
+      </div>
+      <h2 class="mt-7 font-display text-4xl leading-[1.02] font-bold tracking-[-0.035em] sm:text-5xl">
+        Your keys stay on your computer.
+      </h2>
+      <p class="mt-4 text-lg text-zinc-400">
+        QuizPilot runs on your machine. There's no server in between.
+      </p>
+    </div>
+    <ul class="relative grid gap-3">
+      {POINTS.map((point) => (
+        <li class="flex gap-3 rounded-2xl border border-white/[0.07] bg-white/[0.03] p-4">
+          <span class="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-lime/15 text-lime">
+            <Icon name="check" class="size-3.5" />
+          </span>
+          <span class="text-zinc-300">{point}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>

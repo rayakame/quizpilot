@@ -1,0 +1,33 @@
+---
+import { REPO } from "../lib/download"
+import { url } from "../lib/url"
+---
+
+<header class="fixed inset-x-0 top-4 z-50 px-4">
+  <nav class="glass mx-auto flex max-w-5xl items-center justify-between rounded-full py-2 pr-2 pl-4 shadow-2xl shadow-black/40">
+    <a href={url()} class="flex items-center gap-2.5 font-display text-lg font-semibold">
+      <img src={url("favicon.svg")} alt="" width="28" height="28" class="size-7" />
+      QuizPilot
+    </a>
+    <div class="hidden items-center gap-7 text-sm text-zinc-400 md:flex">
+      <a href="#features" class="transition hover:text-white">
+        Features
+      </a>
+      <a href="#privacy" class="transition hover:text-white">
+        Privacy
+      </a>
+      <a href="#faq" class="transition hover:text-white">
+        FAQ
+      </a>
+      <a href={`https://github.com/${REPO}`} class="transition hover:text-white">
+        GitHub
+      </a>
+    </div>
+    <a
+      href="#download"
+      class="rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition hover:bg-lime"
+    >
+      Download
+    </a>
+  </nav>
+</header>

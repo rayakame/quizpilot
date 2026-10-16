@@ -1,0 +1,24 @@
+---
+import gameOver from "../assets/game-over.png"
+import history from "../assets/history.png"
+import AppWindow from "./AppWindow.astro"
+import SectionHead from "./SectionHead.astro"
+---
+
+<section class="px-4 pt-36">
+  <SectionHead
+    eyebrow="In the app"
+    title="Watch it think."
+    text="Every question shows what Jev picked, how sure it was and how each bot did."
+  />
+  <div class="mx-auto mt-16 grid max-w-6xl gap-6 lg:grid-cols-2">
+    <div data-reveal>
+      <AppWindow src={gameOver} alt="The game over screen with points, right answers and costs" />
+      <p class="mt-4 text-center text-sm text-zinc-500">The scoreboard when it's over</p>
+    </div>
+    <div data-reveal style="--delay: 120ms">
+      <AppWindow src={history} alt="The history page with every saved game and its questions" />
+      <p class="mt-4 text-center text-sm text-zinc-500">Every game, question by question</p>
+    </div>
+  </div>
+</section>

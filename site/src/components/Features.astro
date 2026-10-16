@@ -1,0 +1,107 @@
+---
+import Icon from "./Icon.astro"
+import SectionHead from "./SectionHead.astro"
+
+const TYPES = [
+  "Quiz",
+  "True or false",
+  "Multiple select",
+  "Puzzle",
+  "Slider",
+  "Type answer",
+  "Poll",
+  "Word cloud",
+]
+const BOTS = ["Anna", "Ben", "Cleo", "Dev", "Emi"]
+---
+
+<section id="features" class="scroll-mt-28 px-4 pt-36">
+  <SectionHead
+    eyebrow="Features"
+    title="Built for every round."
+    text="From the first question to the podium, QuizPilot handles the whole game."
+  />
+  <div class="mx-auto mt-16 grid max-w-6xl gap-4 md:grid-cols-6">
+    <article data-reveal class="spot p-8 md:col-span-4">
+      <Icon name="list" class="size-6 text-lime" />
+      <h3 class="mt-5 text-2xl font-semibold">Every question type</h3>
+      <p class="mt-2 max-w-lg text-zinc-400">
+        Quiz, true or false, multiple select, puzzles and sliders. With a backup AI also typed
+        answers and word clouds.
+      </p>
+      <div class="mt-7 flex flex-wrap gap-2">
+        {TYPES.map((type) => (
+          <span class="rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-1.5 text-sm text-zinc-300">
+            {type}
+          </span>
+        ))}
+      </div>
+    </article>
+
+    <article data-reveal style="--delay: 80ms" class="spot p-8 md:col-span-2">
+      <Icon name="users" class="size-6 text-lime" />
+      <h3 class="mt-5 text-2xl font-semibold">Up to five bots</h3>
+      <p class="mt-2 text-zinc-400">Each with its own name. Pause one or send it home any time.</p>
+      <div class="mt-7 flex -space-x-2">
+        {BOTS.map((bot, i) => (
+          <span
+            class="flex size-10 items-center justify-center rounded-full border-2 border-ink text-sm font-semibold text-black"
+            style={`background: hsl(${80 + i * 22} 75% ${62 - i * 3}%)`}
+          >
+            {bot[0]}
+          </span>
+        ))}
+      </div>
+    </article>
+
+    <article data-reveal class="spot p-8 md:col-span-2">
+      <Icon name="image" class="size-6 text-lime" />
+      <h3 class="mt-5 text-2xl font-semibold">Reads pictures</h3>
+      <p class="mt-2 text-zinc-400">
+        Question images and picture answers go to the AI too, not just the text.
+      </p>
+    </article>
+
+    <article data-reveal style="--delay: 80ms" class="spot p-8 md:col-span-2">
+      <Icon name="chat" class="size-6 text-lime" />
+      <h3 class="mt-5 text-2xl font-semibold">A second opinion</h3>
+      <p class="mt-2 text-zinc-400">
+        When Jev isn't sure, Claude, GPT or Gemini take a look, with a web search when there's time.
+      </p>
+    </article>
+
+    <article data-reveal style="--delay: 160ms" class="spot p-8 md:col-span-2">
+      <Icon name="clock" class="size-6 text-lime" />
+      <h3 class="mt-5 text-2xl font-semibold">Plays like a human</h3>
+      <p class="mt-2 text-zinc-400">
+        Answer right away or after a random pause, so the bots don't all buzz in at once.
+      </p>
+      <div class="mt-6 flex h-10 items-end gap-1.5">
+        {[40, 75, 55, 90, 35, 65, 80, 50].map((h) => (
+          <span
+            class="w-full rounded-sm bg-gradient-to-t from-emerald/40 to-lime/80"
+            style={`height: ${h}%`}
+          />
+        ))}
+      </div>
+    </article>
+
+    <article data-reveal class="spot p-8 md:col-span-3">
+      <Icon name="link" class="size-6 text-lime" />
+      <h3 class="mt-5 text-2xl font-semibold">Knows the answers</h3>
+      <p class="mt-2 text-zinc-400">
+        Paste a link to a public quiz and the bots know every right answer before the question even
+        shows up.
+      </p>
+    </article>
+
+    <article data-reveal style="--delay: 80ms" class="spot p-8 md:col-span-3">
+      <Icon name="history" class="size-6 text-lime" />
+      <h3 class="mt-5 text-2xl font-semibold">Remembers every game</h3>
+      <p class="mt-2 text-zinc-400">
+        Questions, answers, what went wrong and what the AI cost, saved on your computer. Export it
+        as CSV or JSON.
+      </p>
+    </article>
+  </div>
+</section>

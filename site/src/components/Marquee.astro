@@ -1,0 +1,25 @@
+---
+const ITEMS = [
+  "Jev by TypeSafe",
+  "Claude",
+  "GPT",
+  "Gemini",
+  "Web search",
+  "Picture questions",
+  "Puzzles",
+  "Sliders",
+  "Type answers",
+  "Two-step join",
+]
+---
+
+<div class="relative mt-28 overflow-hidden border-y border-white/[0.06] py-6 [mask-image:linear-gradient(90deg,transparent,black_15%,black_85%,transparent)]">
+  <div class="marquee flex w-max gap-10 text-lg text-zinc-500">
+    {[...ITEMS, ...ITEMS].map((item, i) => (
+      <span class="flex items-center gap-10 whitespace-nowrap" aria-hidden={i >= ITEMS.length}>
+        {item}
+        <span class="text-lime/60">✦</span>
+      </span>
+    ))}
+  </div>
+</div>

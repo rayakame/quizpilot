@@ -1,0 +1,42 @@
+---
+import { RELEASES, REPO } from "../lib/download"
+import { url } from "../lib/url"
+import Icon from "./Icon.astro"
+---
+
+<section class="px-4 pt-40">
+  <div data-reveal class="relative mx-auto max-w-4xl text-center">
+    <div class="pointer-events-none absolute inset-x-10 -top-10 bottom-0 rounded-full bg-lime/15 blur-3xl"></div>
+    <h2 class="relative font-display text-5xl leading-[0.95] font-bold tracking-[-0.04em] sm:text-7xl">
+      Your next quiz
+      <br />
+      <span class="text-gradient">is waiting.</span>
+    </h2>
+    <div class="relative mt-10 flex justify-center">
+      <a href="#download" data-primary class="btn-primary">
+        <Icon name="download" />
+        <span data-label>Download QuizPilot</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer class="mt-32 border-t border-white/[0.06] px-4 py-10">
+  <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-6 text-sm text-zinc-500 md:flex-row">
+    <div class="flex items-center gap-2.5">
+      <img src={url("favicon.svg")} alt="" width="22" height="22" class="size-5.5" />
+      <span>QuizPilot · MIT license</span>
+    </div>
+    <p class="max-w-md text-center text-xs text-zinc-600">
+      Not affiliated with Kahoot!, TypeSafe, Anthropic, OpenAI or Google.
+    </p>
+    <div class="flex gap-6">
+      <a href={`https://github.com/${REPO}`} class="transition hover:text-white">
+        GitHub
+      </a>
+      <a href={RELEASES} class="transition hover:text-white">
+        Releases
+      </a>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,30 @@
+---
+import SectionHead from "./SectionHead.astro"
+
+const STEPS = [
+  { title: "Paste the PIN", text: "Or the whole kahoot.it link. QuizPilot finds the game." },
+  {
+    title: "Pick your bots",
+    text: "Up to five. Name them yourself or let QuizPilot make up names.",
+  },
+  {
+    title: "Lean back",
+    text: "Every question goes to Jev the moment it shows up. The bots answer, usually within a second.",
+  },
+]
+---
+
+<section class="px-4 pt-32">
+  <SectionHead eyebrow="How it works" title="Three steps. Then it plays itself." />
+  <ol class="mx-auto mt-16 grid max-w-5xl gap-6 md:grid-cols-3">
+    {STEPS.map((step, i) => (
+      <li data-reveal style={`--delay: ${i * 120}ms`} class="spot p-7">
+        <div class="font-display text-7xl leading-none font-bold text-transparent [-webkit-text-stroke:1.5px_#a3e63599]">
+          {i + 1}
+        </div>
+        <h3 class="mt-6 text-xl font-semibold">{step.title}</h3>
+        <p class="mt-2 text-zinc-400">{step.text}</p>
+      </li>
+    ))}
+  </ol>
+</section>

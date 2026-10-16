@@ -1,7 +1,35 @@
 ---
+import Download from "../components/Download.astro"
+import Faq from "../components/Faq.astro"
+import Features from "../components/Features.astro"
+import Footer from "../components/Footer.astro"
+import Hero from "../components/Hero.astro"
+import Marquee from "../components/Marquee.astro"
+import Nav from "../components/Nav.astro"
+import Privacy from "../components/Privacy.astro"
+import Shots from "../components/Shots.astro"
+import Steps from "../components/Steps.astro"
 import Layout from "../layouts/Layout.astro"
 ---
 
-<Layout title="QuizPilot" description="Kahoot on autopilot.">
-  <h1 class="font-display text-6xl">QuizPilot</h1>
+<Layout
+  title="QuizPilot · Kahoot on autopilot"
+  description="QuizPilot joins a Kahoot game with up to five bots and answers every question with AI. Free and open source for macOS, Windows and Linux."
+>
+  <Nav />
+  <main>
+    <Hero />
+    <Marquee />
+    <Steps />
+    <Features />
+    <Shots />
+    <Privacy />
+    <Download />
+    <Faq />
+  </main>
+  <Footer />
 </Layout>
+
+<script>
+  import "../scripts/page"
+</script>
