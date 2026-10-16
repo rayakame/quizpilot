@@ -165,3 +165,44 @@ describe("HistoryRecorder", () => {
     expect(store.listGames()).toEqual([])
   })
 })
+
+describe("HistoryRecorder: which game", () => {
+  it("remembers the game it recorded last until the next one starts", () => {
+    const { store, recorder } = setup()
+    expect(recorder.gameId).toBeNull()
+    recorder.begin(request, null)
+    const id = store.latestGameId()
+    recorder.finish()
+    expect(recorder.gameId).toBe(id)
+  })
+
+  it("has no game when the recording could not start", () => {
+    const { store, recorder } = setup()
+    recorder.begin(request, null)
+    store.close()
+    recorder.begin(request, null)
+    expect(recorder.gameId).toBeNull()
+  })
+
+  it("logs a failure again in a later game", () => {
+    const { store, deps, recorder } = setup()
+    recorder.begin(request, null)
+    recorder.event({
+      type: "result",
+      bot: "Ben",
+      result: {
+        index: 9,
+        correct: false,
+        points: 0,
+        totalScore: 0,
+        rank: 2,
+        correctChoices: null,
+        answerText: null,
+      },
+    })
+    recorder.begin(request, null)
+    store.close()
+    for (const e of round(0)) recorder.event(e)
+    expect(deps.log).toHaveBeenCalledTimes(2)
+  })
+})

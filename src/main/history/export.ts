@@ -22,11 +22,18 @@ export function toJson(record: HistoryRecord): string {
 
 export function toCsv(record: HistoryRecord): string {
   const rows = record.questions.filter((h) => h.question.type !== "content").map(row)
-  return [HEADER, ...rows].map((cells) => cells.map(cell).join(",")).join("\r\n") + "\r\n"
+  // Excel only reads the file as UTF-8 with a byte order mark.
+  const lines = [HEADER, ...rows].map((cells) => cells.map(cell).join(","))
+  return "\uFEFF" + lines.join("\r\n") + "\r\n"
 }
 
 export function exportName(record: HistoryRecord): string {
-  const day = new Date(record.game.startedAt).toISOString().slice(0, 10)
+  const started = new Date(record.game.startedAt)
+  const day = [
+    started.getFullYear(),
+    String(started.getMonth() + 1).padStart(2, "0"),
+    String(started.getDate()).padStart(2, "0"),
+  ].join("-")
   const name = (record.game.quizTitle ?? record.game.pin)
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
@@ -53,6 +60,7 @@ function row(h: HistoryQuestion): (string | number | null)[] {
 
 function cell(value: string | number | null): string {
   if (value === null) return ""
-  const text = String(value)
+  // Quiz texts come from strangers; spreadsheets would run a leading = + - @ as a formula.
+  const text = typeof value === "string" && /^[=+\-@\t\r]/.test(value) ? `'${value}` : String(value)
   return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text
 }

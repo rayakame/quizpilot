@@ -21,12 +21,19 @@ interface Current {
 
 export class HistoryRecorder implements GameRecorder {
   private current: Current | null = null
+  private lastId: number | null = null
   private failed = false
 
   constructor(private readonly deps: RecorderDeps) {}
 
+  get gameId(): number | null {
+    return this.lastId
+  }
+
   begin(request: StartRequest, quiz: KnownQuiz | null): void {
     this.finish()
+    this.lastId = null
+    this.failed = false
     if (this.deps.enabled()) this.safely(() => this.open(request, quiz))
   }
 
@@ -55,6 +62,7 @@ export class HistoryRecorder implements GameRecorder {
     })
     for (const name of request.names) store.saveBot(id, name, null)
     this.current = { id, request, quiz, last: null }
+    this.lastId = id
   }
 
   private apply(current: Current, e: GameEvent): void {

@@ -46,7 +46,9 @@ const record = (questions: HistoryQuestion[]): HistoryRecord => ({
 
 describe("toCsv", () => {
   it("writes one row per question and quotes what needs quoting", () => {
-    const [header, row, ...rest] = toCsv(record([q()])).split("\r\n")
+    const [header, row, ...rest] = toCsv(record([q()]))
+      .replace(/^\uFEFF/, "")
+      .split("\r\n")
     expect(header).toBe(
       "question,type,title,answer,correct_answer,result,source,confidence,average_ms,cost_usd",
     )
@@ -83,5 +85,37 @@ describe("toJson / exportName", () => {
     expect(exportName({ ...record([]), game: { ...record([]).game, quizTitle: null } })).toBe(
       "quizpilot-916240-2026-10-16",
     )
+  })
+})
+
+describe("export safety", () => {
+  it("stops spreadsheets from running cells as formulas", () => {
+    const evil = q({
+      question: {
+        ...q().question,
+        title: '=HYPERLINK("http://x","click")',
+        choices: [
+          { text: "@SUM(1)", image: null },
+          { text: "+2", image: null },
+        ],
+      },
+      correctChoices: [1],
+      decision: { answer: { kind: "choice", index: 0 }, source: "jev", confidence: 0.5, usage: [] },
+    })
+    const row = toCsv(record([evil])).split("\r\n")[1]!
+    expect(row).toContain(`"'=HYPERLINK(""http://x"",""click"")"`)
+    expect(row).toContain(",'@SUM(1),'+2,")
+  })
+
+  it("marks the file as UTF-8 for Excel", () => {
+    expect(toCsv(record([q()])).startsWith("\uFEFFquestion,")).toBe(true)
+  })
+
+  it("names the file after the local day", () => {
+    const night = {
+      ...record([]),
+      game: { ...record([]).game, startedAt: new Date(2026, 9, 17, 0, 30).getTime() },
+    }
+    expect(exportName(night)).toBe("quizpilot-geo-2026-10-17")
   })
 })

@@ -16,7 +16,7 @@ import { withTimeout } from "../core/util/async.js"
 import { GAME_EVENT_CHANNEL, OPEN_SETTINGS_CHANNEL } from "../shared/api.js"
 import { removeFallback, saveFallback } from "./fallback.js"
 import { GameController } from "./game-controller.js"
-import { exportName, toCsv, toJson } from "./history/export.js"
+import { historyHandlers } from "./history/handlers.js"
 import { HistoryRecorder } from "./history/recorder.js"
 import { HistoryStore } from "./history/store.js"
 import { registerIpc } from "./ipc.js"
@@ -116,8 +116,6 @@ async function start(): Promise<void> {
         log: (message, err) => console.error(message, err),
       })
     : undefined
-  const removeImages = (id: number) =>
-    rm(join(historyDir, String(id)), { recursive: true, force: true })
 
   const quizzes = new QuizCache()
   const controller = new GameController({
@@ -156,43 +154,26 @@ async function start(): Promise<void> {
     openExternal: async (url) => {
       if (url.startsWith("https://")) await shell.openExternal(url)
     },
-    listHistory: async () => history?.listGames() ?? [],
-    getHistory: async (id) => history?.getGame(id) ?? null,
-    deleteHistory: async (id) => {
-      if (!history || !(await confirm("Delete this game from the history?", "Delete"))) {
-        return false
-      }
-      history.deleteGame(id)
-      await removeImages(id)
-      return true
-    },
-    clearHistory: async () => {
-      const count = history?.listGames().length ?? 0
-      if (!history || count === 0) return false
-      const games = count === 1 ? "the saved game" : `all ${count} saved games`
-      if (!(await confirm(`Delete ${games}?`, "Delete"))) return false
-      for (const id of history.deleteAll()) await removeImages(id)
-      return true
-    },
-    exportHistory: async (id) => {
-      const gameId = id ?? history?.latestGameId() ?? null
-      const record = gameId === null ? null : (history?.getGame(gameId) ?? null)
-      if (!record) return "missing"
-      const options = {
-        defaultPath: `${exportName(record)}.json`,
-        filters: [
-          { name: "JSON", extensions: ["json"] },
-          { name: "CSV", extensions: ["csv"] },
-        ],
-      }
-      const { canceled, filePath } = win
-        ? await dialog.showSaveDialog(win, options)
-        : await dialog.showSaveDialog(options)
-      if (canceled || !filePath) return "cancelled"
-      const csv = filePath.toLowerCase().endsWith(".csv")
-      await writeFile(filePath, csv ? toCsv(record) : toJson(record))
-      return "saved"
-    },
+    ...historyHandlers({
+      store: history,
+      currentGameId: () => recorder?.gameId ?? null,
+      confirm,
+      removeImages: (id) => rm(join(historyDir, String(id)), { recursive: true, force: true }),
+      chooseFile: async (name) => {
+        const options = {
+          defaultPath: `${name}.json`,
+          filters: [
+            { name: "JSON", extensions: ["json"] },
+            { name: "CSV", extensions: ["csv"] },
+          ],
+        }
+        const { canceled, filePath } = win
+          ? await dialog.showSaveDialog(win, options)
+          : await dialog.showSaveDialog(options)
+        return canceled || !filePath ? null : filePath
+      },
+      writeFile: (path, text) => writeFile(path, text),
+    }),
   })
 
   let quitting = false
