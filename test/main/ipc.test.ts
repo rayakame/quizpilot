@@ -10,6 +10,7 @@ function handlers(): Handlers {
     saveTypesafeKey: vi.fn(),
     saveFallback: vi.fn(),
     removeFallback: vi.fn(),
+    checkQuizLink: vi.fn(),
     startGame: vi.fn(),
     addBot: vi.fn(),
     submitTwoStep: vi.fn(),

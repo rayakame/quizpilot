@@ -46,6 +46,7 @@ describe("startProblem", () => {
     timing: { mode: "instant", minMs: 1000, maxMs: 5000 },
     quizContext: null,
     includePrevious: true,
+    quizLink: null,
   }
 
   it("accepts a complete request", () => {
@@ -60,5 +61,15 @@ describe("startProblem", () => {
     expect(startProblem({ ...request, timing: { mode: "human", minMs: 3000, maxMs: 1000 } })).toBe(
       "timing",
     )
+  })
+
+  it("checks the quiz link", () => {
+    expect(startProblem({ ...request, quizLink: "https://kahoot.it/" })).toBe("quiz_link")
+    expect(
+      startProblem({
+        ...request,
+        quizLink: "https://create.kahoot.it/details/fba5cd05-96af-4506-b8ce-388ff9b33fbb",
+      }),
+    ).toBeNull()
   })
 })

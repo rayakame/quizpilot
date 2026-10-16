@@ -1,4 +1,5 @@
 import { MAX_NAME_LENGTH } from "../core/names/names.js"
+import { parseQuizLink } from "../core/quiz-source/link.js"
 import { MAX_BOTS } from "../core/session/game-session.js"
 import type { StartProblem, StartRequest, Timing } from "./api.js"
 
@@ -33,5 +34,6 @@ export function startProblem(request: StartRequest): StartProblem | null {
     const problem = nameProblem(name, names.slice(0, i))
     if (problem) return problem
   }
+  if (request.quizLink !== null && parseQuizLink(request.quizLink) === null) return "quiz_link"
   return timingProblem(request.timing)
 }

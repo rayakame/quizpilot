@@ -1,4 +1,5 @@
 import type { JoinErrorCode } from "../core/kahoot/adapter.js"
+import type { QuizLoadProblem } from "../core/quiz-source/link.js"
 import type { FallbackProviderId } from "../core/providers/fallback/ids.js"
 import type { Effort, ModelChoice } from "../core/providers/fallback/models.js"
 import type { JoinOutcome, SessionEvent, SessionSettings } from "../core/session/game-session.js"
@@ -56,9 +57,16 @@ export interface StartRequest {
   timing: Timing
   quizContext: string | null
   includePrevious: boolean
+  quizLink: string | null
 }
 
-export type StartProblem = "pin" | "bots" | "name_empty" | "name_long" | "name_taken" | "timing"
+export type QuizLinkProblem = QuizLoadProblem
+
+export type QuizCheck =
+  { ok: true; title: string; questions: number } | { ok: false; error: QuizLinkProblem }
+
+export type StartProblem =
+  "pin" | "bots" | "name_empty" | "name_long" | "name_taken" | "timing" | "quiz_link"
 
 export type StartResult =
   { ok: true } | { ok: false; error: StartProblem | JoinErrorCode; message: string }
@@ -71,6 +79,7 @@ export interface QuizPilotApi {
   saveTypesafeKey(key: string): Promise<KeyCheck>
   saveFallback(setup: FallbackSetup): Promise<KeyCheck>
   removeFallback(): Promise<void>
+  checkQuizLink(link: string): Promise<QuizCheck>
   startGame(request: StartRequest): Promise<StartResult>
   addBot(name: string): Promise<JoinOutcome>
   submitTwoStep(sequence: number[]): Promise<void>
@@ -91,6 +100,7 @@ export const CHANNELS = {
   saveTypesafeKey: "settings:typesafe-key",
   saveFallback: "settings:fallback",
   removeFallback: "settings:fallback-remove",
+  checkQuizLink: "quiz:check",
   startGame: "game:start",
   addBot: "game:add-bot",
   submitTwoStep: "game:two-step",

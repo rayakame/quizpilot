@@ -47,6 +47,7 @@ export function toRequest(form: StartForm): StartRequest {
     timing: toTiming(form.human, form.minSeconds, form.maxSeconds),
     quizContext: form.context.trim() || null,
     includePrevious: form.includePrevious,
+    quizLink: null,
   }
 }
 

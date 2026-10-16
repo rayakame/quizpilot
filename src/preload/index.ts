@@ -15,6 +15,7 @@ const api: QuizPilotApi = {
   saveTypesafeKey: (key) => ipcRenderer.invoke(CHANNELS.saveTypesafeKey, key),
   saveFallback: (setup) => ipcRenderer.invoke(CHANNELS.saveFallback, setup),
   removeFallback: () => ipcRenderer.invoke(CHANNELS.removeFallback),
+  checkQuizLink: (link) => ipcRenderer.invoke(CHANNELS.checkQuizLink, link),
   startGame: (request) => ipcRenderer.invoke(CHANNELS.startGame, request),
   addBot: (name) => ipcRenderer.invoke(CHANNELS.addBot, name),
   submitTwoStep: (sequence) => ipcRenderer.invoke(CHANNELS.submitTwoStep, sequence),

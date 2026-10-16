@@ -1,10 +1,12 @@
 import { parseSequence } from "../core/kahoot/two-step.js"
+import type { KnownQuiz } from "../core/quiz-source/link.js"
 import type { GameSession, JoinOutcome, SessionEvent } from "../core/session/game-session.js"
 import type { GameEvent, QuestionView, StartRequest, StartResult } from "../shared/api.js"
 import { startProblem } from "../shared/start.js"
 
 export interface ControllerDeps {
-  createSession(request: StartRequest): GameSession
+  createSession(request: StartRequest, quiz: KnownQuiz | null): GameSession
+  loadQuiz(link: string): Promise<KnownQuiz>
   send(event: GameEvent): void
 }
 
@@ -22,10 +24,18 @@ export class GameController {
   async start(request: StartRequest): Promise<StartResult> {
     const problem = startProblem(request)
     if (problem) return { ok: false, error: problem, message: problem }
+    let quiz: KnownQuiz | null = null
+    if (request.quizLink !== null) {
+      try {
+        quiz = await this.deps.loadQuiz(request.quizLink)
+      } catch (err) {
+        return { ok: false, error: "quiz_link", message: errorText(err) }
+      }
+    }
     await this.end()
     let session: GameSession
     try {
-      session = this.deps.createSession(request)
+      session = this.deps.createSession(request, quiz)
     } catch (err) {
       return { ok: false, error: "unknown", message: errorText(err) }
     }

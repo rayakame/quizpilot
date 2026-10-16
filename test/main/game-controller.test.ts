@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest"
 import { JoinError, type JoinErrorCode } from "../../src/core/kahoot/adapter.js"
+import { QuizLoadError, type KnownQuiz } from "../../src/core/quiz-source/link.js"
 import { GameSession } from "../../src/core/session/game-session.js"
 import type { Question } from "../../src/core/types.js"
 import { GameController, toGameEvent } from "../../src/main/game-controller.js"
@@ -12,11 +13,17 @@ const request: StartRequest = {
   timing: { mode: "instant", minMs: 0, maxMs: 0 },
   quizContext: "TUM",
   includePrevious: true,
+  quizLink: null,
 }
 
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0))
 
-function setup(firstJoinFails?: JoinErrorCode) {
+function setup(
+  firstJoinFails?: JoinErrorCode,
+  loadQuiz: (link: string) => Promise<KnownQuiz> = async () => {
+    throw new QuizLoadError("unknown")
+  },
+) {
   const adapters: FakeAdapter[] = []
   const sent: GameEvent[] = []
   const createSession = vi.fn(
@@ -43,7 +50,7 @@ function setup(firstJoinFails?: JoinErrorCode) {
         },
       ),
   )
-  const controller = new GameController({ createSession, send: (e) => sent.push(e) })
+  const controller = new GameController({ createSession, loadQuiz, send: (e) => sent.push(e) })
   return { controller, createSession, adapters, sent }
 }
 
@@ -141,6 +148,31 @@ describe("GameController", () => {
     await controller.start({ ...request, names: ["Cem"] })
     expect(adapters[0]!.leave).toHaveBeenCalled()
     expect(adapters[1]!.leave).toHaveBeenCalled()
+  })
+
+  const LINK = "https://create.kahoot.it/details/fba5cd05-96af-4506-b8ce-388ff9b33fbb"
+
+  it("loads the quiz before joining and hands it to the session", async () => {
+    const quiz = { id: "q", title: "Geo", questions: [] }
+    const { controller, createSession } = setup(
+      undefined,
+      vi.fn(async () => quiz),
+    )
+    expect(await controller.start({ ...request, quizLink: LINK })).toEqual({ ok: true })
+    expect(createSession).toHaveBeenCalledWith({ ...request, quizLink: LINK }, quiz)
+  })
+
+  it("does not join when the quiz does not load", async () => {
+    const loadQuiz = vi.fn(async () => {
+      throw new QuizLoadError("private")
+    })
+    const { controller, createSession } = setup(undefined, loadQuiz)
+    expect(await controller.start({ ...request, quizLink: LINK })).toEqual({
+      ok: false,
+      error: "quiz_link",
+      message: "private",
+    })
+    expect(createSession).not.toHaveBeenCalled()
   })
 })
 

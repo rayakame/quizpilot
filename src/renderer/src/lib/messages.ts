@@ -33,6 +33,7 @@ export const ERROR_TEXT: Record<StartProblem | JoinErrorCode, string> = {
   name_long: "Names can have at most 15 characters.",
   name_taken: "Every bot needs a different name.",
   timing: "Pick a delay between 0 and 30 seconds, the smaller number first.",
+  quiz_link: "Couldn't use this quiz link.",
   not_found: "There's no game with this PIN.",
   locked: "The host has locked this game.",
   duplicate_name: "Someone in the game already has this name.",

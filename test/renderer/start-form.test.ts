@@ -68,6 +68,7 @@ describe("start form", () => {
       timing: { mode: "human", minMs: 500, maxMs: 5000 },
       quizContext: null,
       includePrevious: false,
+      quizLink: null,
     })
   })
 

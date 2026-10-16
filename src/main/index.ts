@@ -16,6 +16,7 @@ import { removeFallback, saveFallback } from "./fallback.js"
 import { GameController } from "./game-controller.js"
 import { registerIpc } from "./ipc.js"
 import { menuTemplate } from "./menu.js"
+import { QuizCache } from "./quiz.js"
 import { createSession } from "./session-factory.js"
 import { applyPatch, DEFAULT_CONFIG, loadConfig, SettingsStore, toPublic } from "./settings.js"
 import { checkTypesafeKey } from "./typesafe.js"
@@ -66,8 +67,10 @@ async function start(): Promise<void> {
   if (!settings) return app.quit()
   nativeTheme.themeSource = settings.get().ui.theme
 
+  const quizzes = new QuizCache()
   const controller = new GameController({
-    createSession: (request) => createSession(request, settings.get()),
+    createSession: (request, quiz) => createSession(request, settings.get(), quiz),
+    loadQuiz: (link) => quizzes.get(link),
     send: (event) => {
       if (win && !win.isDestroyed()) win.webContents.send(GAME_EVENT_CHANNEL, event)
     },
@@ -90,6 +93,7 @@ async function start(): Promise<void> {
     },
     saveFallback: (setup) => saveFallback(settings, setup),
     removeFallback: () => removeFallback(settings),
+    checkQuizLink: (link) => quizzes.check(link),
     startGame: (request) => controller.start(request),
     addBot: (name) => controller.addBot(name),
     submitTwoStep: (sequence) => controller.submitTwoStep(sequence),
