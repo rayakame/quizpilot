@@ -1,6 +1,6 @@
 appId: io.github.rayakame.quizpilot
 productName: QuizPilot
-artifactName: ${productName}-${version}-${arch}.${ext}
+artifactName: ${productName}-${arch}.${ext}
 directories:
   output: dist
   buildResources: resources
@@ -27,6 +27,7 @@ win:
       arch: [x64]
   icon: resources/icon.png
 nsis:
+  artifactName: ${productName}-Setup.${ext}
   oneClick: true
   perMachine: false
 linux:
@@ -35,6 +36,8 @@ linux:
       arch: [x64]
   category: Utility
   icon: resources/icon.png
+appImage:
+  artifactName: ${productName}-${arch}.${ext}
 publish:
   provider: github
   owner: rayakame
