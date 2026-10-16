@@ -1,19 +1,24 @@
-import { assetUrl, detectPlatform, latestVersion, type Asset } from "../lib/download"
-
-const PRIMARY: Record<"mac" | "windows" | "linux", { asset: Asset; label: string }> = {
-  mac: { asset: "macArm", label: "Download for macOS" },
-  windows: { asset: "windows", label: "Download for Windows" },
-  linux: { asset: "linux", label: "Download for Linux" },
-}
+import { assetUrl, detectPlatform, latestVersion, primaryDownload } from "../lib/download"
 
 function downloads(): void {
   const platform = detectPlatform(navigator.userAgent, navigator.platform, navigator.maxTouchPoints)
-  if (platform === "other") return
-  const { asset, label } = PRIMARY[platform]
+  const main = primaryDownload(platform)
+  if (!main) return
   for (const link of document.querySelectorAll<HTMLAnchorElement>("[data-primary]")) {
-    link.href = assetUrl(asset)
+    link.href = assetUrl(main.asset)
     const text = link.querySelector("[data-label]")
-    if (text) text.textContent = label
+    if (text) text.textContent = main.label
+  }
+  for (const note of document.querySelectorAll<HTMLElement>("[data-note]")) {
+    if (!main.note) continue
+    note.textContent = main.alternative ? `${main.note} ·` : main.note
+    note.hidden = false
+  }
+  for (const link of document.querySelectorAll<HTMLAnchorElement>("[data-alternative]")) {
+    if (!main.alternative) continue
+    link.href = assetUrl(main.alternative.asset)
+    link.textContent = main.alternative.label
+    link.hidden = false
   }
   document.querySelector(`[data-card="${platform}"]`)?.setAttribute("data-current", "")
 }

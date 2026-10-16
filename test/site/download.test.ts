@@ -1,5 +1,11 @@
 import { describe, expect, it, vi } from "vitest"
-import { ASSETS, assetUrl, detectPlatform, latestVersion } from "../../site/src/lib/download.js"
+import {
+  ASSETS,
+  assetUrl,
+  detectPlatform,
+  latestVersion,
+  primaryDownload,
+} from "../../site/src/lib/download.js"
 import { installerNames } from "../support/installers.js"
 
 const UA = {
@@ -15,6 +21,9 @@ const UA = {
   iphone:
     "Mozilla/5.0 (iPhone; CPU iPhone OS 26_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Mobile/15E148 Safari/604.1",
   ipad: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Safari/605.1.15",
+  chromebook:
+    "Mozilla/5.0 (X11; CrOS x86_64 16181.47.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+  linuxArm: "Mozilla/5.0 (X11; Linux aarch64; rv:150.0) Gecko/20100101 Firefox/150.0",
 }
 
 describe("detectPlatform", () => {
@@ -30,6 +39,11 @@ describe("detectPlatform", () => {
     expect(detectPlatform(UA.iphone, "iPhone", 5)).toBe("other")
     // iPads ask for the desktop site and only give themselves away by touch.
     expect(detectPlatform(UA.ipad, "MacIntel", 5)).toBe("other")
+  })
+
+  it("doesn't offer the x86 AppImage where it can't run", () => {
+    expect(detectPlatform(UA.chromebook, "Linux x86_64", 0)).toBe("other")
+    expect(detectPlatform(UA.linuxArm, "Linux aarch64", 0)).toBe("other")
   })
 })
 
@@ -57,5 +71,23 @@ describe("latestVersion", () => {
     expect(await latestVersion(reply(200, JSON.stringify({ name: "x" })))).toBeNull()
     const offline = vi.fn(async () => Promise.reject(new TypeError("fetch failed")))
     expect(await latestVersion(offline as unknown as typeof fetch)).toBeNull()
+  })
+})
+
+describe("primaryDownload", () => {
+  it("offers Intel Macs their own file next to the main button", () => {
+    expect(primaryDownload("mac")).toEqual({
+      asset: "macArm",
+      label: "Download for Mac",
+      note: "Apple Silicon",
+      alternative: { asset: "macIntel", label: "Intel Mac?" },
+    })
+    expect(primaryDownload("windows")).toEqual({
+      asset: "windows",
+      label: "Download for Windows",
+      note: null,
+      alternative: null,
+    })
+    expect(primaryDownload("other")).toBeNull()
   })
 })

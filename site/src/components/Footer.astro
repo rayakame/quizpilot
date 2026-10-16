@@ -18,16 +18,24 @@ import Icon from "./Icon.astro"
         <span data-label>Download QuizPilot</span>
       </a>
     </div>
+    <p class="relative mt-3 h-5 text-sm text-zinc-400">
+      <span data-note hidden></span>
+      <a
+        data-alternative
+        hidden
+        class="ml-1 underline decoration-white/30 underline-offset-4 hover:text-white"
+      ></a>
+    </p>
   </div>
 </section>
 
 <footer class="mt-32 border-t border-white/[0.06] px-4 py-10">
-  <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-6 text-sm text-zinc-500 md:flex-row">
+  <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-6 text-sm text-zinc-400 md:flex-row">
     <div class="flex items-center gap-2.5">
       <img src={url("favicon.svg")} alt="" width="22" height="22" class="size-5.5" />
       <span>QuizPilot · MIT license</span>
     </div>
-    <p class="max-w-md text-center text-xs text-zinc-600">
+    <p class="max-w-md text-center text-xs text-zinc-400">
       Not affiliated with Kahoot!, TypeSafe, Anthropic, OpenAI or Google.
     </p>
     <div class="flex gap-6">

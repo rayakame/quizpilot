@@ -52,7 +52,7 @@ const CARDS = [
           </span>
         </div>
         <h3 class="mt-6 font-display text-3xl font-bold tracking-tight">{card.name}</h3>
-        <p class="mt-1 text-sm text-zinc-500">{card.note}</p>
+        <p class="mt-1 text-sm text-zinc-400">{card.note}</p>
         <div class="mt-6 flex flex-wrap gap-2">
           {card.links.map((link) => (
             <a
@@ -70,7 +70,7 @@ const CARDS = [
           ))}
         </div>
         <details class="mt-6 border-t border-white/[0.07] pt-4 text-sm text-zinc-400">
-          <summary class="cursor-pointer text-zinc-300 marker:text-zinc-600">
+          <summary class="cursor-pointer text-zinc-300 marker:text-zinc-400">
             Opening it the first time
           </summary>
           <p class="mt-2">{card.help}</p>
@@ -78,7 +78,7 @@ const CARDS = [
       </article>
     ))}
   </div>
-  <p class="mt-8 text-center text-sm text-zinc-500">
+  <p class="mt-8 text-center text-sm text-zinc-400">
     All files and older versions are on the{" "}
     <a
       href={RELEASES}
