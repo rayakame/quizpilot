@@ -10,6 +10,7 @@ import {
   Menu,
   nativeImage,
   nativeTheme,
+  Notification,
   shell,
 } from "electron"
 import { createImageLoader } from "../core/media/image-loader.js"
@@ -25,6 +26,7 @@ import { HistoryStore } from "./history/store.js"
 import { registerIpc } from "./ipc.js"
 import { Logger } from "./log.js"
 import { menuTemplate } from "./menu.js"
+import { Notifier } from "./notifier.js"
 import { QuizCache } from "./quiz.js"
 import { createSession } from "./session-factory.js"
 import { applyPatch, freshConfig, loadConfig, SettingsStore, toPublic } from "./settings.js"
@@ -150,8 +152,31 @@ async function start(): Promise<void> {
 
   const quizzes = new QuizCache()
   const writeEntry = (entry: LogEntry) => log.write(entry.level, entry.message, entry.detail)
+  const shown = new Set<Notification>()
+  const notifier = new Notifier({
+    show: (title, body) => {
+      if (!Notification.isSupported()) return
+      const note = new Notification({ title, body })
+      // Without a reference the click handler is collected before anyone clicks.
+      shown.add(note)
+      note.on("click", () => {
+        shown.delete(note)
+        if (!win || win.isDestroyed()) return
+        if (win.isMinimized()) win.restore()
+        win.show()
+        win.focus()
+      })
+      note.on("close", () => shown.delete(note))
+      note.show()
+    },
+    focused: () => win !== null && !win.isDestroyed() && win.isFocused(),
+    enabled: () => settings.get().behavior.notify,
+    text: () => text().notify,
+    later: (run, ms) => void setTimeout(run, ms),
+  })
   const emit = (event: GameEvent) => {
     if (win && !win.isDestroyed()) win.webContents.send(GAME_EVENT_CHANNEL, event)
+    notifier.event(event)
   }
   const controller = new GameController({
     createSession: (request, quiz) =>
@@ -185,7 +210,10 @@ async function start(): Promise<void> {
     saveFallback: (setup) => saveFallback(settings, setup),
     removeFallback: () => removeFallback(settings),
     checkQuizLink: (link) => quizzes.check(link),
-    startGame: (request) => controller.start(request),
+    startGame: (request) => {
+      notifier.reset()
+      return controller.start(request)
+    },
     addBot: (name) => controller.addBot(name),
     submitTwoStep: (sequence) => controller.submitTwoStep(sequence),
     pause: async (bot, paused) => controller.pause(bot, paused),

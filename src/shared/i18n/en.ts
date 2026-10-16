@@ -3,6 +3,8 @@ import type { BotStatus } from "../../core/session/game-session.js"
 import type { QuestionType } from "../../core/types.js"
 import type { QuizLinkProblem, StartProblem, Theme } from "../api.js"
 
+const names = (list: string[]) => new Intl.ListFormat("en", { type: "conjunction" }).format(list)
+
 export const en = {
   locale: "en",
   menu: {
@@ -235,6 +237,7 @@ export const en = {
     backupSaved: "Backup AI saved",
     behaviorText: "Defaults for new games. The start wizard can change them per game.",
     reconnect: "Reconnect bots when the connection drops",
+    notify: "Notify me when QuizPilot is in the background",
     theme: "Theme",
     language: "Language",
     historyText: "Played games stay on this computer, with their questions, answers and costs.",
@@ -259,6 +262,18 @@ export const en = {
     noQuestions: "No questions here.",
     rightAnswer: "Right answer:",
     result: { right: "right", wrong: "wrong" },
+  },
+  notify: {
+    twoStepTitle: "Two-step join",
+    twoStepBody: "Enter the symbols from the host's screen.",
+    overTitle: "Game over",
+    overBody: (bot: string, rank: number) => `${bot} finished #${rank}.`,
+    lostTitle: "Connection lost",
+    lostBody: (bots: string[]) => `${names(bots)} lost the connection.`,
+    kickedTitle: "Removed from the game",
+    kickedBody: (bots: string[]) => `The host removed ${names(bots)}.`,
+    jevKeyTitle: "TypeSafe key rejected",
+    jevKeyBody: "The bots are guessing. Change the key in the settings.",
   },
   colors: {
     red: "red triangle",

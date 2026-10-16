@@ -31,7 +31,11 @@ describe("parseConfig", () => {
         webSearch: false,
       },
       context: { includePrevious: false },
-      behavior: { timing: { mode: "human", minMs: 500, maxMs: 2000 }, reconnect: false },
+      behavior: {
+        timing: { mode: "human", minMs: 500, maxMs: 2000 },
+        reconnect: false,
+        notify: false,
+      },
       ui: { language: "de", theme: "dark" },
       history: { enabled: false },
     }
@@ -104,6 +108,7 @@ describe("toPublic", () => {
       timing: DEFAULT_CONFIG.behavior.timing,
       includePrevious: true,
       reconnect: true,
+      notify: true,
       theme: "system",
       language: "en",
       saveHistory: true,
@@ -137,6 +142,7 @@ describe("applyPatch", () => {
     expect(next.behavior).toEqual({
       timing: { mode: "human", minMs: 500, maxMs: 2500 },
       reconnect: false,
+      notify: true,
     })
     expect(next.context.includePrevious).toBe(false)
     expect(next.ui).toEqual({ language: "en", theme: "dark" })
@@ -191,5 +197,14 @@ describe("language", () => {
     expect(toPublic(freshConfig("de")).language).toBe("de")
     expect(applyPatch(DEFAULT_CONFIG, { language: "de" }).ui.language).toBe("de")
     expect(applyPatch(DEFAULT_CONFIG, { language: "fr" as never }).ui.language).toBe("en")
+  })
+})
+
+describe("notifications", () => {
+  it("are on unless turned off", () => {
+    expect(toPublic(DEFAULT_CONFIG).notify).toBe(true)
+    expect(applyPatch(DEFAULT_CONFIG, { notify: false }).behavior.notify).toBe(false)
+    expect(applyPatch(DEFAULT_CONFIG, { notify: "no" as never }).behavior.notify).toBe(true)
+    expect(parseConfig({ version: 1, behavior: {} }).behavior.notify).toBe(true)
   })
 })

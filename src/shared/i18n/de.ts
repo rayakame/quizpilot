@@ -1,5 +1,7 @@
 import type { Messages } from "./en.js"
 
+const names = (list: string[]) => new Intl.ListFormat("de", { type: "conjunction" }).format(list)
+
 export const de: Messages = {
   locale: "de",
   menu: {
@@ -231,6 +233,7 @@ export const de: Messages = {
     backupSaved: "Backup-KI gespeichert",
     behaviorText: "Standards für neue Spiele. Im Start-Assistenten kannst du sie pro Spiel ändern.",
     reconnect: "Bots neu verbinden, wenn die Verbindung abbricht",
+    notify: "Benachrichtigen, wenn QuizPilot im Hintergrund ist",
     theme: "Erscheinungsbild",
     language: "Sprache",
     historyText: "Gespielte Spiele bleiben auf diesem Computer, mit Fragen, Antworten und Kosten.",
@@ -255,6 +258,19 @@ export const de: Messages = {
     noQuestions: "Hier gibt es keine Fragen.",
     rightAnswer: "Richtige Antwort:",
     result: { right: "richtig", wrong: "falsch" },
+  },
+  notify: {
+    twoStepTitle: "Zwei-Schritt-Beitritt",
+    twoStepBody: "Gib die Symbole vom Bildschirm des Hosts ein.",
+    overTitle: "Spiel vorbei",
+    overBody: (bot, rank) => `${bot} ist auf Platz ${rank}.`,
+    lostTitle: "Verbindung verloren",
+    lostBody: (bots) =>
+      `${names(bots)} ${bots.length === 1 ? "hat" : "haben"} die Verbindung verloren.`,
+    kickedTitle: "Aus dem Spiel entfernt",
+    kickedBody: (bots) => `Der Host hat ${names(bots)} entfernt.`,
+    jevKeyTitle: "TypeSafe-Key abgelehnt",
+    jevKeyBody: "Die Bots raten. Ändere den Key in den Einstellungen.",
   },
   colors: {
     red: "rotes Dreieck",

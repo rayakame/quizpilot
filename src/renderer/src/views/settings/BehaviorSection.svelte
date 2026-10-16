@@ -91,4 +91,8 @@
     />
     <Label for="reconnect" class="font-normal">{t.settings.reconnect}</Label>
   </div>
+  <div class="flex items-center gap-2">
+    <Switch id="notify" checked={settings.notify} onCheckedChange={(v) => patch({ notify: v })} />
+    <Label for="notify" class="font-normal">{t.settings.notify}</Label>
+  </div>
 </section>

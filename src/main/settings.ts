@@ -24,7 +24,7 @@ export interface Config {
     webSearch: boolean
   }
   context: { includePrevious: boolean }
-  behavior: { timing: Timing; reconnect: boolean }
+  behavior: { timing: Timing; reconnect: boolean; notify: boolean }
   ui: { language: Language; theme: Theme }
   history: { enabled: boolean }
 }
@@ -41,7 +41,11 @@ export const DEFAULT_CONFIG: Config = {
     webSearch: true,
   },
   context: { includePrevious: true },
-  behavior: { timing: { mode: "instant", minMs: 1000, maxMs: 5000 }, reconnect: true },
+  behavior: {
+    timing: { mode: "instant", minMs: 1000, maxMs: 5000 },
+    reconnect: true,
+    notify: true,
+  },
   ui: { language: "en", theme: "system" },
   history: { enabled: true },
 }
@@ -112,6 +116,7 @@ export function parseConfig(raw: unknown): Config {
     behavior: {
       timing: timing(behavior.timing) ?? { ...d.behavior.timing },
       reconnect: bool(behavior.reconnect, d.behavior.reconnect),
+      notify: bool(behavior.notify, d.behavior.notify),
     },
     ui: {
       language: oneOf(ui.language, LANGUAGES, d.ui.language),
@@ -127,6 +132,7 @@ export function toPublic(config: Config): PublicSettings {
     timing: config.behavior.timing,
     includePrevious: config.context.includePrevious,
     reconnect: config.behavior.reconnect,
+    notify: config.behavior.notify,
     theme: config.ui.theme,
     language: config.ui.language,
     saveHistory: config.history.enabled,
@@ -155,6 +161,7 @@ export function applyPatch(config: Config, patch: SettingsPatch): Config {
     }
   }
   if (typeof reconnect === "boolean") next.behavior.reconnect = reconnect
+  if (typeof patch.notify === "boolean") next.behavior.notify = patch.notify
   if (typeof includePrevious === "boolean") next.context.includePrevious = includePrevious
   if (theme && THEMES.includes(theme)) next.ui.theme = theme
   if (isShare(fallbackBelow)) next.fallback.below = fallbackBelow

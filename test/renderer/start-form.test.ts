@@ -16,6 +16,7 @@ const settings: PublicSettings = {
   timing: { mode: "human", minMs: 1000, maxMs: 5000 },
   includePrevious: false,
   reconnect: true,
+  notify: true,
   theme: "system",
   language: "en",
   saveHistory: true,

@@ -83,6 +83,7 @@ export interface PublicSettings {
   timing: Timing
   includePrevious: boolean
   reconnect: boolean
+  notify: boolean
   theme: Theme
   language: Language
   saveHistory: boolean
@@ -108,6 +109,7 @@ export interface SettingsPatch {
   timing?: Timing
   includePrevious?: boolean
   reconnect?: boolean
+  notify?: boolean
   theme?: Theme
   language?: Language
   fallbackBelow?: number
