@@ -1,6 +1,6 @@
 # QuizPilot
 
-[Website](https://rayakame.github.io/quizpilot/) · [Download](https://github.com/rayakame/quizpilot/releases/latest)
+[Website](https://quizpilot.rayakame.dev) · [Download](https://github.com/rayakame/quizpilot/releases/latest)
 
 Joins a Kahoot game with up to five bots that answer for you. Questions go to
 [Jev](https://typesafe.ai) from TypeSafe and, when Jev isn't sure, optionally to Claude,

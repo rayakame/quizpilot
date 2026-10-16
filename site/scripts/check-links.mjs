@@ -1,9 +1,9 @@
-// Fails when a page points at a file that won't exist under the GitHub Pages base path.
+// Fails when a page points at a file that isn't in the build.
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs"
 import { join, relative } from "node:path"
 
 const DIST = new URL("../dist/", import.meta.url).pathname
-const BASE = "/quizpilot/"
+const BASE = "/"
 
 function files(dir) {
   return readdirSync(dir).flatMap((name) => {
