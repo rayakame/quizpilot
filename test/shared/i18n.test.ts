@@ -26,9 +26,11 @@ const SAME = new Set([
 // Words that only read the same in one language.
 const ALSO_SAME: Partial<Record<Language, string[]>> = {
   fr: ["Services", "Options"],
+  id: ["Model", "Slide"],
   nl: ["Model"],
   pl: ["Model"],
   pt: ["Slide"],
+  tr: ["Model"],
 }
 
 // Lists for the functions that take bot names, numbers for everything else.
@@ -60,11 +62,15 @@ describe("pickLanguage", () => {
     expect(pickLanguage(["pt-PT"])).toBe("pt")
     expect(pickLanguage(["fr-CA", "de"])).toBe("fr")
     expect(pickLanguage(["nl-BE"])).toBe("nl")
+    expect(pickLanguage(["ja-JP"])).toBe("ja")
+    expect(pickLanguage(["id-ID"])).toBe("id")
+    expect(pickLanguage(["tr"])).toBe("tr")
   })
 
   it("falls back to English", () => {
     expect(pickLanguage(["sv-SE", "ko"])).toBe("en")
     expect(pickLanguage(["zh-Hant-TW"])).toBe("en")
+    expect(pickLanguage(["in-ID"])).toBe("en")
     expect(pickLanguage([])).toBe("en")
   })
 })
@@ -110,6 +116,13 @@ describe("dictionaries", () => {
     expect(messagesFor("it").start.questions(3)).toBe("3 domande")
     expect(messagesFor("nl").start.questions(1)).toBe("1 vraag")
     expect(messagesFor("nl").start.questions(3)).toBe("3 vragen")
+  })
+
+  it("counts without plural endings in Turkish, Indonesian and Japanese", () => {
+    expect(messagesFor("tr").start.questions(3)).toBe("3 soru")
+    expect(messagesFor("id").start.questions(3)).toBe("3 pertanyaan")
+    expect(messagesFor("ja").start.questions(3)).toBe("3問")
+    expect(messagesFor("ja").start.questions(1)).toBe("1問")
   })
 })
 
