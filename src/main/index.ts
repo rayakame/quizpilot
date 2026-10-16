@@ -77,17 +77,7 @@ async function start(): Promise<void> {
     },
     saveFallback: (setup) => saveFallback(settings, setup),
     removeFallback: () => removeFallback(settings),
-    startGame: async (request) => {
-      const result = await controller.start(request)
-      if (result.ok) {
-        await settings.update((c) => ({
-          ...c,
-          context: { ...c.context, includePrevious: request.includePrevious },
-          behavior: { ...c.behavior, timing: request.timing },
-        }))
-      }
-      return result
-    },
+    startGame: (request) => controller.start(request),
     addBot: (name) => controller.addBot(name),
     submitTwoStep: (sequence) => controller.submitTwoStep(sequence),
     pause: async (bot, paused) => controller.pause(bot, paused),
