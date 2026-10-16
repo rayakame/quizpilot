@@ -5,7 +5,7 @@
   import { Button } from "$lib/components/ui/button/index.js"
   import { Toaster } from "$lib/components/ui/sonner/index.js"
   import { game } from "$lib/game.svelte.js"
-  import { setLanguage } from "$lib/i18n.js"
+  import { setLanguage, t } from "$lib/i18n.js"
   import Logo from "$lib/Logo.svelte"
   import type { PublicSettings } from "../../shared/api.js"
   import Dashboard from "./views/Dashboard.svelte"
@@ -63,7 +63,7 @@
         <Button
           variant="ghost"
           size="icon-sm"
-          aria-label="History"
+          aria-label={t.app.history}
           onclick={() => (view = "history")}
         >
           <History />
@@ -71,7 +71,7 @@
         <Button
           variant="ghost"
           size="icon-sm"
-          aria-label="Settings"
+          aria-label={t.app.settings}
           onclick={() => (view = "settings")}
         >
           <Settings />

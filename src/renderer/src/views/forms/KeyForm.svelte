@@ -3,6 +3,7 @@
   import { Button } from "$lib/components/ui/button/index.js"
   import { Input } from "$lib/components/ui/input/index.js"
   import { Label } from "$lib/components/ui/label/index.js"
+  import { t } from "$lib/i18n.js"
   import { keyText } from "$lib/messages.js"
   import type { KeyCheck } from "../../../../shared/api.js"
 
@@ -32,12 +33,12 @@
 </script>
 
 <form class="grid gap-2" onsubmit={save}>
-  <Label for="typesafe-key">API key</Label>
+  <Label for="typesafe-key">{t.common.apiKey}</Label>
   <Input
     id="typesafe-key"
     type="password"
     autocomplete="off"
-    placeholder={saved ? "Saved, paste a new key to replace it" : ""}
+    placeholder={saved ? t.setup.keySaved : ""}
     bind:value={key}
   />
   {#if problem}
@@ -48,12 +49,12 @@
     class="h-auto w-fit p-0"
     onclick={() => window.quizpilot.openExternal("https://typesafe.ai")}
   >
-    Get a key at typesafe.ai
+    {t.setup.getKey}
   </Button>
   <div class="flex justify-end gap-2 pt-2">
     {@render children?.()}
     <Button type="submit" disabled={checking || !key.trim()}>
-      {checking ? "Checking…" : "Check and save"}
+      {checking ? t.common.checking : t.setup.checkAndSave}
     </Button>
   </div>
 </form>

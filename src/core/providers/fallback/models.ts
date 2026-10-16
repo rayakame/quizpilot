@@ -2,10 +2,12 @@ import { DEFAULT_MODELS, type FallbackProviderId } from "./ids.js"
 
 export type Effort = "minimal" | "low" | "medium" | "high"
 
+export type ModelTier = "best" | "balanced" | "fast"
+
 export interface ModelOption {
   id: string
   name: string
-  note: string
+  tier: ModelTier
   efforts: Effort[]
 }
 
@@ -18,23 +20,23 @@ const STANDARD: Effort[] = ["low", "medium", "high"]
 
 export const MODELS: Record<FallbackProviderId, ModelOption[]> = {
   anthropic: [
-    { id: "claude-opus-5-5", name: "Claude Opus 5.5", note: "most accurate", efforts: STANDARD },
-    { id: "claude-sonnet-5-5", name: "Claude Sonnet 5.5", note: "balanced", efforts: STANDARD },
+    { id: "claude-opus-5-5", name: "Claude Opus 5.5", tier: "best", efforts: STANDARD },
+    { id: "claude-sonnet-5-5", name: "Claude Sonnet 5.5", tier: "balanced", efforts: STANDARD },
     // Haiku 4.5 rejects the effort setting.
-    { id: "claude-haiku-4-5", name: "Claude Haiku 4.5", note: "fastest", efforts: [] },
+    { id: "claude-haiku-4-5", name: "Claude Haiku 4.5", tier: "fast", efforts: [] },
   ],
   openai: [
-    { id: "gpt-6-astra", name: "GPT-6 Astra", note: "most accurate", efforts: STANDARD },
-    { id: "gpt-6.1-sol", name: "GPT-6.1 Sol", note: "balanced", efforts: STANDARD },
-    { id: "gpt-6-luna", name: "GPT-6 Luna", note: "fastest", efforts: STANDARD },
+    { id: "gpt-6-astra", name: "GPT-6 Astra", tier: "best", efforts: STANDARD },
+    { id: "gpt-6.1-sol", name: "GPT-6.1 Sol", tier: "balanced", efforts: STANDARD },
+    { id: "gpt-6-luna", name: "GPT-6 Luna", tier: "fast", efforts: STANDARD },
   ],
   gemini: [
-    { id: "gemini-4-argon", name: "Gemini 4 Argon", note: "most accurate", efforts: STANDARD },
-    { id: "gemini-3.8-flash", name: "Gemini 3.8 Flash", note: "balanced", efforts: STANDARD },
+    { id: "gemini-4-argon", name: "Gemini 4 Argon", tier: "best", efforts: STANDARD },
+    { id: "gemini-3.8-flash", name: "Gemini 3.8 Flash", tier: "balanced", efforts: STANDARD },
     {
       id: "gemini-3.5-flash-lite",
       name: "Gemini 3.5 Flash-Lite",
-      note: "fastest",
+      tier: "fast",
       efforts: ["minimal", ...STANDARD],
     },
   ],

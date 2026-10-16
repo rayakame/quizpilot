@@ -2,6 +2,7 @@
   import ArrowLeft from "@lucide/svelte/icons/arrow-left"
   import { toast } from "svelte-sonner"
   import { Button } from "$lib/components/ui/button/index.js"
+  import { t } from "$lib/i18n.js"
   import type { PublicSettings, SettingsPatch } from "../../../../shared/api.js"
   import FallbackForm from "../forms/FallbackForm.svelte"
   import KeyForm from "../forms/KeyForm.svelte"
@@ -21,23 +22,16 @@
     onClose: () => void
   } = $props()
 
-  const SECTIONS = [
-    { id: "keys", label: "TypeSafe key" },
-    { id: "backup", label: "Backup AI" },
-    { id: "behavior", label: "Behavior" },
-    { id: "history", label: "History" },
-    { id: "appearance", label: "Appearance" },
-    { id: "about", label: "About" },
-  ] as const
+  const SECTIONS = ["keys", "backup", "behavior", "history", "appearance", "about"] as const
 
-  let section = $state<(typeof SECTIONS)[number]["id"]>("keys")
+  let section = $state<(typeof SECTIONS)[number]>("keys")
   let saves = $state(0)
 
   async function patch(p: SettingsPatch) {
     try {
       onChange(await window.quizpilot.saveSettings(p))
     } catch {
-      toast.error("Couldn't save the settings.")
+      toast.error(t.settings.saveFailed)
     }
   }
 
@@ -51,15 +45,16 @@
 <div class="grid h-full grid-cols-[14rem_1fr]">
   <nav class="flex flex-col gap-1 border-r p-3">
     <Button variant="ghost" class="mb-2 justify-start" onclick={onClose}>
-      <ArrowLeft /> Back
+      <ArrowLeft />
+      {t.common.back}
     </Button>
-    {#each SECTIONS as item (item.id)}
+    {#each SECTIONS as id (id)}
       <Button
-        variant={section === item.id ? "secondary" : "ghost"}
+        variant={section === id ? "secondary" : "ghost"}
         class="justify-start"
-        onclick={() => (section = item.id)}
+        onclick={() => (section = id)}
       >
-        {item.label}
+        {t.settings.sections[id]}
       </Button>
     {/each}
   </nav>
@@ -68,23 +63,19 @@
       {#if section === "keys"}
         <section class="space-y-6">
           <div>
-            <h2 class="text-lg font-semibold">TypeSafe key</h2>
-            <p class="text-muted-foreground text-sm">
-              Jev answers every question. The key stays on this computer.
-            </p>
+            <h2 class="text-lg font-semibold">{t.settings.sections.keys}</h2>
+            <p class="text-muted-foreground text-sm">{t.settings.keyText}</p>
           </div>
-          <KeyForm saved={settings.hasTypesafeKey} onSaved={() => saved("TypeSafe key saved")} />
+          <KeyForm saved={settings.hasTypesafeKey} onSaved={() => saved(t.settings.keySaved)} />
         </section>
       {:else if section === "backup"}
         <section class="space-y-6">
           <div>
-            <h2 class="text-lg font-semibold">Backup AI</h2>
-            <p class="text-muted-foreground text-sm">
-              Asked when Jev is unsure, on picture questions, for typed answers and word clouds.
-            </p>
+            <h2 class="text-lg font-semibold">{t.settings.sections.backup}</h2>
+            <p class="text-muted-foreground text-sm">{t.settings.backupText}</p>
           </div>
           {#key saves}
-            <FallbackForm {settings} onSaved={() => saved("Backup AI saved")} />
+            <FallbackForm {settings} onSaved={() => saved(t.settings.backupSaved)} />
           {/key}
           <ThresholdsSection {settings} {patch} />
         </section>
@@ -93,7 +84,7 @@
       {:else if section === "history"}
         <HistorySection {settings} {patch} />
       {:else if section === "appearance"}
-        <AppearanceSection theme={settings.theme} {patch} />
+        <AppearanceSection {settings} {patch} />
       {:else}
         <AboutSection />
       {/if}

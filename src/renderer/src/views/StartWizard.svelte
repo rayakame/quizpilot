@@ -29,13 +29,13 @@
 
   let { settings }: { settings: PublicSettings } = $props()
 
-  const STEPS = ["Game", "Bots", "Options"]
+  const STEPS = ["game", "bots", "options"] as const
   const BACK_TO_PIN = ["pin", "not_found", "locked", "unknown"]
 
   // svelte-ignore state_referenced_locally
   let form = $state(newForm(settings))
   let step = $state(0)
-  let error = $state<string | null>(null)
+  let error = $state<(() => string) | null>(null)
   let starting = $state(false)
   let linkCheck = $state<LinkCheck | null>(null)
   const shownCheck = $derived(checkFor(linkCheck, form.quizLink))
@@ -43,7 +43,7 @@
   function next(event: SubmitEvent) {
     event.preventDefault()
     const problem = stepProblem(form, step)
-    error = problem ? t.errors[problem] : null
+    error = problem ? () => t.errors[problem] : null
     if (problem) return
     if (step < STEPS.length - 1) step += 1
     else void start()
@@ -67,7 +67,8 @@
     const check = await checkLink()
     if (check && !check.ok) {
       starting = false
-      error = t.quizLink[check.error]
+      const problem = check.error
+      error = () => t.quizLink[problem]
       return
     }
     game.reset()
@@ -85,8 +86,11 @@
     }
     if (result.ok) return game.begin()
     game.reset()
-    error = t.errors[result.error]
-    if (result.error === "unknown") error += ` (${result.message})`
+    const failed = result
+    error =
+      failed.error === "unknown"
+        ? () => `${t.errors.unknown} (${failed.message})`
+        : () => t.errors[failed.error]
     if (BACK_TO_PIN.includes(result.error)) step = 0
   }
 
@@ -99,10 +103,12 @@
 <div class="flex h-full items-center justify-center p-6">
   <Card.Root class="w-full max-w-lg">
     <Card.Header>
-      <Card.Title>New game</Card.Title>
+      <Card.Title>{t.start.title}</Card.Title>
       <Card.Description>
-        {#each STEPS as label, i (label)}
-          <span class={i === step ? "text-foreground font-medium" : ""}>{i + 1}. {label}</span>
+        {#each STEPS as id, i (id)}
+          <span class={i === step ? "text-foreground font-medium" : ""}
+            >{i + 1}. {t.start.steps[id]}</span
+          >
           {#if i < STEPS.length - 1}<span class="px-1">›</span>{/if}
         {/each}
       </Card.Description>
@@ -111,24 +117,19 @@
       <Card.Content class="grid gap-4">
         {#if step === 0}
           <div class="grid gap-2">
-            <Label for="pin">Game PIN</Label>
-            <Input
-              id="pin"
-              bind:value={form.pin}
-              placeholder="123456 or kahoot.it link"
-              autofocus
-            />
+            <Label for="pin">{t.start.pin}</Label>
+            <Input id="pin" bind:value={form.pin} placeholder={t.start.pinPlaceholder} autofocus />
           </div>
         {:else if step === 1}
           <div class="grid gap-2">
-            <Label>Bots</Label>
+            <Label>{t.start.bots}</Label>
             {#each form.bots as bot, i (i)}
               <div class="flex gap-2">
                 <Input bind:value={bot.value} placeholder={bot.placeholder} maxlength={15} />
                 <Button
                   variant="ghost"
                   size="icon"
-                  aria-label="Random name"
+                  aria-label={t.start.randomName}
                   onclick={() => randomName(i)}
                 >
                   <Dices />
@@ -136,7 +137,7 @@
                 <Button
                   variant="ghost"
                   size="icon"
-                  aria-label="Remove bot"
+                  aria-label={t.start.removeBot}
                   disabled={form.bots.length === 1}
                   onclick={() => form.bots.splice(i, 1)}
                 >
@@ -150,24 +151,25 @@
                 class="w-fit"
                 onclick={() => (form.bots = addField(form.bots))}
               >
-                <Plus /> Add bot
+                <Plus />
+                {t.start.addBot}
               </Button>
             {/if}
           </div>
         {:else}
           <div class="grid gap-2">
-            <Label>When to answer</Label>
+            <Label>{t.start.whenToAnswer}</Label>
             <RadioGroup.Root
               value={form.human ? "human" : "instant"}
               onValueChange={(v) => (form.human = v === "human")}
             >
               <div class="flex items-center gap-2">
                 <RadioGroup.Item value="instant" id="instant" />
-                <Label for="instant" class="font-normal">As soon as the answer is ready</Label>
+                <Label for="instant" class="font-normal">{t.start.instant}</Label>
               </div>
               <div class="flex items-center gap-2">
                 <RadioGroup.Item value="human" id="human" />
-                <Label for="human" class="font-normal">Like a human, after a random delay</Label>
+                <Label for="human" class="font-normal">{t.start.human}</Label>
               </div>
             </RadioGroup.Root>
             {#if form.human}
@@ -180,7 +182,7 @@
                   class="w-20"
                   bind:value={form.minSeconds}
                 />
-                to
+                {t.common.to}
                 <Input
                   type="number"
                   min="0"
@@ -189,12 +191,12 @@
                   class="w-20"
                   bind:value={form.maxSeconds}
                 />
-                seconds
+                {t.common.seconds}
               </div>
             {/if}
           </div>
           <div class="grid gap-2">
-            <Label for="quiz-link">Quiz link (optional)</Label>
+            <Label for="quiz-link">{t.start.quizLink}</Label>
             <Input
               id="quiz-link"
               bind:value={form.quizLink}
@@ -211,36 +213,34 @@
                 {quizLinkText(shownCheck)}
               </p>
             {:else}
-              <p class="text-muted-foreground text-sm">
-                Public quizzes only. QuizPilot then knows the right answers.
-              </p>
+              <p class="text-muted-foreground text-sm">{t.start.quizLinkHint}</p>
             {/if}
           </div>
           <div class="grid gap-2">
-            <Label for="context">What is the quiz about? (optional)</Label>
+            <Label for="context">{t.start.context}</Label>
             <Textarea
               id="context"
               bind:value={form.context}
-              placeholder="e.g. TUM first-semester quiz about campus life in Munich"
+              placeholder={t.start.contextPlaceholder}
             />
           </div>
           <div class="flex items-center gap-2">
             <Switch id="previous" bind:checked={form.includePrevious} />
-            <Label for="previous" class="font-normal">Tell the AI about earlier questions</Label>
+            <Label for="previous" class="font-normal">{t.start.previous}</Label>
           </div>
         {/if}
         {#if error}
           <Alert.Root variant="destructive">
-            <Alert.Description>{error}</Alert.Description>
+            <Alert.Description>{error()}</Alert.Description>
           </Alert.Root>
         {/if}
       </Card.Content>
       <Card.Footer class="justify-between">
         <Button variant="ghost" disabled={step === 0 || starting} onclick={() => (step -= 1)}>
-          Back
+          {t.common.back}
         </Button>
         <Button type="submit" disabled={starting}>
-          {step < STEPS.length - 1 ? "Next" : starting ? "Joining…" : "Join game"}
+          {step < STEPS.length - 1 ? t.common.next : starting ? t.start.joining : t.start.join}
         </Button>
       </Card.Footer>
     </form>

@@ -10,6 +10,7 @@
     type HistoryFilter,
   } from "$lib/history-view.js"
   import { t } from "$lib/i18n.js"
+  import { dateText } from "$lib/messages.js"
   import type { HistoryGame, HistoryRecord, PublicSettings } from "../../../../shared/api.js"
   import QuestionRow from "./QuestionRow.svelte"
 
@@ -32,7 +33,7 @@
       await select(id ?? games[0]?.id ?? null)
     } catch {
       games = []
-      toast.error("Couldn't load the history.")
+      toast.error(t.history.loadFailed)
     }
   }
 
@@ -48,7 +49,7 @@
 
   async function exportGame(id: number) {
     const result = await window.quizpilot.exportHistory(id)
-    if (result === "saved") toast.success("Game exported")
+    if (result === "saved") toast.success(t.game.exported)
   }
 
   void load()
@@ -57,10 +58,11 @@
 <div class="grid h-full grid-cols-[18rem_1fr]">
   <nav class="flex min-h-0 flex-col gap-1 overflow-y-auto border-r p-3">
     <Button variant="ghost" class="mb-2 justify-start" onclick={onClose}>
-      <ArrowLeft /> Back
+      <ArrowLeft />
+      {t.common.back}
     </Button>
     {#if games?.length === 0}
-      <p class="text-muted-foreground px-3 text-sm">No games yet.</p>
+      <p class="text-muted-foreground px-3 text-sm">{t.history.noGames}</p>
     {/if}
     {#each games ?? [] as g (g.id)}
       <button
@@ -72,7 +74,7 @@
       >
         <div class="truncate font-medium">{gameTitle(g)}</div>
         <div class="text-muted-foreground text-xs">
-          {new Date(g.startedAt).toLocaleString()} · {gameLine(g)}
+          {dateText(g.startedAt)} · {gameLine(g)}
         </div>
       </button>
     {/each}
@@ -84,15 +86,17 @@
           <div>
             <h2 class="text-lg font-semibold">{gameTitle(record.game)}</h2>
             <p class="text-muted-foreground text-sm">
-              PIN {record.game.pin} · {new Date(record.game.startedAt).toLocaleString()} ·
+              {t.history.pin(record.game.pin)} · {dateText(record.game.startedAt)} ·
               {record.bots.map((b) => (b.rank ? `#${b.rank} ${b.name}` : b.name)).join(", ")}
             </p>
           </div>
           <div class="flex gap-2">
-            <Button variant="outline" onclick={() => void exportGame(record!.game.id)}
-              >Export</Button
-            >
-            <Button variant="ghost" onclick={() => void remove(record!.game.id)}>Delete</Button>
+            <Button variant="outline" onclick={() => void exportGame(record!.game.id)}>
+              {t.common.export}
+            </Button>
+            <Button variant="ghost" onclick={() => void remove(record!.game.id)}>
+              {t.common.delete}
+            </Button>
           </div>
         </div>
         <div class="flex gap-1">
@@ -107,7 +111,7 @@
           {/each}
         </div>
         {#if shown.length === 0}
-          <p class="text-muted-foreground text-sm">No questions here.</p>
+          <p class="text-muted-foreground text-sm">{t.history.noQuestions}</p>
         {/if}
         <ol class="grid gap-2">
           {#each shown as item (item.question.index)}

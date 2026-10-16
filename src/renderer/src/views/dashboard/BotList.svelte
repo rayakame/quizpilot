@@ -30,7 +30,7 @@
     const name = retryName(bot)
     game.forget(bot.name)
     const outcome = await window.quizpilot.addBot(name)
-    if (!outcome.ok) toast.error(`${name}: ${outcome.message}`)
+    if (!outcome.ok) toast.error(`${name}: ${t.errors[outcome.code]}`)
   }
 </script>
 
@@ -45,13 +45,13 @@
           </Badge>
         </div>
         <div class="text-muted-foreground text-sm">
-          {bot.totalScore} points{bot.rank ? ` · #${bot.rank}` : ""}
+          {t.common.points(bot.totalScore)}{bot.rank ? ` · #${bot.rank}` : ""}
         </div>
         {#if bot.joinError}
           <p class="text-destructive text-sm">{t.errors[bot.joinError]}</p>
           {#if bot.joinError === "duplicate_name" || bot.joinError === "unknown"}
             <Button size="sm" variant="outline" onclick={() => retry(bot)}>
-              Join as {retryName(bot)}
+              {t.game.joinAs(retryName(bot))}
             </Button>
           {/if}
         {:else if bot.detail && bot.status !== "joining"}
@@ -63,7 +63,7 @@
               <Button
                 size="icon-sm"
                 variant="ghost"
-                aria-label={bot.status === "paused" ? "Resume" : "Pause"}
+                aria-label={bot.status === "paused" ? t.game.resume : t.game.pause}
                 onclick={() => window.quizpilot.pause(bot.name, bot.status !== "paused")}
               >
                 {#if bot.status === "paused"}<Play />{:else}<Pause />{/if}
@@ -73,7 +73,7 @@
               <Button
                 size="icon-sm"
                 variant="ghost"
-                aria-label="Leave"
+                aria-label={t.game.leave}
                 onclick={() => window.quizpilot.leave(bot.name)}
               >
                 <LogOut />
@@ -86,13 +86,13 @@
   </div>
   <div class="grid gap-2 border-t p-3">
     {#if game.state.twoStep !== "none"}
-      <Button onclick={() => (game.twoStepOpen = true)}>Enter two-step code</Button>
+      <Button onclick={() => (game.twoStepOpen = true)}>{t.game.enterCode}</Button>
     {/if}
     {#if bots.some(canPause)}
       <Button variant="outline" onclick={() => window.quizpilot.pause(null, !allPaused)}>
-        {allPaused ? "Resume all" : "Pause all"}
+        {allPaused ? t.game.resumeAll : t.game.pauseAll}
       </Button>
     {/if}
-    <Button variant="ghost" onclick={onNewGame}>Leave and start over</Button>
+    <Button variant="ghost" onclick={onNewGame}>{t.game.startOver}</Button>
   </div>
 </aside>

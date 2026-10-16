@@ -39,7 +39,7 @@ describe("resolveChoice", () => {
 
   it("offers three models per provider, fastest last", () => {
     for (const options of Object.values(MODELS)) {
-      expect(options.map((o) => o.note)).toEqual(["most accurate", "balanced", "fastest"])
+      expect(options.map((o) => o.tier)).toEqual(["best", "balanced", "fast"])
     }
   })
 })

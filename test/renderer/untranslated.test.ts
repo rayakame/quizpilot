@@ -6,7 +6,16 @@ import { describe, expect, it } from "vitest"
 const ROOT = "src/renderer/src"
 const SKIP = [join(ROOT, "lib/components/ui")]
 const SHOWN = new Set(["aria-label", "placeholder", "title", "alt"])
-const NAMES = new Set(["QuizPilot", "Jev", "TypeSafe", "Anthropic", "OpenAI", "Google"])
+// Names and examples that read the same in every language.
+const SAME = new Set([
+  "QuizPilot",
+  "Jev",
+  "TypeSafe",
+  "Anthropic",
+  "OpenAI",
+  "Google",
+  "create.kahoot.it/details/…",
+])
 const IGNORED = new Set([
   "start",
   "end",
@@ -28,8 +37,8 @@ function files(dir: string): string[] {
   })
 }
 
-const words = (s: string) => /\p{L}{2,}/u.test(s) && !NAMES.has(s.trim())
-const label = (s: string) => /^[A-Z][a-z]/.test(s.trim()) && !NAMES.has(s.trim())
+const words = (s: string) => /\p{L}{2,}/u.test(s) && !SAME.has(s.trim())
+const label = (s: string) => /^[A-Z][a-z]/.test(s.trim()) && !SAME.has(s.trim())
 
 // The strings an expression can put on screen, not the ones it compares against.
 function shown(node: unknown): string[] {
@@ -59,7 +68,7 @@ function find(node: unknown, out: string[]): void {
       const p = part as Record<string, unknown> | null
       if (p?.type !== "Text") {
         if (SHOWN.has(String(n.name))) out.push(...shown(p?.expression).filter(words))
-        find(p, out)
+        find(p?.expression ?? p, out)
       } else if (SHOWN.has(String(n.name)) && words(String(p.data))) out.push(String(p.data))
     }
     return
@@ -74,7 +83,7 @@ function find(node: unknown, out: string[]): void {
   for (const [key, child] of Object.entries(n)) if (!IGNORED.has(key)) find(child, out)
 }
 
-describe.skip("views", () => {
+describe("views", () => {
   it.each(files(ROOT))("%s takes its texts from the dictionary", (file) => {
     const ast = parse(readFileSync(file, "utf8"), { modern: true })
     const out: string[] = []

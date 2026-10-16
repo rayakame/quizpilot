@@ -4,7 +4,18 @@ import { en } from "../../src/shared/i18n/en.js"
 import { messagesFor, pickLanguage } from "../../src/shared/i18n/index.js"
 
 // Words that read the same in both languages.
-const SAME = new Set(["Bot", "Bots", "Quiz", "Puzzle", "Jev", "Host", "OK", "Name", "Text"])
+const SAME = new Set([
+  "Bot",
+  "Bots",
+  "Quiz",
+  "Puzzle",
+  "Jev",
+  "Host",
+  "OK",
+  "Name",
+  "Text",
+  "Minimal",
+])
 
 function strings(value: unknown, path = ""): [string, string][] {
   if (typeof value === "string") return [[path, value]]

@@ -19,15 +19,11 @@
 <Dialog.Root bind:open={game.twoStepOpen}>
   <Dialog.Content>
     <Dialog.Header>
-      <Dialog.Title>Two-step join</Dialog.Title>
-      <Dialog.Description>
-        Tap the four symbols in the order the host's screen shows them.
-      </Dialog.Description>
+      <Dialog.Title>{t.twoStep.title}</Dialog.Title>
+      <Dialog.Description>{t.twoStep.text}</Dialog.Description>
     </Dialog.Header>
     {#if game.state.twoStep === "wrong"}
-      <p class="text-destructive text-sm">
-        That wasn't right. The code changes every few seconds, so check the screen and try again.
-      </p>
+      <p class="text-destructive text-sm">{t.twoStep.wrong}</p>
     {/if}
     <div class="grid grid-cols-2 gap-2">
       {#each COLORS as color, i (color.name)}
@@ -55,9 +51,9 @@
     </div>
     <Dialog.Footer>
       <Button variant="ghost" disabled={picked.length === 0} onclick={() => (picked = [])}>
-        Clear
+        {t.twoStep.clear}
       </Button>
-      <Button disabled={picked.length < 4 || sending} onclick={send}>Send code</Button>
+      <Button disabled={picked.length < 4 || sending} onclick={send}>{t.twoStep.send}</Button>
     </Dialog.Footer>
   </Dialog.Content>
 </Dialog.Root>

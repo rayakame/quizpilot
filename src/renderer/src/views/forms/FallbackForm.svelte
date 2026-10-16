@@ -5,13 +5,14 @@
   import { Label } from "$lib/components/ui/label/index.js"
   import * as RadioGroup from "$lib/components/ui/radio-group/index.js"
   import { Switch } from "$lib/components/ui/switch/index.js"
+  import { t } from "$lib/i18n.js"
   import { keyText } from "$lib/messages.js"
   import {
     FALLBACK_PROVIDERS,
     PROVIDER_NAMES,
     type FallbackProviderId,
   } from "../../../../core/providers/fallback/ids.js"
-  import { MODELS, resolveChoice, type Effort } from "../../../../core/providers/fallback/models.js"
+  import { MODELS, resolveChoice } from "../../../../core/providers/fallback/models.js"
   import type { KeyCheck, PublicSettings } from "../../../../shared/api.js"
 
   let {
@@ -40,13 +41,6 @@
   let key = $state("")
   let checking = $state(false)
   let problem = $state<Exclude<KeyCheck, "ok"> | null>(null)
-
-  const EFFORT_TEXT: Record<Effort, string> = {
-    minimal: "Minimal",
-    low: "Low",
-    medium: "Medium",
-    high: "High",
-  }
 
   const saved = $derived(settings.fallback.savedKeys.includes(provider))
   const choice = $derived(choices[provider])
@@ -104,12 +98,12 @@
     {/each}
   </RadioGroup.Root>
   <div class="grid gap-2">
-    <Label for="fallback-key">API key</Label>
+    <Label for="fallback-key">{t.common.apiKey}</Label>
     <Input
       id="fallback-key"
       type="password"
       autocomplete="off"
-      placeholder={saved ? "Saved, leave empty to keep it" : ""}
+      placeholder={saved ? t.backup.keySaved : ""}
       bind:value={key}
     />
     {#if problem}
@@ -120,11 +114,11 @@
       class="h-auto w-fit p-0"
       onclick={() => window.quizpilot.openExternal(KEY_PAGES[provider])}
     >
-      Get a key from {COMPANY[provider]}
+      {t.backup.getKey(COMPANY[provider])}
     </Button>
   </div>
   <div class="grid gap-2">
-    <Label>Model</Label>
+    <Label>{t.backup.model}</Label>
     <RadioGroup.Root
       value={choice.model}
       onValueChange={(m) => (choices[provider] = resolveChoice(provider, m, choice.effort))}
@@ -133,16 +127,16 @@
         <div class="flex items-center gap-2">
           <RadioGroup.Item value={model.id} id="model-{model.id}" />
           <Label for="model-{model.id}" class="font-normal">
-            {model.name} <span class="text-muted-foreground">· {model.note}</span>
+            {model.name} <span class="text-muted-foreground">· {t.backup.tiers[model.tier]}</span>
           </Label>
         </div>
       {/each}
     </RadioGroup.Root>
   </div>
   <div class="grid gap-2">
-    <Label>Effort</Label>
+    <Label>{t.backup.effort}</Label>
     {#if option.efforts.length === 0}
-      <p class="text-muted-foreground text-sm">{option.name} has no effort setting.</p>
+      <p class="text-muted-foreground text-sm">{t.backup.noEffort(option.name)}</p>
     {:else}
       <RadioGroup.Root
         class="flex flex-wrap gap-4"
@@ -152,26 +146,24 @@
         {#each option.efforts as effort (effort)}
           <div class="flex items-center gap-2">
             <RadioGroup.Item value={effort} id="effort-{effort}" />
-            <Label for="effort-{effort}" class="font-normal">{EFFORT_TEXT[effort]}</Label>
+            <Label for="effort-{effort}" class="font-normal">{t.backup.efforts[effort]}</Label>
           </div>
         {/each}
       </RadioGroup.Root>
-      <p class="text-muted-foreground text-sm">
-        More effort can be more accurate but answers later.
-      </p>
+      <p class="text-muted-foreground text-sm">{t.backup.effortHint}</p>
     {/if}
   </div>
   <div class="flex items-center gap-2">
     <Switch id="web-search" bind:checked={webSearch} />
-    <Label for="web-search" class="font-normal">Search the web when there's time</Label>
+    <Label for="web-search" class="font-normal">{t.backup.webSearch}</Label>
   </div>
   <div class="flex justify-end gap-2 pt-2">
     {@render children?.()}
     {#if active}
-      <Button variant="outline" onclick={turnOff}>Turn off</Button>
+      <Button variant="outline" onclick={turnOff}>{t.backup.turnOff}</Button>
     {/if}
     <Button type="submit" disabled={checking || (!key.trim() && !saved)}>
-      {checking ? "Checking…" : "Save"}
+      {checking ? t.common.checking : t.common.save}
     </Button>
   </div>
 </form>

@@ -5,7 +5,8 @@
   import X from "@lucide/svelte/icons/x"
   import { answerText, correctAnswer } from "../../../../core/answer/describe.js"
   import type { Question } from "../../../../core/types.js"
-  import { secondsText, sourceText } from "$lib/messages.js"
+  import { t } from "$lib/i18n.js"
+  import { percent, secondsText, sourceText } from "$lib/messages.js"
   import type { HistoryQuestion } from "../../../../shared/api.js"
   import { questionOutcome } from "../../../../shared/history.js"
 
@@ -26,7 +27,7 @@
       <Minus class="text-muted-foreground mt-0.5 size-4 shrink-0" />
     {/if}
     <div class="min-w-0 flex-1">
-      <div class="font-medium">{q.index + 1}. {q.title ?? "(no text)"}</div>
+      <div class="font-medium">{q.index + 1}. {q.title ?? t.common.noText}</div>
       {#if item.decision}
         <div class="text-muted-foreground truncate">
           {answerText(item.decision.answer, q)} · {sourceText(item.decision)}
@@ -42,7 +43,7 @@
       {/if}
       {#if item.correctChoices}
         <div>
-          <span class="text-muted-foreground">Right answer:</span>
+          <span class="text-muted-foreground">{t.history.rightAnswer}</span>
           {answerText(correctAnswer(q, item.correctChoices), q)}
         </div>
       {/if}
@@ -59,7 +60,7 @@
               {/if}
               {#if item.decision?.jev?.probabilities?.[i] !== undefined}
                 <span class="text-muted-foreground">
-                  · {Math.round(item.decision.jev.probabilities[i]! * 100)}%
+                  · {percent(item.decision.jev.probabilities[i]!)}
                 </span>
               {/if}
             </li>
@@ -70,8 +71,12 @@
         <ul class="text-muted-foreground grid gap-1">
           {#each item.results as r (r.bot)}
             <li>
-              {r.bot}: {r.correct === null ? "–" : r.correct ? "right" : "wrong"}
-              {#if r.points !== null}· {r.points} points{/if}
+              {r.bot}: {r.correct === null
+                ? "–"
+                : r.correct
+                  ? t.history.result.right
+                  : t.history.result.wrong}
+              {#if r.points !== null}· {t.common.points(r.points)}{/if}
               {#if r.answeredMs !== null}· {secondsText(r.answeredMs)}{/if}
             </li>
           {/each}

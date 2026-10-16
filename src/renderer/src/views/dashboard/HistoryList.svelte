@@ -3,15 +3,16 @@
   import Minus from "@lucide/svelte/icons/minus"
   import X from "@lucide/svelte/icons/x"
   import { answerSummary, outcome, type RoundView } from "$lib/game-state.js"
+  import { t } from "$lib/i18n.js"
   import { sourceText } from "$lib/messages.js"
 
   let { rounds }: { rounds: RoundView[] } = $props()
 </script>
 
 <aside class="min-h-0 overflow-y-auto p-3">
-  <h3 class="text-muted-foreground px-1 pb-2 text-sm font-medium">Earlier questions</h3>
+  <h3 class="text-muted-foreground px-1 pb-2 text-sm font-medium">{t.game.earlier}</h3>
   {#if rounds.length === 0}
-    <p class="text-muted-foreground px-1 text-sm">Nothing yet.</p>
+    <p class="text-muted-foreground px-1 text-sm">{t.game.nothingYet}</p>
   {/if}
   <ol class="space-y-2">
     {#each rounds as round (round.question.index)}
@@ -27,7 +28,7 @@
           {/if}
           <div class="min-w-0">
             <div class="line-clamp-2 font-medium">
-              {round.question.index + 1}. {round.question.title ?? "(no text)"}
+              {round.question.index + 1}. {round.question.title ?? t.common.noText}
             </div>
             {#if round.decision}
               <div class="text-muted-foreground truncate">

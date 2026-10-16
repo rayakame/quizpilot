@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Button } from "$lib/components/ui/button/index.js"
   import * as Card from "$lib/components/ui/card/index.js"
+  import { t } from "$lib/i18n.js"
   import type { PublicSettings } from "../../../shared/api.js"
   import FallbackForm from "./forms/FallbackForm.svelte"
 
@@ -11,15 +12,12 @@
   <div class="flex min-h-full items-center justify-center p-6">
     <Card.Root class="w-full max-w-md">
       <Card.Header>
-        <Card.Title>Backup AI (optional)</Card.Title>
-        <Card.Description>
-          When Jev is unsure, QuizPilot can ask a second AI. It needs its own API key and costs a
-          little per question. You can set it up later in the settings.
-        </Card.Description>
+        <Card.Title>{t.setup.backupTitle}</Card.Title>
+        <Card.Description>{t.setup.backupText}</Card.Description>
       </Card.Header>
       <Card.Content>
         <FallbackForm {settings} onSaved={onDone}>
-          <Button variant="ghost" onclick={onDone}>Skip</Button>
+          <Button variant="ghost" onclick={onDone}>{t.common.skip}</Button>
         </FallbackForm>
       </Card.Content>
     </Card.Root>

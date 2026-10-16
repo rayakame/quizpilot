@@ -1,6 +1,8 @@
 <script lang="ts">
   import { Label } from "$lib/components/ui/label/index.js"
   import { Slider } from "$lib/components/ui/slider/index.js"
+  import { t } from "$lib/i18n.js"
+  import { percent } from "$lib/messages.js"
   import type { PublicSettings, SettingsPatch } from "../../../../shared/api.js"
 
   let { settings, patch }: { settings: PublicSettings; patch: (p: SettingsPatch) => void } =
@@ -14,7 +16,7 @@
 
 <div class="space-y-6 border-t pt-6">
   <div class="grid gap-3">
-    <Label>Ask the backup AI when Jev is less than {below}% sure</Label>
+    <Label>{t.backup.below(percent(below / 100))}</Label>
     <Slider
       type="single"
       min={0}
@@ -25,7 +27,7 @@
     />
   </div>
   <div class="grid gap-3">
-    <Label>On picture questions, don't wait for it when Jev is at least {instant}% sure</Label>
+    <Label>{t.backup.instantAt(percent(instant / 100))}</Label>
     <Slider
       type="single"
       min={0}

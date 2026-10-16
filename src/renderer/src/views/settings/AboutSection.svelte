@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from "$lib/i18n.js"
   import Logo from "$lib/Logo.svelte"
 
   let version = $state("")
@@ -10,11 +11,8 @@
     <Logo class="size-16" />
     <div>
       <h2 class="text-lg font-semibold">QuizPilot</h2>
-      <p class="text-muted-foreground text-sm">Version {version}</p>
+      <p class="text-muted-foreground text-sm">{t.about.version(version)}</p>
     </div>
   </div>
-  <p class="text-muted-foreground text-sm">
-    Open source under the MIT license. Not affiliated with Kahoot!, TypeSafe, Anthropic, OpenAI or
-    Google.
-  </p>
+  <p class="text-muted-foreground text-sm">{t.about.license}</p>
 </section>

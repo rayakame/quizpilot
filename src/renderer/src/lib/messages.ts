@@ -100,6 +100,7 @@ function money(usd: number, digits = 2): string {
 export function costText({ usd, complete }: Cost): string {
   const more = complete ? "" : t.cost.orMore
   if (usd === 0) return complete ? money(0) : t.cost.unknown
-  if (usd < 0.001) return `< ${money(0.001, 1)}${more}`
-  return `≈ ${money(usd)}${more}`
+  // A narrow column must not leave "≈" alone at the end of a line.
+  if (usd < 0.001) return `<\u00a0${money(0.001, 1)}${more}`
+  return `≈\u00a0${money(usd)}${more}`
 }

@@ -3,6 +3,7 @@
   import { Button } from "$lib/components/ui/button/index.js"
   import { Label } from "$lib/components/ui/label/index.js"
   import { Switch } from "$lib/components/ui/switch/index.js"
+  import { t } from "$lib/i18n.js"
   import type { PublicSettings, SettingsPatch } from "../../../../shared/api.js"
 
   let { settings, patch }: { settings: PublicSettings; patch: (p: SettingsPatch) => void } =
@@ -16,9 +17,9 @@
 
   async function clear() {
     try {
-      if (await window.quizpilot.clearHistory()) toast.success("History deleted")
+      if (await window.quizpilot.clearHistory()) toast.success(t.settings.historyDeleted)
     } catch {
-      toast.error("Couldn't delete the history.")
+      toast.error(t.settings.deleteFailed)
     }
     await refresh()
   }
@@ -28,10 +29,8 @@
 
 <section class="space-y-6">
   <div>
-    <h2 class="text-lg font-semibold">History</h2>
-    <p class="text-muted-foreground text-sm">
-      Played games stay on this computer, with their questions, answers and costs.
-    </p>
+    <h2 class="text-lg font-semibold">{t.settings.sections.history}</h2>
+    <p class="text-muted-foreground text-sm">{t.settings.historyText}</p>
   </div>
   <div class="flex items-center gap-2">
     <Switch
@@ -39,15 +38,15 @@
       checked={settings.saveHistory}
       onCheckedChange={(on) => patch({ saveHistory: on })}
     />
-    <Label for="save-history" class="font-normal">Save played games</Label>
+    <Label for="save-history" class="font-normal">{t.settings.saveGames}</Label>
   </div>
   <div class="flex items-center gap-3">
-    <Button variant="outline" disabled={!count} onclick={() => void clear()}
-      >Delete all games</Button
-    >
+    <Button variant="outline" disabled={!count} onclick={() => void clear()}>
+      {t.settings.deleteAll}
+    </Button>
     {#if count !== null}
       <span class="text-muted-foreground text-sm">
-        {count === 1 ? "1 game saved" : `${count} games saved`}
+        {t.settings.gamesSaved(count)}
       </span>
     {/if}
   </div>

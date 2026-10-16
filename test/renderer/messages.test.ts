@@ -76,10 +76,10 @@ describe("quizLinkText", () => {
 
 describe("game over texts", () => {
   it("shows costs as an estimate", () => {
-    expect(costText({ usd: 0.0123, complete: true })).toBe("≈ $0.012")
-    expect(costText({ usd: 0.0000126, complete: true })).toBe("< $0.001")
+    expect(costText({ usd: 0.0123, complete: true })).toBe("≈\u00a0$0.012")
+    expect(costText({ usd: 0.0000126, complete: true })).toBe("<\u00a0$0.001")
     expect(costText({ usd: 0, complete: true })).toBe("$0")
-    expect(costText({ usd: 1.5, complete: false })).toBe("≈ $1.50 or more")
+    expect(costText({ usd: 1.5, complete: false })).toBe("≈\u00a0$1.50 or more")
   })
 
   it("lists where the answers came from", () => {
@@ -101,8 +101,8 @@ describe("German", () => {
   it("writes numbers the German way", () => {
     expect(secondsText(2100)).toBe("2,1 s")
     expect(percent(0.72)).toBe("72\u00a0%")
-    expect(costText({ usd: 0.0042, complete: true })).toBe("≈ 0,0042\u00a0$")
-    expect(costText({ usd: 0.0000126, complete: false })).toBe("< 0,001\u00a0$ oder mehr")
+    expect(costText({ usd: 0.0042, complete: true })).toBe("≈\u00a00,0042\u00a0$")
+    expect(costText({ usd: 0.0000126, complete: false })).toBe("<\u00a00,001\u00a0$ oder mehr")
   })
 
   it("names statuses and sources", () => {

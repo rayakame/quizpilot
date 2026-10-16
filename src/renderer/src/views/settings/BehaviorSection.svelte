@@ -28,13 +28,11 @@
 
 <section class="space-y-6">
   <div>
-    <h2 class="text-lg font-semibold">Behavior</h2>
-    <p class="text-muted-foreground text-sm">
-      Defaults for new games. The start wizard can change them per game.
-    </p>
+    <h2 class="text-lg font-semibold">{t.settings.sections.behavior}</h2>
+    <p class="text-muted-foreground text-sm">{t.settings.behaviorText}</p>
   </div>
   <div class="grid gap-2">
-    <Label>When to answer</Label>
+    <Label>{t.start.whenToAnswer}</Label>
     <RadioGroup.Root
       value={human ? "human" : "instant"}
       onValueChange={(v) => {
@@ -44,11 +42,11 @@
     >
       <div class="flex items-center gap-2">
         <RadioGroup.Item value="instant" id="default-instant" />
-        <Label for="default-instant" class="font-normal">As soon as the answer is ready</Label>
+        <Label for="default-instant" class="font-normal">{t.start.instant}</Label>
       </div>
       <div class="flex items-center gap-2">
         <RadioGroup.Item value="human" id="default-human" />
-        <Label for="default-human" class="font-normal">Like a human, after a random delay</Label>
+        <Label for="default-human" class="font-normal">{t.start.human}</Label>
       </div>
     </RadioGroup.Root>
     <div class="flex items-center gap-2 pl-6 text-sm">
@@ -61,7 +59,7 @@
         bind:value={minSeconds}
         onchange={saveTiming}
       />
-      to
+      {t.common.to}
       <Input
         type="number"
         min="0"
@@ -71,7 +69,7 @@
         bind:value={maxSeconds}
         onchange={saveTiming}
       />
-      seconds
+      {t.common.seconds}
     </div>
     {#if invalid}
       <p class="text-destructive text-sm">{t.errors.timing}</p>
@@ -83,7 +81,7 @@
       checked={settings.includePrevious}
       onCheckedChange={(v) => patch({ includePrevious: v })}
     />
-    <Label for="default-previous" class="font-normal">Tell the AI about earlier questions</Label>
+    <Label for="default-previous" class="font-normal">{t.start.previous}</Label>
   </div>
   <div class="flex items-center gap-2">
     <Switch
@@ -91,6 +89,6 @@
       checked={settings.reconnect}
       onCheckedChange={(v) => patch({ reconnect: v })}
     />
-    <Label for="reconnect" class="font-normal">Reconnect bots when the connection drops</Label>
+    <Label for="reconnect" class="font-normal">{t.settings.reconnect}</Label>
   </div>
 </section>

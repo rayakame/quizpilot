@@ -6,7 +6,7 @@
   import { answerSummary, choiceRows, type RoundView } from "$lib/game-state.js"
   import { choiceStyle } from "$lib/kahoot-style.js"
   import { t } from "$lib/i18n.js"
-  import { percent, sourceText } from "$lib/messages.js"
+  import { percent, secondsText, sourceText } from "$lib/messages.js"
 
   let { round }: { round: RoundView | null } = $props()
 
@@ -16,15 +16,15 @@
 
 {#if !round}
   <div class="text-muted-foreground flex h-full items-center justify-center p-6">
-    Waiting for the first question…
+    {t.game.waiting}
   </div>
 {:else}
   <section class="space-y-4 p-6">
     <div class="text-muted-foreground text-sm">
-      Question {round.question.index + 1} · {t.types[round.question.type]}
+      {t.game.question(round.question.index + 1, t.types[round.question.type])}
     </div>
     <h2 class="text-xl font-semibold">
-      {round.question.title ?? "The host doesn't show questions on devices."}
+      {round.question.title ?? t.game.hidden}
     </h2>
     {#if round.question.image}
       <img
@@ -71,10 +71,10 @@
     {/if}
     <div class="flex items-center gap-2">
       {#if round.decision}
-        <span>Answer: <strong>{answerSummary(round)}</strong></span>
+        <span>{t.game.answer} <strong>{answerSummary(round)}</strong></span>
         <Badge variant="secondary">{sourceText(round.decision)}</Badge>
       {:else}
-        <span class="text-muted-foreground">Thinking…</span>
+        <span class="text-muted-foreground">{t.game.thinking}</span>
       {/if}
     </div>
     {#if results.length > 0}
@@ -90,7 +90,7 @@
             <span class="text-muted-foreground">
               +{result.points ?? 0}
               {#if round.answeredMs[bot] !== undefined}
-                · answered after {(round.answeredMs[bot] / 1000).toFixed(1)} s
+                · {t.game.answeredAfter(secondsText(round.answeredMs[bot]))}
               {/if}
             </span>
           </li>
