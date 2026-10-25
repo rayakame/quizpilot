@@ -1,0 +1,25 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "helpers:pinGitHubActionDigests",
+    ":semanticCommitsDisabled",
+    ":configMigration"
+  ],
+  "timezone": "Europe/Berlin",
+  "lockFileMaintenance": {
+    "enabled": true
+  },
+  "packageRules": [
+    {
+      "description": "One PR for all action updates. Digests stay pinned, the version comment follows.",
+      "matchManagers": ["github-actions"],
+      "groupName": "GitHub Actions"
+    },
+    {
+      "description": "pnpm installs no version younger than a day, so a younger one would fail the lockfile update.",
+      "matchDatasources": ["npm"],
+      "minimumReleaseAge": "1 day"
+    }
+  ]
+}
